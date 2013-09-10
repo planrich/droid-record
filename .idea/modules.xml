@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/generator/Generator.iml" filepath="$PROJECT_DIR$/generator/Generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library/Library.iml" filepath="$PROJECT_DIR$/library/Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample/Sample.iml" filepath="$PROJECT_DIR$/sample/Sample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android_record.iml" filepath="$PROJECT_DIR$/android_record.iml" />
+    </modules>
+  </component>
+</project>
+

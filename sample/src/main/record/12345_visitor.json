@@ -1,0 +1,11 @@
+{
+  change: {
+    add_table: {
+      name: 'person',
+      fields: {
+        name: string,
+        age: integer
+      }
+    }
+  }
+}
