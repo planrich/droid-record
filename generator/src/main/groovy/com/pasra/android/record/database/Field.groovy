@@ -4,7 +4,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.pasra.android.record.generation.CodeGenerator
 import com.pasra.android.record.Inflector
-
 /**
  * Created by rich on 9/8/13.
  *
@@ -17,11 +16,18 @@ class Field {
     JsonElement json;
     String type;
 
-    static final TYPES = [ "integer" : Integer,
-                           "string" : String,
-                           "long" : Long,
-                           "boolean" : Boolean
-                         ]
+    static final to_java_type = ["integer": "java.lang.Integer",
+            "string": "java.lang.String",
+            "long": "java.lang.Long",
+            "boolean": "java.lang.Boolean",
+            "blob": "com.pasra.android.record.Blob",
+            "date": "java.util.Date" ]
+    static final to_sqlite_type = ["integer": "integer",
+            "long": "integer",
+            "float": "real",
+            "string": "text",
+            "blob": "blob",
+            "date": "text", ]
 
     Field(String name, JsonElement json) {
         this.javaName = Inflector.camelize(name);
@@ -37,7 +43,7 @@ class Field {
         // age: 'integer'
         if (json.isJsonPrimitive()) {
             type = json.getAsString()
-        // age: { type: 'integer', default: '0' }
+            // age: { type: 'integer', default: '0' }
         } else if (json.isJsonObject()) {
             JsonObject obj = json.getAsJsonObject();
             if (!obj.has("type") && !obj.get("type").isJsonPrimitive()) {
@@ -47,17 +53,13 @@ class Field {
             type = obj.get("type").getAsString();
         }
 
-        if (TYPES[type] == null) {
+        if (to_java_type[type] == null) {
             throw new IllegalStateException("Type ${type} cannot be used in field ${name}!");
         }
     }
 
-    /**
-     * @throws IllegalStateException if the type is unkown
-     * @param type must be a valid sqlite type
-     */
-    String getType() {
-        return TYPES[type].getSimpleName();
+    String javaType() {
+        return to_java_type[type]
     }
 
     /**
@@ -66,7 +68,7 @@ class Field {
      * @param c
      */
     void generateDaoJavaField(CodeGenerator c) {
-        c.line("private ${getType()} m${javaName};")
+        c.line("protected ${javaType()} m${javaName};")
     }
 
     /**
@@ -82,8 +84,8 @@ class Field {
      * @param c
      */
     void generateDaoJavaFieldGetterSetter(CodeGenerator c) {
-        c.line("public ${getType()} get${javaName}() { return m${javaName}; }")
-        c.line("public void set${javaName}(${getType()} value) { m${javaName} = value; }")
+        c.line("public ${javaType()} get${javaName}() { return m${javaName}; }")
+        c.line("public void set${javaName}(${javaType()} value) { m${javaName} = value; }")
     }
 
     /**
@@ -98,16 +100,8 @@ class Field {
         return json.isJsonObject() && json.getAsJsonObject().has("constraint")
     }
 
-    String typeSQL() {
-
-        def conv = [ "integer": "integer",
-                     "long": "integer",
-                     "float": "real",
-                     "string": "text",
-                     "blob": "blob"
-                   ]
-
-        def result = conv[type.toLowerCase()];
+    String sqlType() {
+        def result = to_sqlite_type[type.toLowerCase()];
         if (result == null) {
             throw new IllegalStateException("unkown datatype: ${type.toLowerCase()} used for column ${name}!");
         }
@@ -115,7 +109,7 @@ class Field {
     }
 
     String columnSQL() {
-        return "${name} ${typeSQL()} ${constraints()}"
+        return "${name} ${sqlType()} ${constraints()}"
     }
 
     String constraints() {

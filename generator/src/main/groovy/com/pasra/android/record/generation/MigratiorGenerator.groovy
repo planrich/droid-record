@@ -20,13 +20,13 @@ class MigratiorGenerator {
     }
 
     void addTable(Table table, File file, long version) {
-        codegen.wrap("if (currentVersion <= ${version})") {
+        codegen.wrap("if (currentVersion <= targetVersion)") {
             codegen.line("db.execSQL(\"${table.creationSQL()}\");")
         }
     }
 
     void rmTable(String name, File file, long version) {
-        codegen.wrap("if (currentVersion <= ${version})") {
+        codegen.wrap("if (currentVersion <= targetVersion)") {
             codegen.line("db.execSQL(\"drop table ${name};\");")
         }
     }
@@ -45,14 +45,14 @@ class MigratiorGenerator {
         c.line()
 
         c.wrap("public class RecordMigrator implements Migrator") {
-            c.line("public static final long MIGRATION_LEVEL = ${migration};");
+            c.line("public static final long MIGRATION_LEVEL = ${migration}L;");
             c.line()
 
             c.wrap("public long getLatestMigrationLevel()") {
                 c.write("return MIGRATION_LEVEL;")
             }
 
-            c.wrap("public void migrate(SQLiteDatabase db, long currentVersion)") {
+            c.wrap("public void migrate(SQLiteDatabase db, long currentVersion, long targetVersion)") {
                 c.write(codegen.toString(), true, false);
             }
 

@@ -1,25 +1,28 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.5.1+'
-    }
-}
-
+apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'android'
 
 group="com.pasra.android.record"
 version="0.0.1"
 
-dependencies {
+
+repositories {
+    mavenCentral()
 }
 
-android {
-    compileSdkVersion 17
-    buildToolsVersion "18.0.1"
+configurations {
+    provided
+}
+
+dependencies {
+    provided 'com.google.android:android:4.1.1.+'
+    provided 'com.google.android:annotations:4.1.1.+'
+    provided 'com.google.android:support-v4:r7'
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
 }
 
 uploadArchives {

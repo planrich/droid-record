@@ -17,6 +17,7 @@ class Table {
     JsonObject json;
     def fields = [:];
     Field primary = null;
+    def relations = []
 
     Table(JsonObject json) {
         this.json = json
@@ -77,7 +78,7 @@ class Table {
 
             c.line()
 
-            c.wrap("public Abstract${Inflector.camelize(name)}(${primary.getType()} id)") {
+            c.wrap("public Abstract${Inflector.camelize(name)}(${primary.javaType()} id)") {
                 c.line("this.mId = id;");
             }
 
@@ -86,6 +87,10 @@ class Table {
             fields.each { _, Field field ->
                 field.generateDaoJavaFieldGetterSetter(c);
             }
+
+            relations.each { relation ->
+                relation.generateJava(c);
+            }
         }
 
 
@@ -93,6 +98,27 @@ class Table {
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
         writer.write(c.toString());
         writer.close();
+
+        file = AndroidRecordPlugin.file(source, pkg, "${Inflector.camelize(name)}.java", false)
+        if (!file.exists()) {
+            c = new CodeGenerator();
+
+            c.line("package ${pkg};")
+            c.line();
+            c.wrap("public class ${Inflector.camelize(name)} extends Abstract${Inflector.camelize(name)} ") {
+
+                c.wrap("public ${Inflector.camelize(name)}(${primary.javaType()} id)") {
+                    c.line("super(id);");
+                }
+
+                c.line()
+                c.line("// add your code here")
+            }
+
+            writer = new OutputStreamWriter(new FileOutputStream(file));
+            writer.write(c.toString());
+            writer.close();
+        }
     }
 
 
@@ -105,7 +131,43 @@ class Table {
         return "drop table ${name}";
     }
 
+    /**
+     * A relation can be either:
+     * has_many
+     * has_one
+     * belongs_to
+     *
+     * @param relation
+     */
     void new_relation(JsonObject relation) {
 
+        if (relation.has("has_many")) {
+            def has_many = relation.get("has_many")
+
+            def many = []
+            if (has_many.isJsonArray()) {
+                many = has_many.getAsJsonArray();
+            } else if (has_many.isJsonPrimitive()) {
+                many = [has_many.getAsString()];
+            }
+
+            many.each { plural_name ->
+                relations << new HasMany(this, Inflector.singularize(plural_name))
+            }
+        }
+
+        if (relation.has("has_one")) {
+            def has_one = relation.get("has_one")
+            if (has_one.isJsonPrimitive()) {
+                relations << new HasOne(this, has_one.asString)
+            }
+        }
+
+        if (relation.has("belongs_to")) {
+            def belongs_to = relation.get("belongs_to")
+            if (belongs_to.isJsonPrimitive()) {
+                relations << new BelongsTo(this, belongs_to.asString)
+            }
+        }
     }
 }

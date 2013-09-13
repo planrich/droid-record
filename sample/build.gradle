@@ -25,12 +25,11 @@ repositories {
 }
 
 dependencies {
-    compile 'com.pasra.android.record:android_record:0.0.+'
+    compile 'com.pasra.android.record:library:0.0.+'
 }
 
 
 android {
-
     compileSdkVersion 17
     buildToolsVersion "18.0.1"
 
