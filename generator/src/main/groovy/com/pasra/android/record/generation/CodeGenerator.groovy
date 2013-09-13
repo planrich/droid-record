@@ -1,13 +1,21 @@
-package com.pasra.android.record.gen
+package com.pasra.android.record.generation
 
 /**
  * Created by rich on 9/10/13.
  */
 class CodeGenerator {
 
+    String formatType;
+    int indentCount;
+    int indent = 0;
+
+    CodeGenerator(int indentCount = 4, String formatType = "java") {
+        this.indentCount = indentCount
+        this.formatType = formatType
+    }
+
     StringBuilder builder = new StringBuilder();
 
-    int indent = 0;
 
     void indent(i = 1) {
         this.indent += i
@@ -17,9 +25,8 @@ class CodeGenerator {
         this.indent -= i
     }
 
-    void wrap(head, Closure closure) {
-
-        line("${head} {\n")
+    void wrap(head = "", Closure closure) {
+        line("${head}{")
         indent()
             closure.run()
         dedent()
@@ -29,7 +36,7 @@ class CodeGenerator {
     void write(str = "", newline = false, indentation = true) {
         if (indentation) {
             indent.times { i ->
-                builder.append("    ")
+                builder.append(" " * indentCount)
             }
         }
 

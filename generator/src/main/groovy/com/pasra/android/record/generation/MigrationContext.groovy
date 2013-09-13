@@ -1,6 +1,9 @@
-package com.pasra.android.record.gen
+package com.pasra.android.record.generation
 
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.pasra.android.record.AndroidRecordPlugin
+import com.pasra.android.record.database.Table
 import org.gradle.api.logging.Logging
 
 /**
@@ -18,23 +21,8 @@ class MigrationContext {
     MigrationContext(String path, String pkg) {
         this.path = path
         this.pkg = pkg
-        File target = Util.file(path, pkg, "RecordMigrator.java", false);
+        File target = AndroidRecordPlugin.file(path, pkg, "RecordMigrator.java", false);
         this.migGen = new MigratiorGenerator(target.path, pkg);
-        this.migGen.oldMigration = 0;
-
-        if (target.exists()) {
-            String content = target.text.toString();
-
-            def versionPat = ~/mLastMigration = (\d+);/
-            def matcher = content =~ versionPat;
-            if (matcher.find()) {
-                try {
-                    long value = Long.parseLong(matcher.group(1));
-                    logger.info("Migration level at ${value}")
-                    migGen.oldMigration = value
-                } catch (NumberFormatException e) {}
-            }
-        }
     }
 
     /**
@@ -45,12 +33,12 @@ class MigrationContext {
      */
     void addMigrationStep(JsonObject obj, File file, long version) {
 
-        migGen.step(version);
+        migGen.migration = version;
 
         JsonObject change = obj.getAsJsonObject("change");
         if (change) {
 
-            JsonObject add_table = change.getAsJsonObject("add_table");
+            JsonObject add_table = change.getAsJsonObject("create_table");
             if (add_table) {
                 Table table = new Table(add_table);
                 table.checkIntegrity();
@@ -64,7 +52,7 @@ class MigrationContext {
                 migGen.addTable(table, file, version);
             }
 
-            JsonObject rm_table = change.getAsJsonObject("rm_rable");
+            JsonObject rm_table = change.getAsJsonObject("drop_table");
             if (rm_table && rm_table.has("name")) {
                 def name = rm_table.get("name").getAsString();
                 def table = tables[name];
@@ -78,6 +66,20 @@ class MigrationContext {
                 migGen.rmTable(name, file, version);
             }
         }
+    }
+
+    void relations(JsonObject rels) {
+
+        rels.entrySet().each { e ->
+            JsonElement element = e.value
+            if (element.isJsonObject()) {
+                JsonObject obj = element.getAsJsonObject()
+                String table_name = e.key
+                Table table = tables[table_name]
+                table.new_relation(obj)
+            }
+        }
+
     }
 
     /**

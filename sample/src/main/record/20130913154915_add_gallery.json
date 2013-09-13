@@ -1,0 +1,8 @@
+change: {
+    create_table: {
+        name: 'gallery',
+        fields: {
+            name: 'string'
+        }
+    }
+}

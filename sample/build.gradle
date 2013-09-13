@@ -8,15 +8,26 @@ buildscript {
     dependencies {
         classpath 'com.pasra.android.record.generator:generator:0.0.+'
         classpath 'com.android.tools.build:gradle:0.5.+'
-
     }
 }
 
 apply plugin: 'android'
-apply plugin: 'android_record_gen'
+apply plugin: 'android_record'
 
 group="com.pasra.android.record.sample"
 version="0.0.1"
+
+repositories {
+    maven {
+        url uri('../repo')
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.pasra.android.record:android_record:0.0.+'
+}
+
 
 android {
 
@@ -28,3 +39,8 @@ android {
         targetSdkVersion 17
     }
 }
+
+android_record {
+    output_package='com.pasra.android.record.sample'
+}
+

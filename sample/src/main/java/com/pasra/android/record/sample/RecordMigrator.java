@@ -1,16 +1,17 @@
 package com.pasra.android.record.sample;
 
 import android.database.sqlite.SQLiteDatabase;
+import com.pasra.android.record.Migrator;
 
-public class RecordMigrator {
+public class RecordMigrator implements Migrator {
 
-    private long mLastMigration = 12345;
+    public static final long MIGRATION_LEVEL = 20130913154915L;
     
-    public void migrate(SQLiteDatabase db, long version) {
+    public long getLatestMigrationLevel() {
 
-        if (mLastMigration <= version) {
+        return MIGRATION_LEVEL;    }
+    public void migrate(SQLiteDatabase db, long currentVersion) {
 
 
-        }
     }
 }

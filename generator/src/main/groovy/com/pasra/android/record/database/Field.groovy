@@ -1,7 +1,9 @@
-package com.pasra.android.record.gen
+package com.pasra.android.record.database
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.pasra.android.record.generation.CodeGenerator
+import com.pasra.android.record.Inflector
 
 /**
  * Created by rich on 9/8/13.
@@ -22,7 +24,7 @@ class Field {
                          ]
 
     Field(String name, JsonElement json) {
-        this.javaName = Util.camelize(name);
+        this.javaName = Inflector.camelize(name);
         this.name = name;
         this.json = json;
     }
@@ -90,5 +92,40 @@ class Field {
      */
     boolean isPrimary() {
         return json.isJsonObject() && json.getAsJsonObject().has("primary") && json.getAsJsonObject().get("primary").asBoolean();
+    }
+
+    boolean hasConstraint() {
+        return json.isJsonObject() && json.getAsJsonObject().has("constraint")
+    }
+
+    String typeSQL() {
+
+        def conv = [ "integer": "integer",
+                     "long": "integer",
+                     "float": "real",
+                     "string": "text",
+                     "blob": "blob"
+                   ]
+
+        def result = conv[type.toLowerCase()];
+        if (result == null) {
+            throw new IllegalStateException("unkown datatype: ${type.toLowerCase()} used for column ${name}!");
+        }
+        return result
+    }
+
+    String columnSQL() {
+        return "${name} ${typeSQL()} ${constraints()}"
+    }
+
+    String constraints() {
+        def constraints = []
+        if (isPrimary()) {
+            constraints << "primary key"
+        }
+        if (hasConstraint()) {
+            constraints << json.getAsJsonObject().get("constraint").getAsString()
+        }
+        return constraints.join(" ")
     }
 }

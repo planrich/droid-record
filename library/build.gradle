@@ -8,8 +8,11 @@ buildscript {
     }
 }
 
+apply plugin: 'maven'
 apply plugin: 'android'
 
+group="com.pasra.android.record"
+version="0.0.1"
 
 dependencies {
 }
@@ -19,3 +22,10 @@ android {
     buildToolsVersion "18.0.1"
 }
 
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
+    }
+}

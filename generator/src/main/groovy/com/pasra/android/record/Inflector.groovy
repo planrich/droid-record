@@ -1,13 +1,9 @@
-package com.pasra.android.record.gen
+package com.pasra.android.record
 
 /**
  * Created by rich on 9/8/13.
  */
-class Util {
-
-    static int versionOfFile(String file) {
-        return Integer.parseInt(file.split("_")[0]);
-    }
+class Inflector {
 
     static String tabelize(String name) {
         StringBuilder builder = new StringBuilder();
@@ -44,23 +40,5 @@ class Util {
         }
 
         return builder.toString()
-    }
-
-    static File file(path, pkg, name, boolean create) {
-        File file = new File(path.toString());
-        pkg.toString().split(/\./).each { folder ->
-            file = new File(file, folder)
-        }
-
-        if (!file.exists() && create) {
-            file.mkdirs();
-        }
-
-        file = new File(file, name.toString());
-        if (create) {
-            file.deleteOnExit();
-        }
-
-        return file;
     }
 }

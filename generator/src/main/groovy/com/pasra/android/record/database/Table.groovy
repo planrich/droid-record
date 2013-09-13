@@ -1,13 +1,16 @@
-package com.pasra.android.record.gen
+package com.pasra.android.record.database
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import com.pasra.android.record.AndroidRecordPlugin
+import com.pasra.android.record.generation.CodeGenerator
+import com.pasra.android.record.Inflector
 import org.gradle.api.logging.Logging
 
 /**
  * Created by rich on 9/8/13.
  */
-class Table implements Record {
+class Table {
 
     def logger = Logging.getLogger("android_record")
     String name;
@@ -28,7 +31,7 @@ class Table implements Record {
            && json.get("name").isJsonPrimitive()
            && json.has("fields")
            && json.get("fields").isJsonObject()) {
-            this.name = Util.tabelize(json.get("name").getAsString())
+            this.name = Inflector.tabelize(json.get("name").getAsString())
             def jsonFields = json.get("fields").getAsJsonObject()
 
             jsonFields.entrySet().each { entry ->
@@ -67,14 +70,14 @@ class Table implements Record {
 
         c.line("package ${pkg};")
         c.line();
-        c.wrap("public class Abstract${Util.camelize(name)}") {
+        c.wrap("public class Abstract${Inflector.camelize(name)}") {
             fields.each { _, Field field ->
                 field.generateDaoJavaField(c);
             }
 
             c.line()
 
-            c.wrap("public Abstract${Util.camelize(name)}(${primary.getType()} id)") {
+            c.wrap("public Abstract${Inflector.camelize(name)}(${primary.getType()} id)") {
                 c.line("this.mId = id;");
             }
 
@@ -86,7 +89,7 @@ class Table implements Record {
         }
 
 
-        File file = Util.file(source, pkg, "Abstract${Util.camelize(name)}.java", true)
+        File file = AndroidRecordPlugin.file(source, pkg, "Abstract${Inflector.camelize(name)}.java", true)
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
         writer.write(c.toString());
         writer.close();
@@ -94,10 +97,15 @@ class Table implements Record {
 
 
     String creationSQL() {
-        return "create table ${name} ();";
+        def columns = fields.values().collect { Field field -> field.columnSQL() }.join ", "
+        return "create table ${name} (${columns});";
     }
 
     String destructionSQL() {
         return "drop table ${name}";
+    }
+
+    void new_relation(JsonObject relation) {
+
     }
 }
