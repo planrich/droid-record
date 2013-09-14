@@ -25,21 +25,16 @@ repositories {
 }
 
 dependencies {
-    compile 'com.pasra.android.record:library:0.0.+'
+    compile 'com.pasra.android.record:library:0.0.+@aar'
 }
 
 
 android {
     compileSdkVersion 17
-    buildToolsVersion "18.0.1"
-
-    defaultConfig {
-        minSdkVersion 7
-        targetSdkVersion 17
-    }
+    buildToolsVersion "17.0.0"
 }
 
 android_record {
-    output_package='com.pasra.android.record.sample'
+    output_package='com.pasra.android.record.sample.generate'
 }
 

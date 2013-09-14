@@ -13,11 +13,14 @@ import org.gradle.api.logging.Logging
 class Table {
 
     def logger = Logging.getLogger("android_record")
+
     String name;
     JsonObject json;
-    def fields = [:];
+
     Field primary = null;
-    def relations = []
+    def fields = [:];
+
+    def relations = [];
 
     Table(JsonObject json) {
         this.json = json
@@ -28,6 +31,9 @@ class Table {
      * @return true if the object has the properties fields (as non empty json map) and name as primitive
      */
     void checkIntegrity() {
+        // define ordering!
+        def forcedOrder = 0;
+
         if (json.has("name")
            && json.get("name").isJsonPrimitive()
            && json.has("fields")
@@ -39,6 +45,7 @@ class Table {
                 def fieldName = entry.getKey()
                 def fieldElement = entry.getValue()
                 def field = new Field(fieldName, fieldElement);
+                field.tableOrder = forcedOrder++;
 
                 field.checkIntegrity();
                 fields[field.name] = field
@@ -55,6 +62,7 @@ class Table {
                 fields["id"] = new Field("id", id)
                 primary = fields["id"]
                 primary.checkIntegrity()
+                primary.tableOrder = forcedOrder++;
             }
 
             if (fields.size() == 0) {
@@ -65,62 +73,18 @@ class Table {
         }
     }
 
-    void generateDaoJavaSource(String source, String pkg) {
-
-        CodeGenerator c = new CodeGenerator();
-
-        c.line("package ${pkg};")
-        c.line();
-        c.wrap("public class Abstract${Inflector.camelize(name)}") {
-            fields.each { _, Field field ->
-                field.generateDaoJavaField(c);
-            }
-
-            c.line()
-
-            c.wrap("public Abstract${Inflector.camelize(name)}(${primary.javaType()} id)") {
-                c.line("this.mId = id;");
-            }
-
-            c.line()
-
-            fields.each { _, Field field ->
-                field.generateDaoJavaFieldGetterSetter(c);
-            }
-
-            relations.each { relation ->
-                relation.generateJava(c);
-            }
+    Field[] getOrderedFields(includePrimary = true) {
+        def fs = fields.values();
+        if (!includePrimary) {
+            fs.remove(primary)
         }
 
-
-        File file = AndroidRecordPlugin.file(source, pkg, "Abstract${Inflector.camelize(name)}.java", true)
-        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
-        writer.write(c.toString());
-        writer.close();
-
-        file = AndroidRecordPlugin.file(source, pkg, "${Inflector.camelize(name)}.java", false)
-        if (!file.exists()) {
-            c = new CodeGenerator();
-
-            c.line("package ${pkg};")
-            c.line();
-            c.wrap("public class ${Inflector.camelize(name)} extends Abstract${Inflector.camelize(name)} ") {
-
-                c.wrap("public ${Inflector.camelize(name)}(${primary.javaType()} id)") {
-                    c.line("super(id);");
-                }
-
-                c.line()
-                c.line("// add your code here")
-            }
-
-            writer = new OutputStreamWriter(new FileOutputStream(file));
-            writer.write(c.toString());
-            writer.close();
+        def orderedFields = fields.values().sort() { a, b ->
+            return new Integer(a.tableOrder).compareTo(new Integer(b.tableOrder))
         }
+
+        return orderedFields
     }
-
 
     String creationSQL() {
         def columns = fields.values().collect { Field field -> field.columnSQL() }.join ", "

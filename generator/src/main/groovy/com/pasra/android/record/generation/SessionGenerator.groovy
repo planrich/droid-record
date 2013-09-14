@@ -1,0 +1,50 @@
+package com.pasra.android.record.generation
+
+import com.pasra.android.record.AndroidRecordPlugin
+import com.pasra.android.record.Inflector
+
+/**
+ * Created by rich on 9/14/13.
+ */
+class SessionGenerator {
+
+    def tables
+
+    SessionGenerator(tables) {
+        this.tables = tables
+    }
+
+    void generate(String path, String pkg) {
+
+        CodeGenerator c = new CodeGenerator();
+
+        c.line("package ${pkg};")
+        c.line()
+        c.line("import android.database.sqlite.SQLiteDatabase;")
+        c.line();
+        c.line("// NOTE generated file! do not edit.");
+        c.line();
+        c.wrap("public class Session") {
+
+            c.line("private SQLiteDatabase mDB;")
+
+            c.wrap("public Session(SQLiteDatabase database)") {
+                c.line("this.mDB = database;")
+            }
+
+            tables.each { name, table ->
+                def nameCamel = Inflector.camelize(table.name)
+                c.wrap("public void insert${nameCamel}(Abstract${nameCamel} obj)") {
+                    c.line("${nameCamel}Record record = ${nameCamel}Record.instance();")
+                    c.line("record.insert(mDB, obj);")
+                }
+            }
+        }
+
+
+        File file = AndroidRecordPlugin.file(path, pkg, "Session.java", true)
+        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
+        writer.write(c.toString());
+        writer.close();
+    }
+}

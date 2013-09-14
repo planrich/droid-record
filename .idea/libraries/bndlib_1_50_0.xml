@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="bndlib-1.50.0">
+    <CLASSES>
+      <root url="jar:///opt/gradle-1.6/lib/plugins/bndlib-1.50.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

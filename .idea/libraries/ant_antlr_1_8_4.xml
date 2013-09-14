@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ant-antlr-1.8.4">
+    <CLASSES>
+      <root url="jar:///opt/gradle-1.6/lib/plugins/ant-antlr-1.8.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

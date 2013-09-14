@@ -1,4 +1,4 @@
-package com.pasra.android.record.sample;
+package com.pasra.android.record.sample.generate;
 
 public class Picture extends AbstractPicture {
     public Picture(java.lang.Long id){

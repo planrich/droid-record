@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gradle-wrapper-1.6">
+    <CLASSES>
+      <root url="jar:///opt/gradle-1.6/lib/gradle-wrapper-1.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

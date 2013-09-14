@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gradle-ear-1.6">
+    <CLASSES>
+      <root url="jar:///opt/gradle-1.6/lib/plugins/gradle-ear-1.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

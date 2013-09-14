@@ -1,4 +1,4 @@
-package com.pasra.android.record.sample;
+package com.pasra.android.record.sample.generate;
 
 import android.database.sqlite.SQLiteDatabase;
 import com.pasra.android.record.Migrator;

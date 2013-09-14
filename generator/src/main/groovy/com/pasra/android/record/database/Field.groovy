@@ -15,12 +15,13 @@ class Field {
     String name; // original
     JsonElement json;
     String type;
+    int tableOrder;
 
     static final to_java_type = ["integer": "java.lang.Integer",
             "string": "java.lang.String",
             "long": "java.lang.Long",
             "boolean": "java.lang.Boolean",
-            "blob": "com.pasra.android.record.Blob",
+            "blob": "java.nio.ByteBuffer",
             "date": "java.util.Date" ]
     static final to_sqlite_type = ["integer": "integer",
             "long": "integer",

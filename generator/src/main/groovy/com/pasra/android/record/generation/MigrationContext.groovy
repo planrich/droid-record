@@ -89,8 +89,11 @@ class MigrationContext {
 
         logger.info("generating source to path '${path}' into package '${pkg}")
 
+        new SessionGenerator(tables).generate(path, pkg)
+
         tables.each { String name, Table table ->
-            table.generateDaoJavaSource(path, pkg);
+            new RecordGenerator(table).generate(path, pkg)
+            new RecordPersistorGenerator(table).generateSQLite(path, pkg)
         }
 
         logger.info("generating migrator")

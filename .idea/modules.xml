@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/generator/Generator.iml" filepath="$PROJECT_DIR$/generator/Generator.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/Library.iml" filepath="$PROJECT_DIR$/library/Library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sample/Sample.iml" filepath="$PROJECT_DIR$/sample/Sample.iml" />
       <module fileurl="file://$PROJECT_DIR$/android_record.iml" filepath="$PROJECT_DIR$/android_record.iml" />
+      <module fileurl="file://$PROJECT_DIR$/generator/generator.iml" filepath="$PROJECT_DIR$/generator/generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
     </modules>
   </component>
 </project>

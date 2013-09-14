@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="ComPasraAndroidRecordLibrary001.aar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/sample/build/exploded-bundles/ComPasraAndroidRecordLibrary001.aar/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/sample/build/exploded-bundles/ComPasraAndroidRecordLibrary001.aar/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

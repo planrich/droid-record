@@ -27,6 +27,10 @@ class Inflector {
         boolean nextUp = true;
         for (int i = 0; i < name.length(); i++) {
             char c = name.charAt(i);
+            if (c == '_') {
+                nextUp = true;
+                continue;
+            }
             if (nextUp) {
                 builder.append(Character.toUpperCase(c));
                 nextUp = false;
@@ -34,9 +38,6 @@ class Inflector {
                 builder.append(c);
             }
 
-            if (c == '_') {
-                nextUp = true;
-            }
         }
 
         return builder.toString()
