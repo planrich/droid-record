@@ -10,8 +10,6 @@ public class AbstractPicture{
     protected java.lang.Integer mGalleryId;
     protected java.lang.Long mId;
     
-    private Object[] _fieldArray = { mName, mImage, mDate, mGalleryId, mId };
-    
     public AbstractPicture(java.lang.Long id){
         this.mId = id;
     }
@@ -26,7 +24,4 @@ public class AbstractPicture{
     public void setGalleryId(java.lang.Integer value) { mGalleryId = value; }
     public java.lang.Long getId() { return mId; }
     public void setId(java.lang.Long value) { mId = value; }
-    public Object[] dataFields(){
-        return _fieldArray;
-    }
 }

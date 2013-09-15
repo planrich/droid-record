@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="xercesImpl-2.9.1">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/wrapper/dists/gradle-1.8-20130730220035+0000-bin/661k9u67ua326mbt26n82qkoji/gradle-1.8-20130730220035+0000/lib/plugins/xercesImpl-2.9.1.jar!/" />
+      <root url="jar:///opt/gradle-1.6/lib/plugins/xercesImpl-2.9.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

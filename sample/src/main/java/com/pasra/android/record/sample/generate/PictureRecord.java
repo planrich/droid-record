@@ -1,7 +1,10 @@
 package com.pasra.android.record.sample.generate;
 
 import android.database.sqlite.SQLiteDatabase;
-import java.util.concurrent.Future;
+import android.content.ContentValues;
+import android.database.Cursor;
+import com.pasra.android.record.SQLiteConverter;
+import java.nio.ByteBuffer;
 
 public class PictureRecord{
     private static PictureRecord mInstance;
@@ -12,20 +15,25 @@ public class PictureRecord{
         return mInstance;
     }
     public void insert(SQLiteDatabase db, AbstractPicture record){
-        String sql = "insert into picture (com.pasra.android.record.database.Field@1c817c06,com.pasra.android.record.database.Field@78f57c88,com.pasra.android.record.database.Field@3cc302c2,com.pasra.android.record.database.Field@26ea2db8) values (?,?,?,?)";
-        String[] args = new String[4];
-        if (record.getName() != null){
-            args[0] = record.getName().toString();
+        ContentValues values = new ContentValues(4);
+        values.put("name", record.getName());
+        values.put("image", record.getImage().array());
+        values.put("date", SQLiteConverter.dateToString(record.getDate()));
+        values.put("gallery_id", record.getGalleryId());
+        long id = db.insert("picture", null, values);
+        record.setId(id);
+    }
+    public Picture load(SQLiteDatabase db, long id){
+        Cursor c = db.rawQuery("select * from picture where id = ?;", new String[] { Long.toString(id) });
+        if (c.moveToFirst()){
+            Picture record = new Picture(null);
+            record.setName(c.getString(0));
+            record.setImage(ByteBuffer.wrap(c.getBlob(1)));
+            record.setDate(SQLiteConverter.stringToDate(c.getString(2)));
+            record.setGalleryId(c.getInt(3));
+            record.setId(c.getLong(4));
+            
         }
-        if (record.getImage() != null){
-            args[1] = record.getImage().toString();
-        }
-        if (record.getDate() != null){
-            args[2] = record.getDate().toString();
-        }
-        if (record.getGalleryId() != null){
-            args[3] = record.getGalleryId().toString();
-        }
-        db.execSQL(sql, args);
+        return null;
     }
 }

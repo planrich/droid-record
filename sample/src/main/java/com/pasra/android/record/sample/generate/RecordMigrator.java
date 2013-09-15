@@ -9,10 +9,10 @@ public class RecordMigrator implements Migrator{
     public long getLatestMigrationLevel(){
         return MIGRATION_LEVEL;    }
     public void migrate(SQLiteDatabase db, long currentVersion, long targetVersion){
-        if (currentVersion <= targetVersion){
+        if (currentVersion < targetVersion){
             db.execSQL("create table picture (name text , image blob , date text , gallery_id integer , id integer primary key);");
         }
-        if (currentVersion <= targetVersion){
+        if (currentVersion < targetVersion){
             db.execSQL("create table gallery (name text , id integer primary key);");
         }
 

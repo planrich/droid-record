@@ -1,7 +1,9 @@
 package com.pasra.android.record.sample.generate;
 
 import android.database.sqlite.SQLiteDatabase;
-import java.util.concurrent.Future;
+import android.content.ContentValues;
+import android.database.Cursor;
+import com.pasra.android.record.SQLiteConverter;
 
 public class GalleryRecord{
     private static GalleryRecord mInstance;
@@ -12,11 +14,19 @@ public class GalleryRecord{
         return mInstance;
     }
     public void insert(SQLiteDatabase db, AbstractGallery record){
-        String sql = "insert into gallery (com.pasra.android.record.database.Field@44162fb2) values (?)";
-        String[] args = new String[1];
-        if (record.getName() != null){
-            args[0] = record.getName().toString();
+        ContentValues values = new ContentValues(1);
+        values.put("name", record.getName());
+        long id = db.insert("gallery", null, values);
+        record.setId(id);
+    }
+    public Gallery load(SQLiteDatabase db, long id){
+        Cursor c = db.rawQuery("select * from gallery where id = ?;", new String[] { Long.toString(id) });
+        if (c.moveToFirst()){
+            Gallery record = new Gallery(null);
+            record.setName(c.getString(0));
+            record.setId(c.getLong(1));
+            
         }
-        db.execSQL(sql, args);
+        return null;
     }
 }

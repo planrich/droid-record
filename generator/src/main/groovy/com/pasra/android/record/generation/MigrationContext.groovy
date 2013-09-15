@@ -92,8 +92,8 @@ class MigrationContext {
         new SessionGenerator(tables).generate(path, pkg)
 
         tables.each { String name, Table table ->
-            new RecordGenerator(table).generate(path, pkg)
-            new RecordPersistorGenerator(table).generateSQLite(path, pkg)
+            new JavaObjectGenerator(table).generate(path, pkg)
+            new RecordGenerator(table).generateSQLite(path, pkg)
         }
 
         logger.info("generating migrator")

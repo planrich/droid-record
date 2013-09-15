@@ -4,6 +4,8 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.pasra.android.record.generation.CodeGenerator
 import com.pasra.android.record.Inflector
+
+import java.nio.ByteBuffer
 /**
  * Created by rich on 9/8/13.
  *
@@ -23,6 +25,7 @@ class Field {
             "boolean": "java.lang.Boolean",
             "blob": "java.nio.ByteBuffer",
             "date": "java.util.Date" ]
+
     static final to_sqlite_type = ["integer": "integer",
             "long": "integer",
             "float": "real",
@@ -61,6 +64,42 @@ class Field {
 
     String javaType() {
         return to_java_type[type]
+    }
+
+    String javaCallToSerialize(String objname) {
+        String type = javaType();
+        def suffix = "";
+        def prefix = "";
+        if (type == "java.nio.ByteBuffer") {
+            suffix = ".array()"
+        }
+        if (type == "java.util.Date") {
+            suffix = ")";
+            prefix = "SQLiteConverter.dateToString("
+        }
+
+        return "${prefix}${objname}.get${Inflector.camelize(name)}()${suffix}";
+    }
+
+    String javaCallToDeserialize(String objname, String cursorobj) {
+        String type = javaType();
+        def i = tableOrder;
+        def call = "";
+        if (type == "java.nio.ByteBuffer") {
+            call = "ByteBuffer.wrap(${cursorobj}.getBlob(${i}))"
+        } else if (type == "java.util.Date") {
+            call = "SQLiteConverter.stringToDate(${cursorobj}.getString(${i}))"
+        } else if (type == "java.lang.String") {
+            call = "${cursorobj}.getString(${i})";
+        } else if (type == "java.lang.Integer") {
+            call = "${cursorobj}.getInt(${i})";
+        } else if (type == "java.lang.Long") {
+            call = "${cursorobj}.getLong(${i})";
+        } else if (type == "java.lang.Boolean") {
+            call = "(${cursorobj}.getInt(${i}) != 0)";
+        }
+
+        return "${objname}.set${Inflector.camelize(name)}(${call})"
     }
 
     /**

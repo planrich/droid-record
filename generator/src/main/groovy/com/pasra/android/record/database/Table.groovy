@@ -75,11 +75,16 @@ class Table {
 
     Field[] getOrderedFields(includePrimary = true) {
         def fs = fields.values();
-        if (!includePrimary) {
-            fs.remove(primary)
+        def list = [];
+        fs.each { Field f ->
+            if (f.isPrimary() && includePrimary) {
+                list << f;
+            } else if (!f.isPrimary()) {
+                list << f;
+            }
         }
 
-        def orderedFields = fields.values().sort() { a, b ->
+        def orderedFields = list.sort() { a, b ->
             return new Integer(a.tableOrder).compareTo(new Integer(b.tableOrder))
         }
 
@@ -133,5 +138,15 @@ class Table {
                 relations << new BelongsTo(this, belongs_to.asString)
             }
         }
+    }
+
+    boolean hasFieldOfType(String type) {
+        def has = false
+        fields.values().each { f ->
+            if (f.javaType() == type) {
+                has = true
+            }
+        }
+        return has
     }
 }

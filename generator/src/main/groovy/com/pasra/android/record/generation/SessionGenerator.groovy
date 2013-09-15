@@ -24,11 +24,11 @@ class SessionGenerator {
         c.line();
         c.line("// NOTE generated file! do not edit.");
         c.line();
-        c.wrap("public class Session") {
+        c.wrap("public class LocalSession") {
 
             c.line("private SQLiteDatabase mDB;")
 
-            c.wrap("public Session(SQLiteDatabase database)") {
+            c.wrap("public LocalSession(SQLiteDatabase database)") {
                 c.line("this.mDB = database;")
             }
 
@@ -38,11 +38,21 @@ class SessionGenerator {
                     c.line("${nameCamel}Record record = ${nameCamel}Record.instance();")
                     c.line("record.insert(mDB, obj);")
                 }
+
+                c.wrap("public ${nameCamel} load${nameCamel}(java.lang.Long id)") {
+                    c.wrap("if (id == null)") {
+                        c.line("throw new IllegalArgumentException(" +
+                                "\"why would you want to load a ${name} record with a null key?\");")
+                    }
+
+                    c.line("${nameCamel}Record record = ${nameCamel}Record.instance();")
+                    c.line("return record.load(mDB, id);")
+                }
             }
         }
 
 
-        File file = AndroidRecordPlugin.file(path, pkg, "Session.java", true)
+        File file = AndroidRecordPlugin.file(path, pkg, "LocalSession.java", true)
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
         writer.write(c.toString());
         writer.close();

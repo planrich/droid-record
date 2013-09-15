@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="jarjar-maven-aether-provider-3.0.4">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/wrapper/dists/gradle-1.8-20130730220035+0000-bin/661k9u67ua326mbt26n82qkoji/gradle-1.8-20130730220035+0000/lib/plugins/jarjar-maven-aether-provider-3.0.4.jar!/" />
+      <root url="jar:///opt/gradle-1.6/lib/plugins/jarjar-maven-aether-provider-3.0.4.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
