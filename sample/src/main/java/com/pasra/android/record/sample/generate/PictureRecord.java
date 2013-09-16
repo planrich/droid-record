@@ -32,8 +32,11 @@ public class PictureRecord{
             record.setDate(SQLiteConverter.stringToDate(c.getString(2)));
             record.setGalleryId(c.getInt(3));
             record.setId(c.getLong(4));
-            
+            return record;
         }
         return null;
+    }
+    public void delete(SQLiteDatabase db, long id){
+        db.execSQL("delete from picture where id = ?;", new String[] { Long.toString(id) });
     }
 }

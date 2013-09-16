@@ -41,6 +41,10 @@ public class CRUDTest extends AndroidTestCase {
         assertEquals(gallery.getId(), id);
         assertEquals(gallery.getName(), "sample");
 
+        mSession.deleteGallery(id);
+        gallery = mSession.loadGallery(id);
+        assertNull(gallery);
+
         //RemoteSession mRemote = new RemoteSession("https", "example.com", new RouteBuilder());
         //mRemote.hookup(mSession);
         //mLocal.load(id);

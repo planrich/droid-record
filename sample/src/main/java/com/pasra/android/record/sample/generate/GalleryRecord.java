@@ -25,8 +25,11 @@ public class GalleryRecord{
             Gallery record = new Gallery(null);
             record.setName(c.getString(0));
             record.setId(c.getLong(1));
-            
+            return record;
         }
         return null;
+    }
+    public void delete(SQLiteDatabase db, long id){
+        db.execSQL("delete from gallery where id = ?;", new String[] { Long.toString(id) });
     }
 }

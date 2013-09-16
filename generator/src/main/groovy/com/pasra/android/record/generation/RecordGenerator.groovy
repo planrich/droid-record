@@ -65,12 +65,18 @@ class RecordGenerator {
                 c.wrap("if (c.moveToFirst())") {
                     c.line("${CamName} record = new ${CamName}(null);")
                     table.getOrderedFields().each { Field f ->
+                        // TODO think about this! do the columns indices change?
                         c.line("${f.javaCallToDeserialize("record", "c")};")
+
                     }
-                    c.line("")
+                    c.line("return record;")
                 }
 
                 c.line("return null;")
+            }
+
+            c.wrap("public void delete(SQLiteDatabase db, long id)") {
+                c.line("db.execSQL(\"delete from ${table.name} where id = ?;\", new String[] { Long.toString(id) });")
             }
 
 
