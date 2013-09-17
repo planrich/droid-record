@@ -52,11 +52,21 @@ class SessionGenerator {
                 c.wrap("public void delete${nameCamel}(java.lang.Long id)") {
                     c.wrap("if (id == null)") {
                         c.line("throw new IllegalArgumentException(" +
-                                "\"why would you want to load a ${name} record with a null key?\");")
+                                "\"why would you want to delete a ${name} record with a null key?\");")
                     }
 
                     c.line("${nameCamel}Record record = ${nameCamel}Record.instance();")
                     c.line("record.delete(mDB, id);")
+                }
+
+                c.wrap("public void update${nameCamel}(Abstract${nameCamel} obj)") {
+                    c.wrap("if (obj == null)") {
+                        c.line("throw new IllegalArgumentException(" +
+                                "\"Argument ${name} is null\");")
+                    }
+
+                    c.line("${nameCamel}Record record = ${nameCamel}Record.instance();")
+                    c.line("record.update(mDB, obj);")
                 }
             }
         }

@@ -1,8 +1,8 @@
 package com.pasra.android.record.sample.generate;
 
 public class Picture extends AbstractPicture {
-    public Picture(java.lang.Long id){
-        super(id);
+    public Picture(){
+        super(null);
     }
     
     // add your code here

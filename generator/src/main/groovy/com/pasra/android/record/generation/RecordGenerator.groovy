@@ -63,7 +63,7 @@ class RecordGenerator {
             c.wrap("public ${CamName} load(SQLiteDatabase db, long id)") {
                 c.line("Cursor c = db.rawQuery(\"select * from ${table.name} where id = ?;\", new String[] { Long.toString(id) });")
                 c.wrap("if (c.moveToFirst())") {
-                    c.line("${CamName} record = new ${CamName}(null);")
+                    c.line("${CamName} record = new ${CamName}();")
                     table.getOrderedFields().each { Field f ->
                         // TODO think about this! do the columns indices change?
                         c.line("${f.javaCallToDeserialize("record", "c")};")
@@ -77,6 +77,16 @@ class RecordGenerator {
 
             c.wrap("public void delete(SQLiteDatabase db, long id)") {
                 c.line("db.execSQL(\"delete from ${table.name} where id = ?;\", new String[] { Long.toString(id) });")
+            }
+
+            c.wrap("public void update(SQLiteDatabase db, Abstract${CamName} record)") {
+                c.line("ContentValues values = new ContentValues(${orderedFields.size()});")
+                orderedFields.each { f ->
+                    c.line("values.put(\"${f.name}\", ${f.javaCallToSerialize("record")});")
+                }
+
+                c.line("long id = record.get${table.primary.javaName}();")
+                c.line("db.update(\"${table.name}\", values, \"${table.primary.name} = ?\", new String[] { Long.toString(id) });")
             }
 
 

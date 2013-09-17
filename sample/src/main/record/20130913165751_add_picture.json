@@ -5,7 +5,7 @@ change: {
             name: 'string',
             image: 'blob',
             date: 'date',
-            gallery_id: 'integer'
+            gallery_id: 'long'
         }
     }
 }

@@ -22,10 +22,17 @@ public class LocalSession{
     }
     public void deletePicture(java.lang.Long id){
         if (id == null){
-            throw new IllegalArgumentException("why would you want to load a picture record with a null key?");
+            throw new IllegalArgumentException("why would you want to delete a picture record with a null key?");
         }
         PictureRecord record = PictureRecord.instance();
         record.delete(mDB, id);
+    }
+    public void updatePicture(AbstractPicture obj){
+        if (obj == null){
+            throw new IllegalArgumentException("Argument picture is null");
+        }
+        PictureRecord record = PictureRecord.instance();
+        record.update(mDB, obj);
     }
     public void insertGallery(AbstractGallery obj){
         GalleryRecord record = GalleryRecord.instance();
@@ -40,9 +47,16 @@ public class LocalSession{
     }
     public void deleteGallery(java.lang.Long id){
         if (id == null){
-            throw new IllegalArgumentException("why would you want to load a gallery record with a null key?");
+            throw new IllegalArgumentException("why would you want to delete a gallery record with a null key?");
         }
         GalleryRecord record = GalleryRecord.instance();
         record.delete(mDB, id);
+    }
+    public void updateGallery(AbstractGallery obj){
+        if (obj == null){
+            throw new IllegalArgumentException("Argument gallery is null");
+        }
+        GalleryRecord record = GalleryRecord.instance();
+        record.update(mDB, obj);
     }
 }

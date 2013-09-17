@@ -5,6 +5,17 @@ package com.pasra.android.record
  */
 class Inflector {
 
+    static String singularize(String name) {
+        if (name.startsWith('#')) {
+            return name.substring(1)
+        }
+
+        // that's it for now. consider using inflector from rails as this happens during pre compile time
+        // performance is not necessery at any cost
+        // https://github.com/rails/rails/blob/feaa6e2048fe86bcf07e967d6e47b865e42e055b/activesupport/lib/active_support/inflections.rb
+        return name;
+    }
+
     static String tabelize(String name) {
         StringBuilder builder = new StringBuilder();
 

@@ -70,6 +70,7 @@ class MigrationContext {
 
     void relations(JsonObject rels) {
 
+        // TODO consider: foreign key must match type of target table or cast it
         rels.entrySet().each { e ->
             JsonElement element = e.value
             if (element.isJsonObject()) {

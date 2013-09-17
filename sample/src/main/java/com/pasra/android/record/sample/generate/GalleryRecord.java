@@ -22,7 +22,7 @@ public class GalleryRecord{
     public Gallery load(SQLiteDatabase db, long id){
         Cursor c = db.rawQuery("select * from gallery where id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
-            Gallery record = new Gallery(null);
+            Gallery record = new Gallery();
             record.setName(c.getString(0));
             record.setId(c.getLong(1));
             return record;
@@ -31,5 +31,11 @@ public class GalleryRecord{
     }
     public void delete(SQLiteDatabase db, long id){
         db.execSQL("delete from gallery where id = ?;", new String[] { Long.toString(id) });
+    }
+    public void update(SQLiteDatabase db, AbstractGallery record){
+        ContentValues values = new ContentValues(1);
+        values.put("name", record.getName());
+        long id = record.getId();
+        db.update("gallery", values, "id = ?", new String[] { Long.toString(id) });
     }
 }

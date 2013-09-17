@@ -7,7 +7,7 @@ public class AbstractPicture{
     protected java.lang.String mName;
     protected java.nio.ByteBuffer mImage;
     protected java.util.Date mDate;
-    protected java.lang.Integer mGalleryId;
+    protected java.lang.Long mGalleryId;
     protected java.lang.Long mId;
     
     public AbstractPicture(java.lang.Long id){
@@ -20,8 +20,13 @@ public class AbstractPicture{
     public void setImage(java.nio.ByteBuffer value) { mImage = value; }
     public java.util.Date getDate() { return mDate; }
     public void setDate(java.util.Date value) { mDate = value; }
-    public java.lang.Integer getGalleryId() { return mGalleryId; }
-    public void setGalleryId(java.lang.Integer value) { mGalleryId = value; }
+    public java.lang.Long getGalleryId() { return mGalleryId; }
+    public void setGalleryId(java.lang.Long value) { mGalleryId = value; }
     public java.lang.Long getId() { return mId; }
     public void setId(java.lang.Long value) { mId = value; }
+    public static Picture of(Gallery obj0){
+        Picture obj = new Picture();
+        obj.setGalleryId(obj0.getId());
+        return obj;
+    }
 }

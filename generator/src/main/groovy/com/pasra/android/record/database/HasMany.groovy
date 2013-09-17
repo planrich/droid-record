@@ -1,5 +1,6 @@
 package com.pasra.android.record.database
 
+import com.pasra.android.record.Inflector
 import com.pasra.android.record.generation.CodeGenerator
 
 /**

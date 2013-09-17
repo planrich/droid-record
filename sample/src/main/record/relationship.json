@@ -1,1 +1,7 @@
-comment: "Insert your model relationships here! See the documentation for details."
+comment: "Insert your model relationships here! See the documentation for details.",
+gallery: {
+  has_many: '#picture'
+},
+picture: {
+  belongs_to: 'gallery'
+}
