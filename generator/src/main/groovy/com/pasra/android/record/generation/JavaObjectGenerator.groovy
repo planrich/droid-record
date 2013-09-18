@@ -4,7 +4,7 @@ import com.pasra.android.record.AndroidRecordPlugin
 import com.pasra.android.record.Inflector
 import com.pasra.android.record.database.BelongsTo
 import com.pasra.android.record.database.Field
-import com.pasra.android.record.database.HasMany
+import com.pasra.android.record.database.Relation
 import com.pasra.android.record.database.Table
 
 /**
@@ -44,15 +44,15 @@ class JavaObjectGenerator {
                 field.generateDaoJavaFieldGetterSetter(c);
             }
 
+            // CLEANUP
             def belongs_to = []
-            table.relations.each { relation ->
-                relation.generateJava(c);
+            table.relations.each { Relation relation ->
+                relation.generateJavaMethods(c);
                 if (relation instanceof BelongsTo) {
                     belongs_to << relation;
                 }
             }
-
-            def params = belongs_to.collect({ r -> r.target_table })
+            def params = belongs_to.collect({ r -> r.target.name })
             def i = 0
             def javaParams = params.collect({ name -> "${Inflector.camelize(name)} obj${i++}"})
             c.wrap("public static ${Inflector.camelize(table.name)} of(${javaParams.join(", ")})") {
@@ -62,7 +62,6 @@ class JavaObjectGenerator {
                 }
                 c.line("return obj;")
             }
-
         }
 
 

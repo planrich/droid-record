@@ -56,4 +56,9 @@ class CodeGenerator {
         return builder.toString();
     }
 
+    void doNotModify() {
+        if (formatType == "java") {
+            line("// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!")
+        }
+    }
 }

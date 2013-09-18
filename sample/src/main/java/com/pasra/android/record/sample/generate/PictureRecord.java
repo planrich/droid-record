@@ -28,7 +28,7 @@ public class PictureRecord{
         if (c.moveToFirst()){
             Picture record = new Picture();
             record.setName(c.getString(0));
-            record.setImage(ByteBuffer.wrap(c.getBlob(1)));
+            record.setImage(java.nio.ByteBuffer.wrap(c.getBlob(1)));
             record.setDate(SQLiteConverter.stringToDate(c.getString(2)));
             record.setGalleryId(c.getLong(3));
             record.setId(c.getLong(4));

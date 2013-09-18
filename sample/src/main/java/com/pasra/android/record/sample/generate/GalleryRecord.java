@@ -38,4 +38,18 @@ public class GalleryRecord{
         long id = record.getId();
         db.update("gallery", values, "id = ?", new String[] { Long.toString(id) });
     }
+    public java.util.List<Picture> loadPicturesBlocking(SQLiteDatabase db, long GalleryId){
+        java.util.List<Picture> list = new java.util.ArrayList();
+        Cursor c = db.rawQuery("select * from picture where gallery_id = ?", new String[] { Long.toString(GalleryId) } );
+        while (c.moveToNext()){
+            Picture record = new Picture();
+            record.setName(c.getString(0));
+            record.setImage(java.nio.ByteBuffer.wrap(c.getBlob(1)));
+            record.setDate(SQLiteConverter.stringToDate(c.getString(2)));
+            record.setGalleryId(c.getLong(3));
+            record.setId(c.getLong(4));
+            list.add(record);
+        }
+        return list;
+    }
 }

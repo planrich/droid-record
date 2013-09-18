@@ -1,8 +1,7 @@
+// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 package com.pasra.android.record.sample.generate;
 
 import android.database.sqlite.SQLiteDatabase;
-
-// NOTE generated file! do not edit.
 
 public class LocalSession{
     private SQLiteDatabase mDB;
@@ -58,5 +57,8 @@ public class LocalSession{
         }
         GalleryRecord record = GalleryRecord.instance();
         record.update(mDB, obj);
+    }
+    public java.util.List<Picture> loadPicturesBlocking(long GalleryId){
+        return GalleryRecord.instance().loadPicturesBlocking(mDB, GalleryId);
     }
 }

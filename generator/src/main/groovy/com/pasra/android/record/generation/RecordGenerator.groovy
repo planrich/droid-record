@@ -4,6 +4,7 @@ import com.pasra.android.record.AndroidRecordPlugin
 
 import com.pasra.android.record.Inflector
 import com.pasra.android.record.database.Field
+import com.pasra.android.record.database.Relation
 import com.pasra.android.record.database.Table
 
 import java.nio.ByteBuffer
@@ -63,12 +64,8 @@ class RecordGenerator {
             c.wrap("public ${CamName} load(SQLiteDatabase db, long id)") {
                 c.line("Cursor c = db.rawQuery(\"select * from ${table.name} where id = ?;\", new String[] { Long.toString(id) });")
                 c.wrap("if (c.moveToFirst())") {
-                    c.line("${CamName} record = new ${CamName}();")
-                    table.getOrderedFields().each { Field f ->
-                        // TODO think about this! do the columns indices change?
-                        c.line("${f.javaCallToDeserialize("record", "c")};")
 
-                    }
+                    table.javaCallsNewObjectFromCursor(c, "record", "c");
                     c.line("return record;")
                 }
 
@@ -87,6 +84,10 @@ class RecordGenerator {
 
                 c.line("long id = record.get${table.primary.javaName}();")
                 c.line("db.update(\"${table.name}\", values, \"${table.primary.name} = ?\", new String[] { Long.toString(id) });")
+            }
+
+            table.relations.each { Relation r ->
+                r.generateRecordMethods(c);
             }
 
 

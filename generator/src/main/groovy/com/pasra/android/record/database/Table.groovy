@@ -109,35 +109,6 @@ class Table {
      * @param relation
      */
     void new_relation(JsonObject relation) {
-
-        if (relation.has("has_many")) {
-            def has_many = relation.get("has_many")
-
-            def many = []
-            if (has_many.isJsonArray()) {
-                many = has_many.getAsJsonArray();
-            } else if (has_many.isJsonPrimitive()) {
-                many = [has_many.getAsString()];
-            }
-
-            many.each { plural_name ->
-                relations << new HasMany(this, Inflector.singularize(plural_name))
-            }
-        }
-
-        if (relation.has("has_one")) {
-            def has_one = relation.get("has_one")
-            if (has_one.isJsonPrimitive()) {
-                relations << new HasOne(this, has_one.asString)
-            }
-        }
-
-        if (relation.has("belongs_to")) {
-            def belongs_to = relation.get("belongs_to")
-            if (belongs_to.isJsonPrimitive()) {
-                relations << new BelongsTo(this, belongs_to.asString)
-            }
-        }
     }
 
     boolean hasFieldOfType(String type) {
@@ -148,5 +119,20 @@ class Table {
             }
         }
         return has
+    }
+
+    String javaCallGetId(String obj) {
+        return "${obj}.get${Inflector.camelize(primary.name)}()"
+    }
+
+    void javaCallsNewObjectFromCursor(CodeGenerator c, String objname, String cursorname) {
+
+        def CamName = Inflector.camelize(name);
+        c.line("${CamName} record = new ${CamName}();")
+        getOrderedFields().each { Field f ->
+            // TODO think about this! do the columns indices change?
+            c.line("${f.javaCallToDeserialize(objname, cursorname)};")
+        }
+
     }
 }

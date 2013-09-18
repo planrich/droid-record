@@ -86,7 +86,7 @@ class Field {
         def i = tableOrder;
         def call = "";
         if (type == "java.nio.ByteBuffer") {
-            call = "ByteBuffer.wrap(${cursorobj}.getBlob(${i}))"
+            call = "java.nio.ByteBuffer.wrap(${cursorobj}.getBlob(${i}))"
         } else if (type == "java.util.Date") {
             call = "SQLiteConverter.stringToDate(${cursorobj}.getString(${i}))"
         } else if (type == "java.lang.String") {

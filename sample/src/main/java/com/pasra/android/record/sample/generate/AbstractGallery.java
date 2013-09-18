@@ -15,6 +15,9 @@ public class AbstractGallery{
     public void setName(java.lang.String value) { mName = value; }
     public java.lang.Long getId() { return mId; }
     public void setId(java.lang.Long value) { mId = value; }
+    public java.util.List<Picture> loadPictures(LocalSession session){
+        return session.loadPicturesBlocking(this.getId());
+    }
     public static Gallery of(){
         Gallery obj = new Gallery();
         return obj;

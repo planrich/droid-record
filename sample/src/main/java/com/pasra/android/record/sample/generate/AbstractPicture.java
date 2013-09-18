@@ -24,6 +24,9 @@ public class AbstractPicture{
     public void setGalleryId(java.lang.Long value) { mGalleryId = value; }
     public java.lang.Long getId() { return mId; }
     public void setId(java.lang.Long value) { mId = value; }
+    public Gallery loadGallery(LocalSession session){
+        return session.loadGallery(this.getId());
+    }
     public static Picture of(Gallery obj0){
         Picture obj = new Picture();
         obj.setGalleryId(obj0.getId());

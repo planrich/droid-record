@@ -8,12 +8,16 @@ import com.pasra.android.record.generation.CodeGenerator
 abstract class Relation {
 
     protected Table origin;
-    protected String target_table;
+    protected Table target;
 
-    Relation(Table origin, String target_table) {
+    protected Relation(Table origin, Table target) {
         this.origin = origin
-        this.target_table = target_table
+        this.target = target
     }
 
-    abstract void generateJava(CodeGenerator c);
+    abstract void generateSessionMethods(CodeGenerator c);
+    abstract void generateJavaMethods(CodeGenerator c);
+    abstract void generateRecordMethods(CodeGenerator c);
+
+    abstract void checkIntegrity();
 }

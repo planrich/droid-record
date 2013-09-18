@@ -17,12 +17,11 @@ class SessionGenerator {
     void generate(String path, String pkg) {
 
         CodeGenerator c = new CodeGenerator();
+        c.doNotModify()
 
         c.line("package ${pkg};")
         c.line()
         c.line("import android.database.sqlite.SQLiteDatabase;")
-        c.line();
-        c.line("// NOTE generated file! do not edit.");
         c.line();
         c.wrap("public class LocalSession") {
 
@@ -67,6 +66,11 @@ class SessionGenerator {
 
                     c.line("${nameCamel}Record record = ${nameCamel}Record.instance();")
                     c.line("record.update(mDB, obj);")
+                }
+
+                // relations
+                table.relations.each { relation ->
+                    relation.generateSessionMethods(c)
                 }
             }
         }
