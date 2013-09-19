@@ -22,10 +22,12 @@ class JavaObjectGenerator {
 
         CodeGenerator c = new CodeGenerator();
 
+        def javaClassName = Inflector.camelize(table.name)
+
         c.line("package ${pkg};")
+        c.doNotModify();
         c.line()
-        c.line();
-        c.line("// NOTE generated file! do not edit.");
+        c.line("import com.pasra.android.record.SQLiteConverter;");
         c.line();
         c.wrap("public class Abstract${Inflector.camelize(table.name)}") {
             table.fields.each { _, Field field ->
@@ -36,31 +38,20 @@ class JavaObjectGenerator {
 
             c.wrap("public Abstract${Inflector.camelize(table.name)}(${table.primary.javaType()} id)") {
                 c.line("this.mId = id;");
+                table.getOrderedFields(false).each { Field f ->
+                    if (!f.allowsNull()) {
+                        c.line("this.${f.privateFieldName()} = ${f.defaultValue()};")
+                    }
+                }
             }
 
             c.line()
 
-            table.fields.each { _, Field field ->
-                field.generateDaoJavaFieldGetterSetter(c);
-            }
+            generateRelations(c)
 
-            // CLEANUP
-            def belongs_to = []
-            table.relations.each { Relation relation ->
-                relation.generateJavaMethods(c);
-                if (relation instanceof BelongsTo) {
-                    belongs_to << relation;
-                }
-            }
-            def params = belongs_to.collect({ r -> r.target.name })
-            def i = 0
-            def javaParams = params.collect({ name -> "${Inflector.camelize(name)} obj${i++}"})
-            c.wrap("public static ${Inflector.camelize(table.name)} of(${javaParams.join(", ")})") {
-                c.line("${Inflector.camelize(table.name)} obj = new ${Inflector.camelize(table.name)}();")
-                params.eachWithIndex { String name, int idx ->
-                    c.line("obj.set${Inflector.camelize(name)}Id(obj${idx}.getId());")
-                }
-                c.line("return obj;")
+            c.wrap("public static ${javaClassName} fromCursor(android.database.Cursor cursor)") {
+                table.javaCallsNewObjectFromCursor(c, "record", "cursor");
+                c.line("return record;")
             }
         }
 
@@ -92,5 +83,31 @@ class JavaObjectGenerator {
         }
     }
 
+    def generateRelations(CodeGenerator c) {
+        table.fields.each { _, Field field ->
+            field.generateDaoJavaFieldGetterSetter(c);
+        }
 
+
+        // CLEANUP
+        def belongs_to = []
+        table.relations.each { Relation relation ->
+            relation.generateJavaMethods(c);
+            if (relation instanceof BelongsTo) {
+                belongs_to << relation;
+            }
+        }
+        if (belongs_to.size() > 0) {
+            def params = belongs_to.collect({ r -> r.target.name })
+            def i = 0
+            def javaParams = params.collect({ name -> "${Inflector.camelize(name)} obj${i++}"})
+            c.wrap("public static ${Inflector.camelize(table.name)} of(${javaParams.join(", ")})") {
+                c.line("${Inflector.camelize(table.name)} obj = new ${Inflector.camelize(table.name)}();")
+                params.eachWithIndex { String name, int idx ->
+                    c.line("obj.set${Inflector.camelize(name)}Id(obj${idx}.getId());")
+                }
+                c.line("return obj;")
+            }
+        }
+    }
 }

@@ -172,6 +172,7 @@ class MigrationContext {
         tables.each { String name, Table table ->
             new JavaObjectGenerator(table).generate(path, pkg)
             new RecordGenerator(table).generateSQLite(path, pkg)
+            new RecordBuilderGenerator(table).generate(path, pkg)
         }
 
         logger.info("generating migrator")

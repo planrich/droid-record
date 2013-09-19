@@ -44,7 +44,7 @@ public class GalleryRecord{
         while (c.moveToNext()){
             Picture record = new Picture();
             record.setName(c.getString(0));
-            record.setImage(java.nio.ByteBuffer.wrap(c.getBlob(1)));
+            record.setImage(c.getBlob(1));
             record.setDate(SQLiteConverter.stringToDate(c.getString(2)));
             record.setGalleryId(c.getLong(3));
             record.setId(c.getLong(4));

@@ -1,7 +1,7 @@
 package com.pasra.android.record.sample.generate;
+// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 
-
-// NOTE generated file! do not edit.
+import com.pasra.android.record.SQLiteConverter;
 
 public class AbstractGallery{
     protected java.lang.String mName;
@@ -9,6 +9,7 @@ public class AbstractGallery{
     
     public AbstractGallery(java.lang.Long id){
         this.mId = id;
+        this.mName = "";
     }
     
     public java.lang.String getName() { return mName; }
@@ -18,8 +19,10 @@ public class AbstractGallery{
     public java.util.List<Picture> loadPictures(LocalSession session){
         return session.loadPicturesBlocking(this.getId());
     }
-    public static Gallery of(){
-        Gallery obj = new Gallery();
-        return obj;
+    public static Gallery fromCursor(android.database.Cursor cursor){
+        Gallery record = new Gallery();
+        record.setName(cursor.getString(0));
+        record.setId(cursor.getLong(1));
+        return record;
     }
 }

@@ -17,13 +17,14 @@ class Field {
     String name; // original
     JsonElement json;
     String type;
+    boolean allowNull = false;
     int tableOrder;
 
     static final to_java_type = ["integer": "java.lang.Integer",
             "string": "java.lang.String",
             "long": "java.lang.Long",
             "boolean": "java.lang.Boolean",
-            "blob": "java.nio.ByteBuffer",
+            "blob": "byte[]",
             "date": "java.util.Date" ]
 
     static final to_sqlite_type = ["integer": "integer",
@@ -55,6 +56,9 @@ class Field {
             }
 
             type = obj.get("type").getAsString();
+            if (obj.has("null") && obj.get("null").asBoolean) {
+                allowNull = true;
+            }
         }
 
         if (to_java_type[type] == null) {
@@ -70,12 +74,9 @@ class Field {
         String type = javaType();
         def suffix = "";
         def prefix = "";
-        if (type == "java.nio.ByteBuffer") {
-            suffix = ".array()"
-        }
         if (type == "java.util.Date") {
-            suffix = ")";
             prefix = "SQLiteConverter.dateToString("
+            suffix = ")";
         }
 
         return "${prefix}${objname}.get${Inflector.camelize(name)}()${suffix}";
@@ -85,8 +86,8 @@ class Field {
         String type = javaType();
         def i = tableOrder;
         def call = "";
-        if (type == "java.nio.ByteBuffer") {
-            call = "java.nio.ByteBuffer.wrap(${cursorobj}.getBlob(${i}))"
+        if (type == "byte[]") {
+            call = "${cursorobj}.getBlob(${i})"
         } else if (type == "java.util.Date") {
             call = "SQLiteConverter.stringToDate(${cursorobj}.getString(${i}))"
         } else if (type == "java.lang.String") {
@@ -161,5 +162,32 @@ class Field {
             constraints << json.getAsJsonObject().get("constraint").getAsString()
         }
         return constraints.join(" ")
+    }
+
+    boolean allowsNull() {
+        return allowNull;
+    }
+
+    String privateFieldName() {
+        return "m${Inflector.camelize(name)}"
+    }
+
+    String defaultValue() {
+        String type = javaType();
+        if (type == "byte[]") {
+            return "new byte[0]"
+        } else if (type == "java.util.Date") {
+            return "new java.util.Date(0)"
+        } else if (type == "java.lang.String") {
+            return "\"\""
+        } else if (type == "java.lang.Integer") {
+            return "new Integer(0)"
+        } else if (type == "java.lang.Long") {
+            return "new Long(0L)"
+        } else if (type == "java.lang.Boolean") {
+            return "new Boolean(false)"
+        }
+
+        return "null";
     }
 }

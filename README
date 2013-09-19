@@ -1,0 +1,29 @@
+# Android Record
+
+## Getting started
+
+
+## Null and default values
+
+By default every value on a table gets a default value in the java objects constructor. 
+This is due to the fact that allowing null objects to be deserialized from a table row can result in
+a null pointer exception.
+
+I'm often finding myself doing the following checks:
+~~~
+if (string == null || string.equals("")) { ... }
+~~~
+
+If this behaviour is desired you should specify it in the migration file:
+~~~
+fields: {
+  pony: {
+    type: 'string',
+    null: true,
+    ...
+  }
+}
+~~~
+
+Whenever you set any value explicitly to null (= farm.setPony(null); ) and save this
+record the value will stay null.

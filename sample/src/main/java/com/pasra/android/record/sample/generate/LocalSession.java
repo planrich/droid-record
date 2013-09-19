@@ -2,6 +2,7 @@
 package com.pasra.android.record.sample.generate;
 
 import android.database.sqlite.SQLiteDatabase;
+import com.pasra.android.record.RecordBuilder;
 
 public class LocalSession{
     private SQLiteDatabase mDB;
@@ -33,6 +34,9 @@ public class LocalSession{
         PictureRecord record = PictureRecord.instance();
         record.update(mDB, obj);
     }
+    public PictureRecordBuilder queryPictures(){
+        return new PictureRecordBuilder(mDB);
+    }
     public void insertGallery(AbstractGallery obj){
         GalleryRecord record = GalleryRecord.instance();
         record.insert(mDB, obj);
@@ -60,5 +64,8 @@ public class LocalSession{
     }
     public java.util.List<Picture> loadPicturesBlocking(long GalleryId){
         return GalleryRecord.instance().loadPicturesBlocking(mDB, GalleryId);
+    }
+    public GalleryRecordBuilder queryGalleries(){
+        return new GalleryRecordBuilder(mDB);
     }
 }
