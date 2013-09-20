@@ -13,6 +13,14 @@ public class PictureRecord{
         }
         return mInstance;
     }
+    public void save(SQLiteDatabase db, AbstractPicture record){
+        if (record.getId() == null){
+            insert(db, record);
+        }
+        else{
+            update(db, record);
+        }
+    }
     public void insert(SQLiteDatabase db, AbstractPicture record){
         ContentValues values = new ContentValues(4);
         values.put("name", record.getName());
@@ -23,7 +31,7 @@ public class PictureRecord{
         record.setId(id);
     }
     public Picture load(SQLiteDatabase db, long id){
-        Cursor c = db.rawQuery("select * from picture where id = ?;", new String[] { Long.toString(id) });
+        Cursor c = db.rawQuery("select * from picture where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             Picture record = new Picture();
             record.setName(c.getString(0));
@@ -36,7 +44,7 @@ public class PictureRecord{
         return null;
     }
     public void delete(SQLiteDatabase db, long id){
-        db.execSQL("delete from picture where id = ?;", new String[] { Long.toString(id) });
+        db.execSQL("delete from picture where  _id = ?;", new String[] { Long.toString(id) });
     }
     public void update(SQLiteDatabase db, AbstractPicture record){
         ContentValues values = new ContentValues(4);
@@ -45,6 +53,6 @@ public class PictureRecord{
         values.put("date", SQLiteConverter.dateToString(record.getDate()));
         values.put("gallery_id", record.getGalleryId());
         long id = record.getId();
-        db.update("picture", values, "id = ?", new String[] { Long.toString(id) });
+        db.update("picture", values, "_id = ?", new String[] { Long.toString(id) });
     }
 }

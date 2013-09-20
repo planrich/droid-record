@@ -13,10 +13,16 @@ public interface Migrator {
     long getLatestMigrationLevel();
 
     /**
-     * Migrates the database to the specified target version
-     * @param db
+     * Migrates the database to the specified target version.
+     * This operation might be _DANGEROUS_. Use migrate() instead.
      * @param currentVersion
      * @param versionTarget
      */
-    void migrate(SQLiteDatabase db, long currentVersion, long versionTarget);
+    void migrate(long currentVersion, long versionTarget);
+
+    /**
+     * Migrate the database to the maximum level currently known.
+     * This operation is idempotent.
+     */
+    void migrate();
 }

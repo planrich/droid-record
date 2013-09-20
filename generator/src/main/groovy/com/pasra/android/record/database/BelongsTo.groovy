@@ -22,7 +22,7 @@ class BelongsTo extends Relation{
         def javaObj = Inflector.camelize(target.name)
         def singular = Inflector.camelize(target.name)
         c.wrap("public ${javaObj} load${singular}(LocalSession session)") {
-            c.line("return session.load${singular}(${origin.javaCallGetId("this")});")
+            c.line("return session.find${singular}(${origin.javaCallGetId("this")});")
         }
     }
 

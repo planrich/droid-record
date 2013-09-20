@@ -30,7 +30,7 @@ public class BasicRecordTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mDB = getContext().openOrCreateDatabase("test", Context.MODE_PRIVATE, null);
-        new RecordMigrator().migrate(mDB, 0, RecordMigrator.MIGRATION_LEVEL);
+        new RecordMigrator(mDB).migrate();
         mSession = new LocalSession(mDB);
     }
 
@@ -44,22 +44,22 @@ public class BasicRecordTest extends AndroidTestCase {
         Gallery gallery = new Gallery();
         gallery.setName("sample");
 
-        mSession.insertGallery(gallery);
+        mSession.saveGallery(gallery);
         assertNotNull(gallery.getId());
 
         Long id = gallery.getId();
 
-        gallery = mSession.loadGallery(id);
+        gallery = mSession.findGallery(id);
         assertEquals(gallery.getId(), id);
         assertEquals(gallery.getName(), "sample");
 
         gallery.setName("example");
-        mSession.updateGallery(gallery);
-        gallery = mSession.loadGallery(id);
+        mSession.saveGallery(gallery);
+        gallery = mSession.findGallery(id);
         assertEquals(gallery.getName(), "example");
 
-        mSession.deleteGallery(id);
-        gallery = mSession.loadGallery(id);
+        mSession.destroyGallery(id);
+        gallery = mSession.findGallery(id);
         assertNull(gallery);
     }
 
@@ -67,7 +67,7 @@ public class BasicRecordTest extends AndroidTestCase {
         byte[] bytes = new byte[] { (byte)0xff, (byte)0xff, 0x0, 0x0 };  // argb :)
         Gallery gallery = new Gallery();
         gallery.setName("pixelart");
-        mSession.insertGallery(gallery);
+        mSession.saveGallery(gallery);
 
         Picture picture = Picture.of(gallery);
         picture.setName("truely-red.jpg");
@@ -75,26 +75,26 @@ public class BasicRecordTest extends AndroidTestCase {
         c.set(2013,8,1);
         picture.setDate(c.getTime());
         picture.setImage(bytes);
-        mSession.insertPicture(picture);
+        mSession.savePicture(picture);
 
         assertNotNull(picture.getId());
 
         long id = picture.getId();
-        picture = mSession.loadPicture(id);
+        picture = mSession.findPicture(id);
 
         assertEquals(new Long(id), picture.getId());
         assertEquals(picture.getGalleryId(), gallery.getId());
 
-        List<Picture> pictures = gallery.loadPictures(mSession);
+        List<Picture> pictures = gallery.loadPictures(mSession).all();
         assertEquals(pictures.size(), 1);
         assertEquals(pictures.get(0).getId(), picture.getId());
         assertEquals(pictures.get(0).getName(), picture.getName());
 
         Picture pic2 = Picture.of(gallery);
         pic2.setName("somerandom.jpg");
-        mSession.insertPicture(pic2);
+        mSession.savePicture(pic2);
 
-        pictures = gallery.loadPictures(mSession);
+        pictures = gallery.loadPictures(mSession).all();
         assertEquals(pictures.size(), 2);
         assertEquals(pictures.get(0).getDate(), picture.getDate());
 
@@ -104,7 +104,7 @@ public class BasicRecordTest extends AndroidTestCase {
 
         List<Gallery> galleries = mSession.queryGalleries().all();
         assertEquals(galleries.size(), 1);
-        mSession.insertGallery(new Gallery());
+        mSession.saveGallery(new Gallery());
         assertEquals(galleries.size(), 1);
         galleries = mSession.queryGalleries().all();
         assertEquals(galleries.size(), 2);
@@ -113,7 +113,7 @@ public class BasicRecordTest extends AndroidTestCase {
     public void testCustomCursorAdapter() {
         Gallery gallery = new Gallery();
         gallery.setName("pixelart");
-        mSession.insertGallery(gallery);
+        mSession.saveGallery(gallery);
         final boolean[] called = {false};
         Cursor c = mSession.queryGalleries().where("name = ? or name = ?", "pixelart", "randomart").cursor();
         CursorAdapter a = new CursorAdapter(getContext(), c, false) {

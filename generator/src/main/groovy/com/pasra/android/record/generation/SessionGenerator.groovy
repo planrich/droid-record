@@ -36,12 +36,16 @@ class SessionGenerator {
             tables.each { String name, Table table ->
                 def javaNameCaml = Inflector.camelize(table.name)
                 def javaPluralCamel = Inflector.camelize(Inflector.pluralize(table.name));
-                c.wrap("public void insert${javaNameCaml}(Abstract${javaNameCaml} obj)") {
+                c.wrap("public void save${javaNameCaml}(Abstract${javaNameCaml} obj)") {
+                    c.wrap("if (obj == null)") {
+                        c.line("throw new IllegalArgumentException(" +
+                                "\"Tried to save an instance of ${javaNameCaml} which was null. Cannot do that!\");")
+                    }
                     c.line("${javaNameCaml}Record record = ${javaNameCaml}Record.instance();")
-                    c.line("record.insert(mDB, obj);")
+                    c.line("record.save(mDB, obj);")
                 }
 
-                c.wrap("public ${javaNameCaml} load${javaNameCaml}(java.lang.Long id)") {
+                c.wrap("public ${javaNameCaml} find${javaNameCaml}(java.lang.Long id)") {
                     c.wrap("if (id == null)") {
                         c.line("throw new IllegalArgumentException(" +
                                 "\"why would you want to load a ${name} record with a null key?\");")
@@ -51,7 +55,7 @@ class SessionGenerator {
                     c.line("return record.load(mDB, id);")
                 }
 
-                c.wrap("public void delete${javaNameCaml}(java.lang.Long id)") {
+                c.wrap("public void destroy${javaNameCaml}(java.lang.Long id)") {
                     c.wrap("if (id == null)") {
                         c.line("throw new IllegalArgumentException(" +
                                 "\"why would you want to delete a ${name} record with a null key?\");")
@@ -59,16 +63,6 @@ class SessionGenerator {
 
                     c.line("${javaNameCaml}Record record = ${javaNameCaml}Record.instance();")
                     c.line("record.delete(mDB, id);")
-                }
-
-                c.wrap("public void update${javaNameCaml}(Abstract${javaNameCaml} obj)") {
-                    c.wrap("if (obj == null)") {
-                        c.line("throw new IllegalArgumentException(" +
-                                "\"Argument ${name} is null\");")
-                    }
-
-                    c.line("${javaNameCaml}Record record = ${javaNameCaml}Record.instance();")
-                    c.line("record.update(mDB, obj);")
                 }
 
                 // relations

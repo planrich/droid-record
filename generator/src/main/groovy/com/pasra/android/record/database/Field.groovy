@@ -70,6 +70,14 @@ class Field {
         return to_java_type[type]
     }
 
+    String javaPrivateFieldName() {
+        return "m${Inflector.camelize(name)}"
+    }
+
+    String javaGetCall() {
+        return "get${Inflector.camelize(name)}()"
+    }
+
     String javaCallToSerialize(String objname) {
         String type = javaType();
         def suffix = "";

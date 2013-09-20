@@ -16,14 +16,6 @@ class HasMany extends Relation {
     @Override
     void generateSessionMethods(CodeGenerator c) {
 
-        def javaObj = Inflector.camelize(target.name)
-        def record = Inflector.camelize(origin.name) + "Record"
-        def originObj = Inflector.camelize(origin.name)
-        def plural = Inflector.camelize(Inflector.pluralize(target.name))
-        c.wrap("public java.util.List<${javaObj}> load${plural}Blocking(long ${originObj}Id)") {
-            c.line("return ${record}.instance().load${plural}Blocking(mDB, ${originObj}Id);")
-        }
-
     }
 
     @Override
@@ -31,26 +23,13 @@ class HasMany extends Relation {
 
         def javaObj = Inflector.camelize(target.name)
         def plural = Inflector.camelize(Inflector.pluralize(target.name))
-        c.wrap("public java.util.List<${javaObj}> load${plural}(LocalSession session)") {
-            c.line("return session.load${plural}Blocking(${origin.javaCallGetId("this")});")
+        c.wrap("public RecordBuilder<${javaObj}> load${plural}(LocalSession session)") {
+            c.line("return session.query${plural}().where(\"${origin.name}_id = ?\", Long.toString(${origin.primary.javaPrivateFieldName()}) );")
         }
     }
 
     @Override
     void generateRecordMethods(CodeGenerator c) {
-
-        def javaObj = Inflector.camelize(target.name)
-        def originObj = Inflector.camelize(origin.name)
-        def plural = Inflector.camelize(Inflector.pluralize(target.name))
-        c.wrap("public java.util.List<${javaObj}> load${plural}Blocking(SQLiteDatabase db, long ${originObj}Id)") {
-            c.line("java.util.List<${javaObj}> list = new java.util.ArrayList();")
-            c.line("Cursor c = db.rawQuery(\"select * from ${target.name} where ${origin.name}_id = ?\", new String[] { Long.toString(${originObj}Id) } );")
-            c.wrap("while (c.moveToNext())") {
-                target.javaCallsNewObjectFromCursor(c, "record", "c")
-                c.line("list.add(record);")
-            }
-            c.line("return list;");
-        }
     }
 
     @Override

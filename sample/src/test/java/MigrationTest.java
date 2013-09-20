@@ -1,4 +1,5 @@
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.test.AndroidTestCase;
@@ -25,16 +26,26 @@ public class MigrationTest extends AndroidTestCase {
     }
 
     public void testMigrate() {
-        RecordMigrator migrator = new RecordMigrator();
-        migrator.migrate(mDB, 0, migrator.getLatestMigrationLevel());
-        migrator.migrate(mDB, migrator.getLatestMigrationLevel(), migrator.getLatestMigrationLevel());
+        RecordMigrator migrator = new RecordMigrator(mDB);
+        migrator.migrate();
+        migrator.migrate();
+
+        Cursor c = mDB.rawQuery("select * from android_record_config where key = 'version';", null);
+        assertEquals(c.getCount(), 1);
+
+        try {
+            mDB.execSQL("insert into android_record_config (key,value) values ('version', 0);");
+            fail("key column is not unique!");
+        } catch (SQLiteException e) {
+            // all good
+        }
     }
 
     public void testDoubleMigrationFails() {
-        RecordMigrator migrator = new RecordMigrator();
-        migrator.migrate(mDB, 0, migrator.getLatestMigrationLevel());
+        RecordMigrator migrator = new RecordMigrator(mDB);
+        migrator.migrate(0, migrator.getLatestMigrationLevel());
         try {
-            migrator.migrate(mDB, 0, migrator.getLatestMigrationLevel());
+            migrator.migrate(0, migrator.getLatestMigrationLevel());
             fail("should not be able to migrate 2 times");
         } catch (SQLiteException e) {
 

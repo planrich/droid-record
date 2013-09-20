@@ -45,6 +45,18 @@ class RecordBuilderGenerator {
 
                 c.line("return list;")
             }
+
+            c.line("@Override")
+            c.wrap("public ${javaClassName} first()") {
+                c.line("android.database.Cursor c = cursor();")
+                c.wrap("if (c.moveToFirst())") {
+                    c.line("${javaClassName} record = ${javaClassName}.fromCursor(c);");
+                    c.line("c.close();")
+                    c.line("return record;")
+                }
+                c.line("c.close();")
+                c.line("return null;")
+            }
         }
 
 

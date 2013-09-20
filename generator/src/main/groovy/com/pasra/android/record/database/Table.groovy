@@ -54,13 +54,12 @@ class Table {
                 }
             }
 
-            if (primary == null) {
-                logger.info 'Table has no primary key, adding id'
+            if (fields["_id"] == null) {
+                logger.info 'Table has no android primary key, adding _id'
                 JsonObject id = new JsonObject();
                 id.add("type", new JsonPrimitive("long"))
                 id.add("primary", new JsonPrimitive(true))
-                fields["id"] = new Field("id", id)
-                primary = fields["id"]
+                primary = fields["_id"] = new Field("_id", id)
                 primary.checkIntegrity()
                 primary.tableOrder = forcedOrder++;
             }

@@ -11,7 +11,8 @@ import java.util.List;
 public abstract class RecordBuilder<E> {
     private String tableName;
     private SQLiteDatabase db;
-    private Selection selection = null;
+    private String selection = null;
+    private String[] bindings = null;
     private String order = null;
     private boolean distinct = false;
     private String[] columns;
@@ -22,38 +23,31 @@ public abstract class RecordBuilder<E> {
         this.columns = columns;
     }
 
-    public RecordBuilder where(String selection, String ... args) {
-        this.selection = new Selection(selection, args);
+    public RecordBuilder<E> where(String selection, String ... args) {
+        this.selection = selection;
+        this.bindings = args;
         return this;
     }
 
-    public RecordBuilder orderBy(String order) {
+    public RecordBuilder<E> orderBy(String order) {
         this.order = order;
 
         return this;
     }
 
     public Cursor cursor() {
-        return db.query(distinct, tableName, columns, selection.toString(), selection.getBindings(), null, null, order, null);
+        return db.query(distinct, tableName, columns, selection, bindings, null, null, order, null);
     }
 
+    /**
+     * Performs the actual fetching from the database
+     * @return fetch all entries and insert it into a list
+     */
     public abstract List<E> all();
 
-    private static class Selection {
-        StringBuilder mBuilder = new StringBuilder();
-        String[] mBindings;
-
-        private Selection(String selection, String[] mBindings) {
-            mBuilder.append(selection);
-            this.mBindings = mBindings;
-        }
-
-        public StringBuilder getBuilder() {
-            return mBuilder;
-        }
-
-        public String[] getBindings() {
-            return mBindings;
-        }
-    }
+    /**
+     *
+     * @return the first entry if it exists. null otherwise
+     */
+    public abstract E first();
 }

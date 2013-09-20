@@ -28,6 +28,7 @@ class JavaObjectGenerator {
         c.doNotModify();
         c.line()
         c.line("import com.pasra.android.record.SQLiteConverter;");
+        c.line("import com.pasra.android.record.RecordBuilder;");
         c.line();
         c.wrap("public class Abstract${Inflector.camelize(table.name)}") {
             table.fields.each { _, Field field ->

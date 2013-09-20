@@ -7,9 +7,12 @@ import org.gradle.api.Project
 
 class AndroidRecordPlugin implements Plugin<Project> {
 
+    public static String VERSION = "0.0.1"
+
     @Override
     void apply(Project project) {
 
+        println(project.version)
         project.extensions.create("android_record", AndroidRecordPluginExtention)
 
         project.tasks.create('migrate', MigrateTask)

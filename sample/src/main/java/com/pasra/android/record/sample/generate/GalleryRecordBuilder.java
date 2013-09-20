@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class GalleryRecordBuilder extends RecordBuilder<Gallery>{
     public GalleryRecordBuilder(SQLiteDatabase db){
-        super("gallery", new String[] { "name", "id" }, db);
+        super("gallery", new String[] { "name", "_id" }, db);
     }
     @Override
     public java.util.List<Gallery> all(){
@@ -16,5 +16,16 @@ public class GalleryRecordBuilder extends RecordBuilder<Gallery>{
             list.add(Gallery.fromCursor(c));
         }
         return list;
+    }
+    @Override
+    public Gallery first(){
+        android.database.Cursor c = cursor();
+        if (c.moveToFirst()){
+            Gallery record = Gallery.fromCursor(c);
+            c.close();
+            return record;
+        }
+        c.close();
+        return null;
     }
 }

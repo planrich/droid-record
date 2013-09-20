@@ -9,61 +9,50 @@ public class LocalSession{
     public LocalSession(SQLiteDatabase database){
         this.mDB = database;
     }
-    public void insertPicture(AbstractPicture obj){
+    public void savePicture(AbstractPicture obj){
+        if (obj == null){
+            throw new IllegalArgumentException("Tried to save an instance of Picture which was null. Cannot do that!");
+        }
         PictureRecord record = PictureRecord.instance();
-        record.insert(mDB, obj);
+        record.save(mDB, obj);
     }
-    public Picture loadPicture(java.lang.Long id){
+    public Picture findPicture(java.lang.Long id){
         if (id == null){
             throw new IllegalArgumentException("why would you want to load a picture record with a null key?");
         }
         PictureRecord record = PictureRecord.instance();
         return record.load(mDB, id);
     }
-    public void deletePicture(java.lang.Long id){
+    public void destroyPicture(java.lang.Long id){
         if (id == null){
             throw new IllegalArgumentException("why would you want to delete a picture record with a null key?");
         }
         PictureRecord record = PictureRecord.instance();
         record.delete(mDB, id);
     }
-    public void updatePicture(AbstractPicture obj){
-        if (obj == null){
-            throw new IllegalArgumentException("Argument picture is null");
-        }
-        PictureRecord record = PictureRecord.instance();
-        record.update(mDB, obj);
-    }
     public PictureRecordBuilder queryPictures(){
         return new PictureRecordBuilder(mDB);
     }
-    public void insertGallery(AbstractGallery obj){
+    public void saveGallery(AbstractGallery obj){
+        if (obj == null){
+            throw new IllegalArgumentException("Tried to save an instance of Gallery which was null. Cannot do that!");
+        }
         GalleryRecord record = GalleryRecord.instance();
-        record.insert(mDB, obj);
+        record.save(mDB, obj);
     }
-    public Gallery loadGallery(java.lang.Long id){
+    public Gallery findGallery(java.lang.Long id){
         if (id == null){
             throw new IllegalArgumentException("why would you want to load a gallery record with a null key?");
         }
         GalleryRecord record = GalleryRecord.instance();
         return record.load(mDB, id);
     }
-    public void deleteGallery(java.lang.Long id){
+    public void destroyGallery(java.lang.Long id){
         if (id == null){
             throw new IllegalArgumentException("why would you want to delete a gallery record with a null key?");
         }
         GalleryRecord record = GalleryRecord.instance();
         record.delete(mDB, id);
-    }
-    public void updateGallery(AbstractGallery obj){
-        if (obj == null){
-            throw new IllegalArgumentException("Argument gallery is null");
-        }
-        GalleryRecord record = GalleryRecord.instance();
-        record.update(mDB, obj);
-    }
-    public java.util.List<Picture> loadPicturesBlocking(long GalleryId){
-        return GalleryRecord.instance().loadPicturesBlocking(mDB, GalleryId);
     }
     public GalleryRecordBuilder queryGalleries(){
         return new GalleryRecordBuilder(mDB);

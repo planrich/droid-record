@@ -50,6 +50,16 @@ class RecordGenerator {
                 c.line("return mInstance;")
             }
 
+            // SAVE
+            c.wrap("public void save(SQLiteDatabase db, Abstract${CamName} record)") {
+                c.wrap("if (record.${table.primary.javaGetCall()} == null)") {
+                    c.line("insert(db, record);")
+                }
+                c.wrap("else") {
+                    c.line("update(db, record);")
+                }
+            }
+
             // INSERT
             c.wrap("public void insert(SQLiteDatabase db, Abstract${CamName} record)") {
                 c.line("ContentValues values = new ContentValues(${orderedFields.size()});")
@@ -62,7 +72,7 @@ class RecordGenerator {
 
             // LOAD
             c.wrap("public ${CamName} load(SQLiteDatabase db, long id)") {
-                c.line("Cursor c = db.rawQuery(\"select * from ${table.name} where id = ?;\", new String[] { Long.toString(id) });")
+                c.line("Cursor c = db.rawQuery(\"select * from ${table.name} where ${table.primary.name} = ?;\", new String[] { Long.toString(id) });")
                 c.wrap("if (c.moveToFirst())") {
 
                     table.javaCallsNewObjectFromCursor(c, "record", "c");
@@ -73,7 +83,7 @@ class RecordGenerator {
             }
 
             c.wrap("public void delete(SQLiteDatabase db, long id)") {
-                c.line("db.execSQL(\"delete from ${table.name} where id = ?;\", new String[] { Long.toString(id) });")
+                c.line("db.execSQL(\"delete from ${table.name} where  ${table.primary.name} = ?;\", new String[] { Long.toString(id) });")
             }
 
             c.wrap("public void update(SQLiteDatabase db, Abstract${CamName} record)") {
