@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import com.pasra.android.record.AndroidRecordPlugin
 import com.pasra.android.record.Inflector
 import com.pasra.android.record.database.BelongsTo
+import com.pasra.android.record.database.Field
 import com.pasra.android.record.database.HasMany
 import com.pasra.android.record.database.Relation
 import com.pasra.android.record.database.Table
@@ -55,6 +56,7 @@ class MigrationContext {
                 }
 
                 migGen.addTable(table, file, version);
+                return
             }
 
             JsonObject rm_table = change.getAsJsonObject("drop_table");
@@ -69,7 +71,33 @@ class MigrationContext {
                 tables[name] = null;
 
                 migGen.rmTable(name, file, version);
+                return
             }
+
+            JsonObject add_column = change.getAsJsonObject("add_column");
+            if (add_column) {
+                if (!add_column.has("column") || !add_column.has("table") || !add_column.has("type")) {
+                    throw new IllegalStateException("the add_column migration has malformed properties! " +
+                            "Please specify at least the following: add_column: { table: 'name_plural', column: 'column_name_singular', type: 'string,integer,...' }")
+                }
+
+                def field_name = add_column.get("column").asString
+                def table_name = Inflector.singularize(add_column.get("table").asString)
+                def type = add_column.get("type")
+
+                def table = tables[table_name]
+                if (table == null) {
+                    throw new IllegalArgumentException("Couldn't find table ${table_name}! If the Inflector messed up the singular step on the table name, use '#table_name_singluar' in the table property!")
+                }
+
+                def field = table.addField(new Field(field_name, type))
+
+                migGen.addField(table, field, file, version)
+                return
+            }
+
+            throw new InvalidUserDataException("the change section contains a key value pair that is not understood by android record." +
+                    "This might be a typo in the migration file.");
         }
     }
 

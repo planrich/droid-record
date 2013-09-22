@@ -1,6 +1,8 @@
 package com.pasra.android.record.generation
 
+import com.google.gson.JsonElement
 import com.pasra.android.record.AndroidRecordPlugin
+import com.pasra.android.record.database.Field
 import com.pasra.android.record.database.Table
 
 /**
@@ -29,6 +31,12 @@ class MigratiorGenerator {
     void rmTable(String name, File file, long version) {
         codegen.wrap("if (currentVersion < targetVersion)") {
             codegen.line("db.execSQL(\"drop table ${name};\");")
+        }
+    }
+
+    void addField(Table table, Field field, File file, long version) {
+        codegen.wrap("if (currentVersion < targetVersion)") {
+            codegen.line("db.execSQL(\"alter table ${table.name} add column (${field.columnSQL()});\");")
         }
     }
 

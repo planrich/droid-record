@@ -1,0 +1,12 @@
+change:{
+  create_table: {
+    name: 'usr',
+    fields: {
+      first_name: "string",
+      last_name: "string",
+      age: "integer"
+    }
+  },
+
+  add_column: { table: "galleries", column: "usr_id", type: "integer" }
+}

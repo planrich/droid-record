@@ -34,11 +34,11 @@ public class PictureRecord{
         Cursor c = db.rawQuery("select * from picture where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             Picture record = new Picture();
-            record.setName(c.getString(0));
-            record.setImage(c.getBlob(1));
-            record.setDate(SQLiteConverter.stringToDate(c.getString(2)));
-            record.setGalleryId(c.getLong(3));
-            record.setId(c.getLong(4));
+            record.setId(c.getLong(0));
+            record.setName(c.getString(1));
+            record.setImage(c.getBlob(2));
+            record.setDate(SQLiteConverter.stringToDate(c.getString(3)));
+            record.setGalleryId(c.getLong(4));
             return record;
         }
         return null;

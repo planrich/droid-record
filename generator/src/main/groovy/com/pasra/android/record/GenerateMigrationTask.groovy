@@ -14,16 +14,14 @@ class GenerateMigrationTask extends DefaultTask {
 
         AndroidRecordPlugin.sanitizeConfiguration(project)
 
-        def name = System.getProperty("name", "migration")
+        def name = System.getProperty("name", "migration").replaceAll(" ","_")
 
         File root = project.file(project.android_record.migration_path)
 
         File migration = new File(root, "${timestamp(new Date())}_${name}.json")
         OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(migration));
         CodeGenerator c = new CodeGenerator();
-        c.wrap("") {
-            c.wrap("change:") {
-            }
+        c.wrap("change: ") {
         }
 
         w.write(c.toString());

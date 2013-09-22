@@ -22,6 +22,8 @@ class Table {
 
     def relations = [];
 
+    def table_order = 1;
+
     Table(JsonObject json) {
         this.json = json
     }
@@ -32,7 +34,6 @@ class Table {
      */
     void checkIntegrity() {
         // define ordering!
-        def forcedOrder = 0;
 
         if (json.has("name")
            && json.get("name").isJsonPrimitive()
@@ -44,32 +45,52 @@ class Table {
             jsonFields.entrySet().each { entry ->
                 def fieldName = entry.getKey()
                 def fieldElement = entry.getValue()
-                def field = new Field(fieldName, fieldElement);
-                field.tableOrder = forcedOrder++;
 
-                field.checkIntegrity();
-                fields[field.name] = field
-                if (field.isPrimary()) {
-                    primary = field;
+                if (fieldName == "id" || fieldName == "_id") {
+                    throw new IllegalArgumentException("Please do not use the reserved column name 'id' or '_id'. " +
+                            "By default android record will add an _id column to uniquely identify " +
+                            "every table row.");
                 }
+
+                addField(new Field(fieldName, fieldElement));
             }
 
-            if (fields["_id"] == null) {
-                logger.info 'Table has no android primary key, adding _id'
-                JsonObject id = new JsonObject();
-                id.add("type", new JsonPrimitive("long"))
-                id.add("primary", new JsonPrimitive(true))
-                primary = fields["_id"] = new Field("_id", id)
-                primary.checkIntegrity()
-                primary.tableOrder = forcedOrder++;
-            }
+            JsonObject id = new JsonObject();
+            id.add("type", new JsonPrimitive("long"))
+            id.add("primary", new JsonPrimitive(true))
+            addField(new Field("_id", id))
+            primary.tableOrder = 0;
 
             if (fields.size() == 0) {
                 throw new IllegalArgumentException("Every table needs at least one table column. '${name}' has none!")
             }
         } else {
-            throw new IllegalArgumentException("Malformed json given!");
+            throw new IllegalArgumentException("A table from the given json cannot be constructed. Please correct typos and chekc the docs for create_table!");
         }
+    }
+
+    Field addField(Field field) {
+
+        if (fields[field.name] != null) {
+            throw new IllegalStateException("The field '${field.name}' is aready present in the schema of '${name}'")
+        }
+
+        field.checkIntegrity();
+
+        fields[field.name] = field
+        if (field.isPrimary() && primary != null) {
+            throw new IllegalStateException("It is not possible to have two primary keys! " +
+                    "Android record defines '_id' by default and yet it is not possible " +
+                    "to have any other primary keys!")
+        }
+
+        if (field.isPrimary()) {
+            primary = field;
+        } else {
+            field.tableOrder = table_order++;
+        }
+
+        return field
     }
 
     Field[] getOrderedFields(includePrimary = true) {

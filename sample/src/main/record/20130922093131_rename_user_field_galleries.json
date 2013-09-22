@@ -1,0 +1,4 @@
+change:{
+  rename_table: { table: 'usrs', to: 'user' },
+  rename_column: { table: 'galleries', name: 'usr_id', to: 'user_id' }
+}

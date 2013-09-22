@@ -30,7 +30,7 @@ class MigrateTask extends DefaultTask {
 
         MigrationContext ctx = new MigrationContext(project.file(ex.output_path).path, ex.output_package);
 
-        String[] files = root.list()
+        String[] files = root.list().sort()
         files.each { String file ->
             if (isMigration(file)) {
                 JsonReader reader = new JsonReader(new StringReader("{"+(new File(root, file).text)+ "}"));

@@ -1,6 +1,69 @@
 # Android Record
 
+## Requirements
+
+Gradle
+
 ## Getting started
+
+Android Record is a code generator. It reduces the hassle with database interaction.
+Its configuration is based on json files which describe the database schema at any
+given time.
+
+~~~
+gradle migration -Dname="create_gallery"
+~~~
+
+It generates a json file (<TIMESTAMP>_create_gallery.json):
+
+~~~
+change: {
+  create_table: {
+    name: 'gallery',
+    fields: {
+      name: 'string',
+    }
+  }
+}
+~~~
+
+~~~
+$ gradle migrate
+~~~
+
+Will generate code to including a gallery java object. Interaction is easy as pie:
+
+~~~
+// in your CustomApplication.java
+db = getContext().openOrCreateDatabase("galleryapp", Context.MODE_PRIVATE, null);
+new RecordMigrator(db).migrate();
+session = new LocalSession(mDB);
+
+// somewhere in your code
+session = ...; // obtain the LocalSession from your CustomApplication
+Gallery gallery = new Gallery();
+gallery.setName("pixelart");
+session.saveGallery(gallery);
+~~~
+
+Well, that is kind of dull? NO PROBLEM! Check this out:
+
+~~~
+List<Gallery> all = session.queryGalleries().all();
+Gallery g = null;
+g = session.findGallery(666);
+g = session.queryGalleries().where("name = ?", "chuck norris best of").first();
+// and there is more!
+~~~
+
+Hmm, that's more like it. But wait:
+
+~~~
+RemoteSession remote = new RemoteSession(session, "pasra.at")
+Gallery g = remote.findGallery(666, new Callback() { ... });
+~~~
+
+
 
 
 ## Null and default values

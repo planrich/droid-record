@@ -39,11 +39,11 @@ public class AbstractPicture{
     }
     public static Picture fromCursor(android.database.Cursor cursor){
         Picture record = new Picture();
-        record.setName(cursor.getString(0));
-        record.setImage(cursor.getBlob(1));
-        record.setDate(SQLiteConverter.stringToDate(cursor.getString(2)));
-        record.setGalleryId(cursor.getLong(3));
-        record.setId(cursor.getLong(4));
+        record.setId(cursor.getLong(0));
+        record.setName(cursor.getString(1));
+        record.setImage(cursor.getBlob(2));
+        record.setDate(SQLiteConverter.stringToDate(cursor.getString(3)));
+        record.setGalleryId(cursor.getLong(4));
         return record;
     }
 }

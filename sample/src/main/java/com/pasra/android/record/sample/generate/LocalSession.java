@@ -9,6 +9,30 @@ public class LocalSession{
     public LocalSession(SQLiteDatabase database){
         this.mDB = database;
     }
+    public void saveGallery(AbstractGallery obj){
+        if (obj == null){
+            throw new IllegalArgumentException("Tried to save an instance of Gallery which was null. Cannot do that!");
+        }
+        GalleryRecord record = GalleryRecord.instance();
+        record.save(mDB, obj);
+    }
+    public Gallery findGallery(java.lang.Long id){
+        if (id == null){
+            throw new IllegalArgumentException("why would you want to load a gallery record with a null key?");
+        }
+        GalleryRecord record = GalleryRecord.instance();
+        return record.load(mDB, id);
+    }
+    public void destroyGallery(java.lang.Long id){
+        if (id == null){
+            throw new IllegalArgumentException("why would you want to delete a gallery record with a null key?");
+        }
+        GalleryRecord record = GalleryRecord.instance();
+        record.delete(mDB, id);
+    }
+    public GalleryRecordBuilder queryGalleries(){
+        return new GalleryRecordBuilder(mDB);
+    }
     public void savePicture(AbstractPicture obj){
         if (obj == null){
             throw new IllegalArgumentException("Tried to save an instance of Picture which was null. Cannot do that!");
@@ -33,28 +57,28 @@ public class LocalSession{
     public PictureRecordBuilder queryPictures(){
         return new PictureRecordBuilder(mDB);
     }
-    public void saveGallery(AbstractGallery obj){
+    public void saveUsr(AbstractUsr obj){
         if (obj == null){
-            throw new IllegalArgumentException("Tried to save an instance of Gallery which was null. Cannot do that!");
+            throw new IllegalArgumentException("Tried to save an instance of Usr which was null. Cannot do that!");
         }
-        GalleryRecord record = GalleryRecord.instance();
+        UsrRecord record = UsrRecord.instance();
         record.save(mDB, obj);
     }
-    public Gallery findGallery(java.lang.Long id){
+    public Usr findUsr(java.lang.Long id){
         if (id == null){
-            throw new IllegalArgumentException("why would you want to load a gallery record with a null key?");
+            throw new IllegalArgumentException("why would you want to load a usr record with a null key?");
         }
-        GalleryRecord record = GalleryRecord.instance();
+        UsrRecord record = UsrRecord.instance();
         return record.load(mDB, id);
     }
-    public void destroyGallery(java.lang.Long id){
+    public void destroyUsr(java.lang.Long id){
         if (id == null){
-            throw new IllegalArgumentException("why would you want to delete a gallery record with a null key?");
+            throw new IllegalArgumentException("why would you want to delete a usr record with a null key?");
         }
-        GalleryRecord record = GalleryRecord.instance();
+        UsrRecord record = UsrRecord.instance();
         record.delete(mDB, id);
     }
-    public GalleryRecordBuilder queryGalleries(){
-        return new GalleryRecordBuilder(mDB);
+    public UsrRecordBuilder queryUsrs(){
+        return new UsrRecordBuilder(mDB);
     }
 }
