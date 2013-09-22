@@ -156,7 +156,7 @@ class MigrationContext {
                     }
 
                 } else {
-                    if (cmd_name == "data_migrate") {
+                    if (cmd_name == "migrate_data") {
                         String javaClassName = e.value.asString
                         migGen.dataMigrator(javaClassName);
                     }

@@ -145,7 +145,7 @@ class Table {
     }
 
     String creationSQL(name_suffix = "") {
-        def columns = fields.values().collect { Field field -> field.columnSQL() }.join ", "
+        def columns = getOrderedFields(true).collect { Field field -> field.columnSQL() }.join ", "
         return "create table ${name + name_suffix} (${columns});";
     }
 

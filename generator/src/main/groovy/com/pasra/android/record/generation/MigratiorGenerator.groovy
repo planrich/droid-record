@@ -58,13 +58,12 @@ class MigratiorGenerator {
                     codegen.line("String s${i++} = c.getString(c.getColumnIndex(\"${name}\"));")
                 }
 
-                i--
                 codegen.line("db.rawQuery(\"insert into ${new_table_name} (" +
                         (table.getOrderedFields(true).collect({ f -> f.name }).join(", ")) +
                         ") values (" +
                         (["?"] * i).join(", ") +
                         ");\", new String[] {" +
-                        ((0..i).collect({ x -> "s${x}" })).join(", ") +
+                        ((0..(i-1)).collect({ x -> "s${x}" })).join(", ") +
                         "});")
             }
             codegen.line("db.execSQL(\"commit\");")
@@ -73,7 +72,7 @@ class MigratiorGenerator {
 
     void dataMigrator(String name) {
         codegen.wrap("if (currentVersion < targetVersion)") {
-            codegen.line("new ${name}().migrate(db, currentVersion, targetVersion)");
+            codegen.line("new ${name}().migrate(db, currentVersion, targetVersion);");
         }
     }
 
