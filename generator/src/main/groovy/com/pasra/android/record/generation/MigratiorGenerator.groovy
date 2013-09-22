@@ -2,6 +2,7 @@ package com.pasra.android.record.generation
 
 import com.google.gson.JsonElement
 import com.pasra.android.record.AndroidRecordPlugin
+import com.pasra.android.record.Inflector
 import com.pasra.android.record.database.Field
 import com.pasra.android.record.database.Table
 
@@ -22,22 +23,23 @@ class MigratiorGenerator {
         codegen.indent(2)
     }
 
-    void addTable(Table table, File file, long version) {
-        codegen.wrap("if (currentVersion < targetVersion)") {
-            codegen.line("db.execSQL(\"${table.creationSQL()}\");")
+    void oneMigrationStep(long version, Closure closure) {
+        codegen.wrap("if (currentVersion < targetVersion && currentVersion < ${version}L)") {
+            closure.run();
+            codegen.line("currentVersion = ${version}L;")
         }
+    }
+
+    void addTable(Table table, File file, long version) {
+        codegen.line("db.execSQL(\"${table.creationSQL()}\");")
     }
 
     void rmTable(String name, File file, long version) {
-        codegen.wrap("if (currentVersion < targetVersion)") {
-            codegen.line("db.execSQL(\"drop table ${name};\");")
-        }
+        codegen.line("db.execSQL(\"drop table ${Inflector.pluralize(Inflector.singularize(name))};\");")
     }
 
     void addField(Table table, Field field, File file, long version) {
-        codegen.wrap("if (currentVersion < targetVersion)") {
-            codegen.line("db.execSQL(\"alter table ${table.name} add column (${field.columnSQL()});\");")
-        }
+        codegen.line("db.execSQL(\"alter table ${table.sqlTableName} add column ${field.columnSQL()};\");")
     }
 
     void moveContentsTo(Table table, String old_table_name, String new_table_name, mapping = [:]) {
@@ -63,62 +65,53 @@ class MigratiorGenerator {
                         ") values (" +
                         (["?"] * i).join(", ") +
                         ");\", new String[] {" +
-                        ((0..(i-1)).collect({ x -> "s${x}" })).join(", ") +
+                        ((0..(i - 1)).collect({ x -> "s${x}" })).join(", ") +
                         "});")
             }
             codegen.line("db.execSQL(\"commit\");")
         }
     }
 
-    void dataMigrator(String name) {
-        codegen.wrap("if (currentVersion < targetVersion)") {
-            codegen.line("new ${name}().migrate(db, currentVersion, targetVersion);");
-        }
+    void dataMigrator(String name, File file, long version) {
+        codegen.line("new ${name}().migrate(db, currentVersion, targetVersion);");
     }
 
     void removeField(Table table, Field removed, File file, long version) {
-        codegen.wrap("if (currentVersion < targetVersion)") {
-            // move contents to new temporary table
-            def suffix = "_mig_temp_table"
-            codegen.line("db.execSQL(\"${table.creationSQL(suffix)}\");")
-            moveContentsTo(table, table.name, table.name + suffix )
-            codegen.line("db.execSQL(\"drop table ${table.name}\");")
+        // move contents to new temporary table
+        def suffix = "_mig_temp_table"
+        codegen.line("db.execSQL(\"${table.creationSQL(suffix)}\");")
+        moveContentsTo(table, table.sqlTableName, table.sqlTableName + suffix)
+        codegen.line("db.execSQL(\"drop table ${table.sqlTableName}\");")
 
-            // create the table again with the new schema. insert the data back
-            codegen.line("db.execSQL(\"${table.creationSQL()}\");")
-            moveContentsTo(table, table.name + suffix, table.name, [:])
-            codegen.line("db.execSQL(\"drop table ${table.name + suffix}\");")
-        }
+        // create the table again with the new schema. insert the data back
+        codegen.line("db.execSQL(\"${table.creationSQL()}\");")
+        moveContentsTo(table, table.sqlTableName + suffix, table.sqlTableName, [:])
+        codegen.line("db.execSQL(\"drop table ${table.sqlTableName + suffix}\");")
     }
 
     void renameTable(Table table, String old_name, String new_name, File file, long version) {
-        codegen.wrap("if (currentVersion < targetVersion)") {
-            // table already has new name
-            codegen.line("db.execSQL(\"${table.creationSQL()}\");")
-            moveContentsTo(table, old_name, new_name)
-            codegen.line("db.execSQL(\"drop table ${old_name}\");")
-        }
+        // table already has new name
+        codegen.line("db.execSQL(\"${table.creationSQL()}\");")
+        moveContentsTo(table, old_name, new_name)
+        codegen.line("db.execSQL(\"drop table ${old_name}\");")
     }
 
     void renameField(Table table, String old_name, String new_name, File file, long version) {
-        codegen.wrap("if (currentVersion < targetVersion)") {
+        // move contents to new temporary table
+        def suffix = "_mig_temp_table"
+        codegen.line("db.execSQL(\"${table.creationSQL(suffix)}\");")
+        moveContentsTo(table, table.sqlTableName, table.sqlTableName + suffix, [new_name: old_name])
+        codegen.line("db.execSQL(\"drop table ${table.sqlTableName}\");")
 
-            // move contents to new temporary table
-            def suffix = "_mig_temp_table"
-            codegen.line("db.execSQL(\"${table.creationSQL(suffix)}\");")
-            moveContentsTo(table, table.name, table.name + suffix, [ new_name : old_name ])
-            codegen.line("db.execSQL(\"drop table ${table.name}\");")
-
-            // create the table again with the new schema. insert the data back
-            codegen.line("db.execSQL(\"${table.creationSQL()}\");")
-            moveContentsTo(table, table.name + suffix, table.name, [:])
-            codegen.line("db.execSQL(\"drop table ${table.name + suffix}\");")
-        }
+        // create the table again with the new schema. insert the data back
+        codegen.line("db.execSQL(\"${table.creationSQL()}\");")
+        moveContentsTo(table, table.sqlTableName + suffix, table.sqlTableName, [:])
+        codegen.line("db.execSQL(\"drop table ${table.sqlTableName + suffix}\");")
     }
 
     void writeToFile() {
 
-        def config_table = "android_record_config";
+        def config_table = "android_record_configs";
         def generator_version_key = "generator_version";
         def version_key = "version";
 
@@ -173,9 +166,15 @@ class MigratiorGenerator {
 
             c.line("@Override")
             c.wrap("public void migrate(long currentVersion, long targetVersion)") {
-                c.line("""db.execSQL("insert or replace into ${config_table} (key,value) values ('${generator_version_key}','${AndroidRecordPlugin.VERSION}')");""")
+                c.line("""db.execSQL("insert or replace into ${config_table} (key,value) values ('${
+                    generator_version_key
+                }','${AndroidRecordPlugin.VERSION}')");""")
                 c.write(codegen.toString(), true, false);
-                c.line("""db.execSQL("insert or replace into ${config_table} (key,value) values (?,?)", new Object[] { "${version_key}", new Long(targetVersion) });""")
+                c.line("""db.execSQL("insert or replace into ${
+                    config_table
+                } (key,value) values (?,?)", new Object[] { "${
+                    version_key
+                }", new Long(currentVersion) });""")
             }
 
         }

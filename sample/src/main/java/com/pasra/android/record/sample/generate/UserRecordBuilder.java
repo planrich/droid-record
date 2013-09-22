@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class UserRecordBuilder extends RecordBuilder<User>{
     public UserRecordBuilder(SQLiteDatabase db){
-        super("user", new String[] { "_id", "first_name", "last_name" }, db);
+        super("users", new String[] { "_id", "first_name", "last_name" }, db);
     }
     @Override
     public java.util.List<User> all(){

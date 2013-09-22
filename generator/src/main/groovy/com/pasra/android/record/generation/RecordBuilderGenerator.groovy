@@ -20,7 +20,7 @@ class RecordBuilderGenerator {
 
         CodeGenerator c = new CodeGenerator();
 
-        def javaClassName = Inflector.camelize(table.name)
+        def javaClassName = table.javaClassName
 
         c.line("package ${pkg};")
         c.doNotModify()
@@ -31,7 +31,7 @@ class RecordBuilderGenerator {
         c.wrap("public class ${javaClassName}RecordBuilder extends RecordBuilder<${javaClassName}>") {
             c.wrap("public ${javaClassName}RecordBuilder(SQLiteDatabase db)") {
                 def cols = table.getOrderedFields(true).collect({ f -> "\"${f.name}\"" })
-                c.line("super(\"${table.name}\", new String[] { ${cols.join(", ")} }, db);");
+                c.line("super(\"${table.sqlTableName}\", new String[] { ${cols.join(", ")} }, db);");
             }
 
             c.line("@Override")

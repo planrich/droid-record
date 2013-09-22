@@ -25,11 +25,11 @@ public class GalleryRecord{
         ContentValues values = new ContentValues(2);
         values.put("name", record.getName());
         values.put("user_id", record.getUserId());
-        long id = db.insert("gallery", null, values);
+        long id = db.insert("galleries", null, values);
         record.setId(id);
     }
     public Gallery load(SQLiteDatabase db, long id){
-        Cursor c = db.rawQuery("select * from gallery where _id = ?;", new String[] { Long.toString(id) });
+        Cursor c = db.rawQuery("select * from galleries where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             Gallery record = new Gallery();
             record.setId(c.getLong(0));
@@ -40,13 +40,13 @@ public class GalleryRecord{
         return null;
     }
     public void delete(SQLiteDatabase db, long id){
-        db.execSQL("delete from gallery where  _id = ?;", new String[] { Long.toString(id) });
+        db.execSQL("delete from galleries where  _id = ?;", new String[] { Long.toString(id) });
     }
     public void update(SQLiteDatabase db, AbstractGallery record){
         ContentValues values = new ContentValues(2);
         values.put("name", record.getName());
         values.put("user_id", record.getUserId());
         long id = record.getId();
-        db.update("gallery", values, "_id = ?", new String[] { Long.toString(id) });
+        db.update("galleries", values, "_id = ?", new String[] { Long.toString(id) });
     }
 }

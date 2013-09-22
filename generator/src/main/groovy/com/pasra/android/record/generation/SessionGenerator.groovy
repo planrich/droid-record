@@ -34,34 +34,34 @@ class SessionGenerator {
             }
 
             tables.each { String name, Table table ->
-                def javaNameCaml = Inflector.camelize(table.name)
-                def javaPluralCamel = Inflector.camelize(Inflector.pluralize(table.name));
-                c.wrap("public void save${javaNameCaml}(Abstract${javaNameCaml} obj)") {
+                def javaClassName = table.javaClassName
+                def javaPluralCamel = Inflector.camelize(Inflector.pluralize(javaClassName));
+                c.wrap("public void save${javaClassName}(Abstract${javaClassName} obj)") {
                     c.wrap("if (obj == null)") {
                         c.line("throw new IllegalArgumentException(" +
-                                "\"Tried to save an instance of ${javaNameCaml} which was null. Cannot do that!\");")
+                                "\"Tried to save an instance of ${javaClassName} which was null. Cannot do that!\");")
                     }
-                    c.line("${javaNameCaml}Record record = ${javaNameCaml}Record.instance();")
+                    c.line("${javaClassName}Record record = ${javaClassName}Record.instance();")
                     c.line("record.save(mDB, obj);")
                 }
 
-                c.wrap("public ${javaNameCaml} find${javaNameCaml}(java.lang.Long id)") {
+                c.wrap("public ${javaClassName} find${javaClassName}(java.lang.Long id)") {
                     c.wrap("if (id == null)") {
                         c.line("throw new IllegalArgumentException(" +
                                 "\"why would you want to load a ${name} record with a null key?\");")
                     }
 
-                    c.line("${javaNameCaml}Record record = ${javaNameCaml}Record.instance();")
+                    c.line("${javaClassName}Record record = ${javaClassName}Record.instance();")
                     c.line("return record.load(mDB, id);")
                 }
 
-                c.wrap("public void destroy${javaNameCaml}(java.lang.Long id)") {
+                c.wrap("public void destroy${javaClassName}(java.lang.Long id)") {
                     c.wrap("if (id == null)") {
                         c.line("throw new IllegalArgumentException(" +
                                 "\"why would you want to delete a ${name} record with a null key?\");")
                     }
 
-                    c.line("${javaNameCaml}Record record = ${javaNameCaml}Record.instance();")
+                    c.line("${javaClassName}Record record = ${javaClassName}Record.instance();")
                     c.line("record.delete(mDB, id);")
                 }
 
@@ -71,8 +71,8 @@ class SessionGenerator {
                 }
 
                 // generate query builder creators
-                c.wrap("public ${javaNameCaml}RecordBuilder query${javaPluralCamel}()") {
-                    c.line("return new ${javaNameCaml}RecordBuilder(mDB);")
+                c.wrap("public ${javaClassName}RecordBuilder query${javaPluralCamel}()") {
+                    c.line("return new ${javaClassName}RecordBuilder(mDB);")
                 }
             }
         }

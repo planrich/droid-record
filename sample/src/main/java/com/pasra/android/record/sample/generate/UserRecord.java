@@ -25,11 +25,11 @@ public class UserRecord{
         ContentValues values = new ContentValues(2);
         values.put("first_name", record.getFirstName());
         values.put("last_name", record.getLastName());
-        long id = db.insert("user", null, values);
+        long id = db.insert("users", null, values);
         record.setId(id);
     }
     public User load(SQLiteDatabase db, long id){
-        Cursor c = db.rawQuery("select * from user where _id = ?;", new String[] { Long.toString(id) });
+        Cursor c = db.rawQuery("select * from users where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             User record = new User();
             record.setId(c.getLong(0));
@@ -40,13 +40,13 @@ public class UserRecord{
         return null;
     }
     public void delete(SQLiteDatabase db, long id){
-        db.execSQL("delete from user where  _id = ?;", new String[] { Long.toString(id) });
+        db.execSQL("delete from users where  _id = ?;", new String[] { Long.toString(id) });
     }
     public void update(SQLiteDatabase db, AbstractUser record){
         ContentValues values = new ContentValues(2);
         values.put("first_name", record.getFirstName());
         values.put("last_name", record.getLastName());
         long id = record.getId();
-        db.update("user", values, "_id = ?", new String[] { Long.toString(id) });
+        db.update("users", values, "_id = ?", new String[] { Long.toString(id) });
     }
 }

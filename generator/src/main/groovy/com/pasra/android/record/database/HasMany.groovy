@@ -21,10 +21,10 @@ class HasMany extends Relation {
     @Override
     void generateJavaMethods(CodeGenerator c) {
 
-        def javaObj = Inflector.camelize(target.name)
-        def plural = Inflector.camelize(Inflector.pluralize(target.name))
-        c.wrap("public RecordBuilder<${javaObj}> load${plural}(LocalSession session)") {
-            c.line("return session.query${plural}().where(\"${origin.name}_id = ?\", Long.toString(${origin.primary.javaPrivateFieldName()}) );")
+        def javaClassName = target.javaClassName
+        def pluralJavaClassName = Inflector.camelize(Inflector.pluralize(javaClassName))
+        c.wrap("public RecordBuilder<${javaClassName}> load${pluralJavaClassName}(LocalSession session)") {
+            c.line("return session.query${pluralJavaClassName}().where(\"${origin.name}_id = ?\", Long.toString(${origin.primary.javaPrivateFieldName()}) );")
         }
     }
 
@@ -43,8 +43,8 @@ class HasMany extends Relation {
         }
 
         if (!has_foreign_key) {
-            throw new InvalidUserDataException("Table ${target.name} does not specify a foreign key '${foreign_key}'. " +
-                    "This means that a ${target.name} record does _NOT_ have many ${Inflector.pluralize(target.name)}!")
+            throw new InvalidUserDataException("Table ${target.sqlTableName} does not specify a foreign key '${foreign_key}'. " +
+                    "This means that a ${origin.sqlTableName} record does _NOT_ have many ${Inflector.pluralize(target.name)}!")
         }
     }
 }

@@ -12,9 +12,9 @@ import org.gradle.api.logging.Logging
  */
 class Table {
 
-    def logger = Logging.getLogger("android_record")
-
     String name;
+    String sqlTableName;
+    String javaClassName;
     JsonObject json;
 
     Field primary = null;
@@ -69,6 +69,8 @@ class Table {
 
     void changeName(String name) {
         this.name = Inflector.tabelize(name)
+        this.javaClassName = Inflector.camelize(this.name);
+        this.sqlTableName = Inflector.pluralize(this.name)
     }
 
     Field removeField(String field_name) {
@@ -146,7 +148,7 @@ class Table {
 
     String creationSQL(name_suffix = "") {
         def columns = getOrderedFields(true).collect { Field field -> field.columnSQL() }.join ", "
-        return "create table ${name + name_suffix} (${columns});";
+        return "create table ${sqlTableName + name_suffix} (${columns});";
     }
 
     /**

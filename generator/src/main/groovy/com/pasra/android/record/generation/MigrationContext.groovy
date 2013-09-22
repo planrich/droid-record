@@ -20,7 +20,7 @@ class MigrationContext {
     def logger = Logging.getLogger("android_record")
     def path;
     def pkg;
-    def migGen;
+    MigratiorGenerator migGen;
 
     def tables = [:];
 
@@ -32,7 +32,7 @@ class MigrationContext {
     }
 
     /**
-     * Add an additional migration step to the context.
+     * Add an additional migration oneMigrationStep to the context.
      * @param obj
      * @param file
      * @param version
@@ -43,126 +43,123 @@ class MigrationContext {
 
         JsonObject change = obj.getAsJsonObject("change");
         if (change) {
-
             change.entrySet().each { Map.Entry<String, JsonElement> e ->
                 String cmd_name = e.key
-                if (e.value.isJsonObject()) {
-                    JsonObject migration = e.value.getAsJsonObject();
-                    if (cmd_name == "create_table") {
-                        Table table = new Table(migration);
-                        table.checkIntegrity();
-                        if (tables[table.name] == null) {
-                            tables[table.name] = table
-                        } else {
-                            throw new IllegalStateException("Duplicate table '${table.name}'.")
+                migGen.oneMigrationStep(version) {
+                    if (e.value.isJsonObject()) {
+                        JsonObject migration = e.value.getAsJsonObject();
+                        if (cmd_name == "create_table") {
+                            Table table = new Table(migration);
+                            table.checkIntegrity();
+                            if (tables[table.name] == null) {
+                                tables[table.name] = table
+                            } else {
+                                throw new IllegalStateException("Duplicate table '${table.name}'.")
+                            }
+
+                            migGen.addTable(table, file, version);
                         }
 
-                        migGen.addTable(table, file, version);
-                    }
+                        if (cmd_name == "drop_table" && migration.has("name")) {
+                            def name = migration.get("name").getAsString();
+                            def table = tables[name];
 
-                    if (cmd_name == "drop_table" && migration.has("name")) {
-                        def name = migration.get("name").getAsString();
-                        def table = tables[name];
+                            if (table == null) {
+                                throw new IllegalStateException("Table ${name} is missing but should be present.");
+                            }
 
-                        if (table == null) {
-                            throw new IllegalStateException("Table ${name} is missing but should be present.");
+                            tables[name] = null;
+
+                            migGen.rmTable(name, file, version);
                         }
 
-                        tables[name] = null;
+                        if (cmd_name == "add_column") {
+                            if (!migration.has("column") || !migration.has("table") || !migration.has("type")) {
+                                throw new IllegalStateException("the add_column migration has malformed properties! " +
+                                        "Please specify at least the following: add_column: { table: 'name_plural', column: 'column_name_singular', type: 'string,integer,...' }")
+                            }
 
-                        migGen.rmTable(name, file, version);
-                    }
+                            def field_name = migration.get("column").asString
+                            def table_name = Inflector.singularize(migration.get("table").asString)
+                            def type = migration.get("type")
 
-                    if (cmd_name == "add_column") {
-                        if (!migration.has("column") || !migration.has("table") || !migration.has("type")) {
-                            throw new IllegalStateException("the add_column migration has malformed properties! " +
-                                    "Please specify at least the following: add_column: { table: 'name_plural', column: 'column_name_singular', type: 'string,integer,...' }")
+                            Table table = tables[table_name]
+                            if (table == null) {
+                                throw new IllegalArgumentException("Couldn't find table ${table_name}! If the Inflector messed up the singular step on the table name, use '#table_name_singluar' in the table property!")
+                            }
+
+                            def field = table.addField(new Field(field_name, type))
+
+                            migGen.addField(table, field, file, version)
                         }
 
-                        def field_name = migration.get("column").asString
-                        def table_name = Inflector.singularize(migration.get("table").asString)
-                        def type = migration.get("type")
+                        if (cmd_name == "rename_column") {
+                            if (!migration.has("column") || !migration.has("table") || !migration.has("to")) {
+                                throw new IllegalStateException("the rename_column migration has malformed properties! " +
+                                        "Please specify at least the following: rename_column: " +
+                                        "{ table: 'name_singular', column: 'column_name_singular', to: 'new_name_singular' }")
+                            }
 
-                        Table table = tables[table_name]
-                        if (table == null) {
-                            throw new IllegalArgumentException("Couldn't find table ${table_name}! If the Inflector messed up the singular step on the table name, use '#table_name_singluar' in the table property!")
+                            def old_field_name = migration.get("column").asString
+                            def table_name = Inflector.tabelize(migration.get("table").asString)
+                            def new_field_name = migration.get("to").asString
+
+                            Table table = tables[table_name]
+                            if (table == null) {
+                                throw new IllegalArgumentException("Couldn't find table ${table_name}!")
+                            }
+
+                            table.renameField(old_field_name, new_field_name)
+                            migGen.renameField(table, old_field_name, new_field_name, file, version)
                         }
 
-                        def field = table.addField(new Field(field_name, type))
+                        if (cmd_name == "remove_column") {
+                            if (!migration.has("table") || !migration.has("column")) {
+                                throw new IllegalStateException("the remove_column migration has malformed properties! " +
+                                        "Please specify at least the following: remove_column: " +
+                                        "{ table: 'name_singular', column: 'column_name_singular' }")
+                            }
 
-                        migGen.addField(table, field, file, version)
-                    }
+                            def table_name = Inflector.tabelize(migration.get("table").asString)
+                            def field_name = migration.get("column").asString
 
-                    if (cmd_name == "rename_column") {
-                        if (!migration.has("column") || !migration.has("table") || !migration.has("to")) {
-                            throw new IllegalStateException("the rename_column migration has malformed properties! " +
-                                    "Please specify at least the following: rename_column: " +
-                                    "{ table: 'name_plural', column: 'column_name_singular', to: 'new_name_singular' }")
+                            Table table = tables[table_name]
+                            if (table == null) {
+                                throw new IllegalArgumentException("Couldn't find table ${table_name}!")
+                            }
+
+                            Field field = table.removeField(field_name)
+                            migGen.removeField(table, field, file, version)
                         }
 
-                        def old_field_name = migration.get("column").asString
-                        def table_name = Inflector.singularize(migration.get("table").asString)
-                        def new_field_name = migration.get("to").asString
+                        if (cmd_name == "rename_table") {
+                            if (!migration.has("table") || !migration.has("to")) {
+                                throw new IllegalStateException("the rename_table migration has malformed properties! " +
+                                        "Please specify at least the following: rename_table: " +
+                                        "{ table: 'name_singular', to: 'table_name_singular' }")
+                            }
 
-                        Table table = tables[table_name]
-                        if (table == null) {
-                            throw new IllegalArgumentException("Couldn't find table ${table_name}! If the Inflector messed up the singular step on the table name, use '#table_name_singluar' in the table property!")
+                            def old_table_name = Inflector.tabelize(migration.get("table").asString)
+                            def new_table_name = Inflector.tabelize(migration.get("to").asString)
+
+                            def table = tables[old_table_name]
+                            if (table == null) {
+                                throw new IllegalArgumentException("Couldn't find table ${old_table_name}!")
+                            }
+                            tables.remove(old_table_name)
+
+                            table.changeName(new_table_name)
+                            migGen.renameTable(table, Inflector.pluralize(old_table_name), Inflector.pluralize(new_table_name), file, version)
+                            tables[new_table_name] = table
                         }
 
-                        table.renameField(old_field_name, new_field_name)
-                        migGen.renameField(table, old_field_name, new_field_name, file, version)
-                    }
-
-                    if (cmd_name == "remove_column") {
-                        if (!migration.has("table") || !migration.has("column")) {
-                            throw new IllegalStateException("the remove_column migration has malformed properties! " +
-                                    "Please specify at least the following: remove_column: " +
-                                    "{ table: 'name_plural', column: 'column_name_singular' }")
+                    } else {
+                        if (cmd_name == "migrate_data") {
+                            String javaClassName = e.value.asString
+                            migGen.dataMigrator(javaClassName, file, version);
                         }
-
-                        def table_name = Inflector.singularize(migration.get("table").asString)
-                        def field_name = migration.get("column").asString
-
-                        def table = tables[table_name]
-                        if (table == null) {
-                            throw new IllegalArgumentException("Couldn't find table ${table_name}! If the Inflector messed up the singular " +
-                                    "step on the table name, use '#table_name_singluar' in the table property!")
-                        }
-
-                        Field field = table.removeField(field_name)
-                        migGen.removeField(table, field, file, version)
-                    }
-
-                    if (cmd_name == "rename_table") {
-                        if (!migration.has("table") || !migration.has("to")) {
-                            throw new IllegalStateException("the rename_table migration has malformed properties! " +
-                                    "Please specify at least the following: rename_table: " +
-                                    "{ table: 'name_plural', to: 'table_name_singular' }")
-                        }
-
-                        def old_table_name = Inflector.singularize(migration.get("table").asString)
-                        def new_table_name = migration.get("to").asString
-
-                        def table = tables[old_table_name]
-                        if (table == null) {
-                            throw new IllegalArgumentException("Couldn't find table ${old_table_name}! If the Inflector messed up the singular " +
-                                    "step on the table name, use '#table_name_singluar' in the table property!")
-                        }
-                        tables.remove(old_table_name)
-
-                        table.changeName(new_table_name)
-                        migGen.renameTable(table, old_table_name, new_table_name, file, version)
-                        tables[new_table_name] = table
-                    }
-
-                } else {
-                    if (cmd_name == "migrate_data") {
-                        String javaClassName = e.value.asString
-                        migGen.dataMigrator(javaClassName);
                     }
                 }
-
-
             }
         }
     }
@@ -255,8 +252,8 @@ class MigrationContext {
 
     }
 /**
-     * Generate the source code
-     */
+ * Generate the source code
+ */
     void generate() {
 
         logger.info("generating source to path '${path}' into package '${pkg}")
