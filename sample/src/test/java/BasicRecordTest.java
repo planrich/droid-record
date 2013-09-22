@@ -7,13 +7,10 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
 import com.pasra.android.record.sample.generate.Gallery;
-import com.pasra.android.record.sample.generate.GalleryRecord;
 import com.pasra.android.record.sample.generate.LocalSession;
 import com.pasra.android.record.sample.generate.Picture;
 import com.pasra.android.record.sample.generate.RecordMigrator;
-import static com.pasra.android.record.RecordBuilder.*;
 
-import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;

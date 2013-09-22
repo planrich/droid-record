@@ -46,9 +46,6 @@ public class RecordMigrator implements Migrator{
         }
         if (currentVersion < targetVersion && currentVersion < 20130922092812L){
             db.execSQL("create table usrs (_id integer primary key, first_name text , last_name text , age integer );");
-            currentVersion = 20130922092812L;
-        }
-        if (currentVersion < targetVersion && currentVersion < 20130922092812L){
             db.execSQL("alter table galleries add column usr_id integer ;");
             currentVersion = 20130922092812L;
         }
@@ -62,14 +59,11 @@ public class RecordMigrator implements Migrator{
                     String s1 = c.getString(c.getColumnIndex("first_name"));
                     String s2 = c.getString(c.getColumnIndex("last_name"));
                     String s3 = c.getString(c.getColumnIndex("age"));
-                    db.rawQuery("insert into users (_id, first_name, last_name, age) values (?, ?, ?, ?);", new String[] {s0, s1, s2, s3});
+                    Cursor c1= db.rawQuery("insert into users (_id, first_name, last_name, age) values (?, ?, ?, ?);", new String[] {s0, s1, s2, s3});
                 }
                 db.execSQL("commit");
             }
             db.execSQL("drop table usrs");
-            currentVersion = 20130922093131L;
-        }
-        if (currentVersion < targetVersion && currentVersion < 20130922093131L){
             db.execSQL("create table galleries_mig_temp_table (_id integer primary key, name text , user_id integer );");
             {
                 Cursor c = db.rawQuery("select * from galleries", null);
@@ -125,9 +119,6 @@ public class RecordMigrator implements Migrator{
                 db.execSQL("commit");
             }
             db.execSQL("drop table users_mig_temp_table");
-            currentVersion = 20130922093633L;
-        }
-        if (currentVersion < targetVersion && currentVersion < 20130922093633L){
             new com.pasra.android.record.sample.NullMigrator().migrate(db, currentVersion, targetVersion);
             currentVersion = 20130922093633L;
         }

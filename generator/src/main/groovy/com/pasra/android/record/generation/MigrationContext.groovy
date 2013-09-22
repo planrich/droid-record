@@ -43,9 +43,9 @@ class MigrationContext {
 
         JsonObject change = obj.getAsJsonObject("change");
         if (change) {
-            change.entrySet().each { Map.Entry<String, JsonElement> e ->
-                String cmd_name = e.key
-                migGen.oneMigrationStep(version) {
+            migGen.oneMigrationStep(version) {
+                change.entrySet().each { Map.Entry<String, JsonElement> e ->
+                    String cmd_name = e.key
                     if (e.value.isJsonObject()) {
                         JsonObject migration = e.value.getAsJsonObject();
                         if (cmd_name == "create_table") {
@@ -142,7 +142,7 @@ class MigrationContext {
                             def old_table_name = Inflector.tabelize(migration.get("table").asString)
                             def new_table_name = Inflector.tabelize(migration.get("to").asString)
 
-                            def table = tables[old_table_name]
+                            Table table = tables[old_table_name]
                             if (table == null) {
                                 throw new IllegalArgumentException("Couldn't find table ${old_table_name}!")
                             }

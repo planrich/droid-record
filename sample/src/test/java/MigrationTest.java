@@ -48,7 +48,7 @@ public class MigrationTest extends AndroidTestCase {
         current = target;
 
         Cursor c = mDB.rawQuery("select * from users;", null);
-        assertTrue(c.getCount() == 1);
+        assertEquals(c.getCount(), 1);
         c.moveToFirst();
         assertEquals(c.getString(c.getColumnIndex("first_name")), "Chuck");
         assertEquals(c.getString(c.getColumnIndex("last_name")), "Norris");
