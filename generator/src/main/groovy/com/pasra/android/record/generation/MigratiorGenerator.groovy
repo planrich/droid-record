@@ -71,6 +71,12 @@ class MigratiorGenerator {
         }
     }
 
+    void dataMigrator(String name) {
+        codegen.wrap("if (currentVersion < targetVersion)") {
+            codegen.line("new ${name}().migrate(db, currentVersion, targetVersion)");
+        }
+    }
+
     void removeField(Table table, Field removed, File file, long version) {
         codegen.wrap("if (currentVersion < targetVersion)") {
             // move contents to new temporary table

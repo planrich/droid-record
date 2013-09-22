@@ -1,3 +1,4 @@
 change:{
-  remove_column: { table: 'users', column: 'age' }
+  remove_column: { table: 'users', column: 'age' },
+  migrate_data: 'NullMigrator'
 }

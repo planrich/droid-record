@@ -154,7 +154,14 @@ class MigrationContext {
                         migGen.renameTable(table, old_table_name, new_table_name, file, version)
                         tables[new_table_name] = table
                     }
+
+                } else {
+                    if (cmd_name == "data_migrate") {
+                        String javaClassName = e.value.asString
+                        migGen.dataMigrator(javaClassName);
+                    }
                 }
+
 
             }
         }
