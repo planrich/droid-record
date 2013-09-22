@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class GalleryRecordBuilder extends RecordBuilder<Gallery>{
     public GalleryRecordBuilder(SQLiteDatabase db){
-        super("gallery", new String[] { "_id", "name", "usr_id" }, db);
+        super("gallery", new String[] { "_id", "name", "user_id" }, db);
     }
     @Override
     public java.util.List<Gallery> all(){

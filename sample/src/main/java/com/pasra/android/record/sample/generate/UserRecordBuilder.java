@@ -4,24 +4,24 @@ package com.pasra.android.record.sample.generate;
 import com.pasra.android.record.RecordBuilder;
 import android.database.sqlite.SQLiteDatabase;
 
-public class UsrRecordBuilder extends RecordBuilder<Usr>{
-    public UsrRecordBuilder(SQLiteDatabase db){
-        super("usr", new String[] { "_id", "first_name", "last_name", "age" }, db);
+public class UserRecordBuilder extends RecordBuilder<User>{
+    public UserRecordBuilder(SQLiteDatabase db){
+        super("user", new String[] { "_id", "first_name", "last_name" }, db);
     }
     @Override
-    public java.util.List<Usr> all(){
-        java.util.List<Usr> list = new java.util.ArrayList<Usr>();
+    public java.util.List<User> all(){
+        java.util.List<User> list = new java.util.ArrayList<User>();
         android.database.Cursor c = cursor();
         while (c.moveToNext()){
-            list.add(Usr.fromCursor(c));
+            list.add(User.fromCursor(c));
         }
         return list;
     }
     @Override
-    public Usr first(){
+    public User first(){
         android.database.Cursor c = cursor();
         if (c.moveToFirst()){
-            Usr record = Usr.fromCursor(c);
+            User record = User.fromCursor(c);
             c.close();
             return record;
         }

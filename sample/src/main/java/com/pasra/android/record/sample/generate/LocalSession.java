@@ -57,28 +57,28 @@ public class LocalSession{
     public PictureRecordBuilder queryPictures(){
         return new PictureRecordBuilder(mDB);
     }
-    public void saveUsr(AbstractUsr obj){
+    public void saveUser(AbstractUser obj){
         if (obj == null){
-            throw new IllegalArgumentException("Tried to save an instance of Usr which was null. Cannot do that!");
+            throw new IllegalArgumentException("Tried to save an instance of User which was null. Cannot do that!");
         }
-        UsrRecord record = UsrRecord.instance();
+        UserRecord record = UserRecord.instance();
         record.save(mDB, obj);
     }
-    public Usr findUsr(java.lang.Long id){
+    public User findUser(java.lang.Long id){
         if (id == null){
-            throw new IllegalArgumentException("why would you want to load a usr record with a null key?");
+            throw new IllegalArgumentException("why would you want to load a user record with a null key?");
         }
-        UsrRecord record = UsrRecord.instance();
+        UserRecord record = UserRecord.instance();
         return record.load(mDB, id);
     }
-    public void destroyUsr(java.lang.Long id){
+    public void destroyUser(java.lang.Long id){
         if (id == null){
-            throw new IllegalArgumentException("why would you want to delete a usr record with a null key?");
+            throw new IllegalArgumentException("why would you want to delete a user record with a null key?");
         }
-        UsrRecord record = UsrRecord.instance();
+        UserRecord record = UserRecord.instance();
         record.delete(mDB, id);
     }
-    public UsrRecordBuilder queryUsrs(){
-        return new UsrRecordBuilder(mDB);
+    public UserRecordBuilder queryUsers(){
+        return new UserRecordBuilder(mDB);
     }
 }

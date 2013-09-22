@@ -41,7 +41,9 @@ class MigrateTask extends DefaultTask {
                     long version = extractVersion(file)
                     ctx.addMigrationStep(obj, new File(root, file), version);
                 } catch (Exception e) {
-                    throw new InvalidUserCodeException("In file ${file}: " + e.message)
+                    throw new InvalidUserCodeException("In file ${file}: " + e.message + e.stackTrace.take(15).collect({ StackTraceElement s ->
+                        s.toString()
+                    }).join("\n    "))
                 }
             } else {
                 logger.info("Did not parse json file '${file}' in migration path!")

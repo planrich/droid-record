@@ -1,7 +1,7 @@
 package com.pasra.android.record.sample.generate;
 
-public class Usr extends AbstractUsr {
-    public Usr(){
+public class User extends AbstractUser {
+    public User(){
         super(null);
     }
     

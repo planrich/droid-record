@@ -33,13 +33,11 @@ class Table {
      * @return true if the object has the properties fields (as non empty json map) and name as primitive
      */
     void checkIntegrity() {
-        // define ordering!
-
         if (json.has("name")
            && json.get("name").isJsonPrimitive()
            && json.has("fields")
            && json.get("fields").isJsonObject()) {
-            this.name = Inflector.tabelize(json.get("name").getAsString())
+            changeName(json.get("name").getAsString())
             def jsonFields = json.get("fields").getAsJsonObject()
 
             jsonFields.entrySet().each { entry ->
@@ -65,8 +63,43 @@ class Table {
                 throw new IllegalArgumentException("Every table needs at least one table column. '${name}' has none!")
             }
         } else {
-            throw new IllegalArgumentException("A table from the given json cannot be constructed. Please correct typos and chekc the docs for create_table!");
+            throw new IllegalArgumentException("A table from the given json cannot be constructed. Please correct typos and check the docs for create_table!");
         }
+    }
+
+    void changeName(String name) {
+        this.name = Inflector.tabelize(name)
+    }
+
+    Field removeField(String field_name) {
+        if (fields[field_name] == null) {
+            throw new IllegalStateException("The field '${field_name}' is not present in the schema of '${name}' but should be")
+        }
+
+        Field field = fields.remove(field_name)
+
+        // correct the index of the other columns
+        fields.each { k, Field f ->
+            if (f.tableOrder > field.tableOrder) {
+                f.tableOrder--;
+            }
+        }
+
+        this.table_order--;
+
+        return field;
+    }
+
+    Field renameField(String old_name, String new_name) {
+
+        if (fields[old_name] == null) {
+            throw new IllegalStateException("The field '${old_name}' is not present in the schema of '${name}' but should be!")
+        }
+
+        Field field = fields[old_name]
+        field.changeName(new_name)
+
+        return field
     }
 
     Field addField(Field field) {
@@ -111,13 +144,9 @@ class Table {
         return orderedFields
     }
 
-    String creationSQL() {
+    String creationSQL(name_suffix = "") {
         def columns = fields.values().collect { Field field -> field.columnSQL() }.join ", "
-        return "create table ${name} (${columns});";
-    }
-
-    String destructionSQL() {
-        return "drop table ${name}";
+        return "create table ${name + name_suffix} (${columns});";
     }
 
     /**
@@ -150,7 +179,6 @@ class Table {
         def CamName = Inflector.camelize(name);
         c.line("${CamName} record = new ${CamName}();")
         getOrderedFields().each { Field f ->
-            // TODO think about this! do the columns indices change?
             c.line("${f.javaCallToDeserialize(objname, cursorname)};")
         }
 

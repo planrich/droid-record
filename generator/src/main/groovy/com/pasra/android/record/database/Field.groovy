@@ -35,8 +35,7 @@ class Field {
             "date": "text", ]
 
     Field(String name, JsonElement json) {
-        this.javaName = Inflector.camelize(name);
-        this.name = name;
+        changeName(name)
         this.json = json;
     }
 
@@ -66,6 +65,11 @@ class Field {
         }
     }
 
+    void changeName(String new_name) {
+        this.javaName = Inflector.camelize(new_name)
+        this.name = new_name
+    }
+
     String javaType() {
         return to_java_type[type]
     }
@@ -91,24 +95,30 @@ class Field {
     }
 
     String javaCallToDeserialize(String objname, String cursorobj) {
-        String type = javaType();
-        def i = tableOrder;
-        def call = "";
-        if (type == "byte[]") {
-            call = "${cursorobj}.getBlob(${i})"
-        } else if (type == "java.util.Date") {
-            call = "SQLiteConverter.stringToDate(${cursorobj}.getString(${i}))"
-        } else if (type == "java.lang.String") {
-            call = "${cursorobj}.getString(${i})";
-        } else if (type == "java.lang.Integer") {
-            call = "${cursorobj}.getInt(${i})";
-        } else if (type == "java.lang.Long") {
-            call = "${cursorobj}.getLong(${i})";
-        } else if (type == "java.lang.Boolean") {
-            call = "(${cursorobj}.getInt(${i}) != 0)";
-        }
+        def call = javaCallGetCursor(cursorobj)
 
         return "${objname}.set${Inflector.camelize(name)}(${call})"
+    }
+
+    String javaCallGetCursor(String c) {
+        def call = "";
+        def type = javaType()
+        def i = tableOrder;
+        if (type == "byte[]") {
+            call = "${c}.getBlob(${i})"
+        } else if (type == "java.util.Date") {
+            call = "SQLiteConverter.stringToDate(${c}.getString(${i}))"
+        } else if (type == "java.lang.String") {
+            call = "${c}.getString(${i})";
+        } else if (type == "java.lang.Integer") {
+            call = "${c}.getInt(${i})";
+        } else if (type == "java.lang.Long") {
+            call = "${c}.getLong(${i})";
+        } else if (type == "java.lang.Boolean") {
+            call = "(${c}.getInt(${i}) != 0)";
+        }
+
+        return call;
     }
 
     /**

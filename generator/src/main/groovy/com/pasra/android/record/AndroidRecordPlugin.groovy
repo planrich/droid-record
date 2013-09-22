@@ -12,7 +12,6 @@ class AndroidRecordPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
 
-        println(project.version)
         project.extensions.create("android_record", AndroidRecordPluginExtention)
 
         project.tasks.create('migrate', MigrateTask)

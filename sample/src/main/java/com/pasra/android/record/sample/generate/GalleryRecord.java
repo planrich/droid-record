@@ -24,7 +24,7 @@ public class GalleryRecord{
     public void insert(SQLiteDatabase db, AbstractGallery record){
         ContentValues values = new ContentValues(2);
         values.put("name", record.getName());
-        values.put("usr_id", record.getUsrId());
+        values.put("user_id", record.getUserId());
         long id = db.insert("gallery", null, values);
         record.setId(id);
     }
@@ -34,7 +34,7 @@ public class GalleryRecord{
             Gallery record = new Gallery();
             record.setId(c.getLong(0));
             record.setName(c.getString(1));
-            record.setUsrId(c.getInt(2));
+            record.setUserId(c.getInt(2));
             return record;
         }
         return null;
@@ -45,7 +45,7 @@ public class GalleryRecord{
     public void update(SQLiteDatabase db, AbstractGallery record){
         ContentValues values = new ContentValues(2);
         values.put("name", record.getName());
-        values.put("usr_id", record.getUsrId());
+        values.put("user_id", record.getUserId());
         long id = record.getId();
         db.update("gallery", values, "_id = ?", new String[] { Long.toString(id) });
     }

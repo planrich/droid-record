@@ -40,6 +40,77 @@ class MigratiorGenerator {
         }
     }
 
+    void moveContentsTo(Table table, String old_table_name, String new_table_name, mapping = [:]) {
+        // wrap in brackets to not pollute the namespace
+        codegen.wrap("") {
+            codegen.line("Cursor c = " +
+                    "db.rawQuery(" +
+                    "\"select * from ${old_table_name}\", null);")
+
+            codegen.line("db.execSQL(\"begin\");")
+            codegen.wrap("while (c.moveToNext())") {
+                def i = 0
+                table.getOrderedFields(true).each { Field f ->
+                    def name = f.name;
+                    if (mapping[f.name] != null) {
+                        name = mapping[f.name];
+                    }
+                    codegen.line("String s${i++} = c.getString(c.getColumnIndex(\"${name}\"));")
+                }
+
+                i--
+                codegen.line("db.rawQuery(\"insert into ${new_table_name} (" +
+                        (table.getOrderedFields(true).collect({ f -> f.name }).join(", ")) +
+                        ") values (" +
+                        (["?"] * i).join(", ") +
+                        ");\", new String[] {" +
+                        ((0..i).collect({ x -> "s${x}" })).join(", ") +
+                        "});")
+            }
+            codegen.line("db.execSQL(\"commit\");")
+        }
+    }
+
+    void removeField(Table table, Field removed, File file, long version) {
+        codegen.wrap("if (currentVersion < targetVersion)") {
+            // move contents to new temporary table
+            def suffix = "_mig_temp_table"
+            codegen.line("db.execSQL(\"${table.creationSQL(suffix)}\");")
+            moveContentsTo(table, table.name, table.name + suffix )
+            codegen.line("db.execSQL(\"drop table ${table.name}\");")
+
+            // create the table again with the new schema. insert the data back
+            codegen.line("db.execSQL(\"${table.creationSQL()}\");")
+            moveContentsTo(table, table.name + suffix, table.name, [:])
+            codegen.line("db.execSQL(\"drop table ${table.name + suffix}\");")
+        }
+    }
+
+    void renameTable(Table table, String old_name, String new_name, File file, long version) {
+        codegen.wrap("if (currentVersion < targetVersion)") {
+            // table already has new name
+            codegen.line("db.execSQL(\"${table.creationSQL()}\");")
+            moveContentsTo(table, old_name, new_name)
+            codegen.line("db.execSQL(\"drop table ${old_name}\");")
+        }
+    }
+
+    void renameField(Table table, String old_name, String new_name, File file, long version) {
+        codegen.wrap("if (currentVersion < targetVersion)") {
+
+            // move contents to new temporary table
+            def suffix = "_mig_temp_table"
+            codegen.line("db.execSQL(\"${table.creationSQL(suffix)}\");")
+            moveContentsTo(table, table.name, table.name + suffix, [ new_name : old_name ])
+            codegen.line("db.execSQL(\"drop table ${table.name}\");")
+
+            // create the table again with the new schema. insert the data back
+            codegen.line("db.execSQL(\"${table.creationSQL()}\");")
+            moveContentsTo(table, table.name + suffix, table.name, [:])
+            codegen.line("db.execSQL(\"drop table ${table.name + suffix}\");")
+        }
+    }
+
     void writeToFile() {
 
         def config_table = "android_record_config";
