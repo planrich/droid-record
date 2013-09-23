@@ -2,6 +2,7 @@ package com.pasra.android.record.sample.generate;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
+import android.content.ContentValues;
 import com.pasra.android.record.Migrator;
 
 public class RecordMigrator implements Migrator{
@@ -55,11 +56,12 @@ public class RecordMigrator implements Migrator{
                 Cursor c = db.rawQuery("select * from usrs", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
-                    String s0 = c.getString(c.getColumnIndex("_id"));
-                    String s1 = c.getString(c.getColumnIndex("first_name"));
-                    String s2 = c.getString(c.getColumnIndex("last_name"));
-                    String s3 = c.getString(c.getColumnIndex("age"));
-                    Cursor c1= db.rawQuery("insert into users (_id, first_name, last_name, age) values (?, ?, ?, ?);", new String[] {s0, s1, s2, s3});
+                    ContentValues vals = new ContentValues();
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
+                    vals.put("first_name", c.getString(c.getColumnIndex("first_name")));
+                    vals.put("last_name", c.getString(c.getColumnIndex("last_name")));
+                    vals.put("age", c.getString(c.getColumnIndex("age")));
+                    db.insert("users", null, vals);
                 }
                 db.execSQL("commit");
             }
@@ -69,10 +71,11 @@ public class RecordMigrator implements Migrator{
                 Cursor c = db.rawQuery("select * from galleries", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
-                    String s0 = c.getString(c.getColumnIndex("_id"));
-                    String s1 = c.getString(c.getColumnIndex("name"));
-                    String s2 = c.getString(c.getColumnIndex("user_id"));
-                    db.rawQuery("insert into galleries_mig_temp_table (_id, name, user_id) values (?, ?, ?);", new String[] {s0, s1, s2});
+                    ContentValues vals = new ContentValues();
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
+                    vals.put("name", c.getString(c.getColumnIndex("name")));
+                    vals.put("user_id", c.getString(c.getColumnIndex("user_id")));
+                    db.insert("galleries_mig_temp_table", null, vals);
                 }
                 db.execSQL("commit");
             }
@@ -82,10 +85,11 @@ public class RecordMigrator implements Migrator{
                 Cursor c = db.rawQuery("select * from galleries_mig_temp_table", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
-                    String s0 = c.getString(c.getColumnIndex("_id"));
-                    String s1 = c.getString(c.getColumnIndex("name"));
-                    String s2 = c.getString(c.getColumnIndex("user_id"));
-                    db.rawQuery("insert into galleries (_id, name, user_id) values (?, ?, ?);", new String[] {s0, s1, s2});
+                    ContentValues vals = new ContentValues();
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
+                    vals.put("name", c.getString(c.getColumnIndex("name")));
+                    vals.put("user_id", c.getString(c.getColumnIndex("user_id")));
+                    db.insert("galleries", null, vals);
                 }
                 db.execSQL("commit");
             }
@@ -98,10 +102,11 @@ public class RecordMigrator implements Migrator{
                 Cursor c = db.rawQuery("select * from users", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
-                    String s0 = c.getString(c.getColumnIndex("_id"));
-                    String s1 = c.getString(c.getColumnIndex("first_name"));
-                    String s2 = c.getString(c.getColumnIndex("last_name"));
-                    db.rawQuery("insert into users_mig_temp_table (_id, first_name, last_name) values (?, ?, ?);", new String[] {s0, s1, s2});
+                    ContentValues vals = new ContentValues();
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
+                    vals.put("first_name", c.getString(c.getColumnIndex("first_name")));
+                    vals.put("last_name", c.getString(c.getColumnIndex("last_name")));
+                    db.insert("users_mig_temp_table", null, vals);
                 }
                 db.execSQL("commit");
             }
@@ -111,10 +116,11 @@ public class RecordMigrator implements Migrator{
                 Cursor c = db.rawQuery("select * from users_mig_temp_table", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
-                    String s0 = c.getString(c.getColumnIndex("_id"));
-                    String s1 = c.getString(c.getColumnIndex("first_name"));
-                    String s2 = c.getString(c.getColumnIndex("last_name"));
-                    db.rawQuery("insert into users (_id, first_name, last_name) values (?, ?, ?);", new String[] {s0, s1, s2});
+                    ContentValues vals = new ContentValues();
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
+                    vals.put("first_name", c.getString(c.getColumnIndex("first_name")));
+                    vals.put("last_name", c.getString(c.getColumnIndex("last_name")));
+                    db.insert("users", null, vals);
                 }
                 db.execSQL("commit");
             }

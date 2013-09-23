@@ -1,6 +1,5 @@
 package com.pasra.android.record.generation
 
-import com.google.gson.JsonElement
 import com.pasra.android.record.AndroidRecordPlugin
 import com.pasra.android.record.Inflector
 import com.pasra.android.record.database.Field
@@ -51,22 +50,17 @@ class MigratiorGenerator {
 
             codegen.line("db.execSQL(\"begin\");")
             codegen.wrap("while (c.moveToNext())") {
-                def i = 0
+                codegen.line("ContentValues vals = new ContentValues();")
                 table.getOrderedFields(true).each { Field f ->
-                    def name = f.name;
+                    def new_name = f.name;
+                    def old_name = f.name;
                     if (mapping[f.name] != null) {
-                        name = mapping[f.name];
+                        old_name = mapping[f.name];
                     }
-                    codegen.line("String s${i++} = c.getString(c.getColumnIndex(\"${name}\"));")
+                    codegen.line("""vals.put("${new_name}", c.getString(c.getColumnIndex("${old_name}")));""")
                 }
 
-                codegen.line("db.rawQuery(\"insert into ${new_table_name} (" +
-                        (table.getOrderedFields(true).collect({ f -> f.name }).join(", ")) +
-                        ") values (" +
-                        (["?"] * i).join(", ") +
-                        ");\", new String[] {" +
-                        ((0..(i - 1)).collect({ x -> "s${x}" })).join(", ") +
-                        "});")
+                codegen.line("""db.insert("${new_table_name}", null, vals);""")
             }
             codegen.line("db.execSQL(\"commit\");")
         }
@@ -124,6 +118,7 @@ class MigratiorGenerator {
         c.line()
         c.line("import android.database.sqlite.SQLiteDatabase;")
         c.line("import android.database.Cursor;")
+        c.line("import android.content.ContentValues;")
         c.line("import com.pasra.android.record.Migrator;")
         c.line()
 

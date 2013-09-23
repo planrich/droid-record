@@ -208,4 +208,25 @@ class Field {
 
         return "null";
     }
+
+    String javaCallContentValueFromCursor(String cursorobj, String colname) {
+        String type = javaType();
+        def colIdxCall = "${cursorobj}.getColumnIndex(\"${colname}\")"
+        if (type == "byte[]") {
+            return "${cursorobj}.getAsByteArray(${colIdxCall})"
+        } else if (type == "java.util.Date") {
+            return "${cursorobj}.getAsString(${colIdxCall})"
+        } else if (type == "java.lang.String") {
+            return "${cursorobj}.getAsString(${colIdxCall})"
+        } else if (type == "java.lang.Integer") {
+            return "${cursorobj}.getAsInteger(${colIdxCall})"
+        } else if (type == "java.lang.Long") {
+            return "${cursorobj}.getAsLong(${colIdxCall})"
+        } else if (type == "java.lang.Boolean") {
+            return "${cursorobj}.getAsBoolean(${colIdxCall})"
+        }
+
+        throw new InternalError("Can't handle type '${type}'. If a type is not present it should " +
+                "already be caugth by Field#checkIntegrity()!")
+    }
 }
