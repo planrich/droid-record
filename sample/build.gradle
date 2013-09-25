@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.pasra.android.record.generator:generator:0.0.+'
+        classpath 'at.pasra.record.generator:generator:0.0.+'
         classpath 'com.android.tools.build:gradle:0.5.+'
         classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.+'
     }
@@ -15,7 +15,7 @@ buildscript {
 apply plugin: 'android'
 apply plugin: 'android_record'
 
-group="com.pasra.android.record.sample"
+group="at.pasra.record.sample"
 version="0.0.1"
 
 android {
@@ -28,7 +28,7 @@ android {
 }
 
 android_record {
-    output_package='com.pasra.android.record.sample.generate'
+    output_package='at.pasra.record.sample.generate'
 }
 
 repositories {
@@ -39,5 +39,5 @@ repositories {
 }
 
 dependencies {
-    compile 'com.pasra.android.record:library:0.0.+@aar'
+    compile 'at.pasra.record:library:0.0.+@aar'
 }

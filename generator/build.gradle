@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 
 version = "0.0.1"
-group = "com.pasra.android.record.generator"
+group = "at.pasra.record.generator"
 
 repositories {
     mavenCentral()
