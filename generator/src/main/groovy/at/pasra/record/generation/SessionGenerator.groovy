@@ -18,6 +18,7 @@ class SessionGenerator {
     void generate(String path, String pkg) {
 
         CodeGenerator c = new CodeGenerator();
+        c.copyrightHeader()
         c.doNotModify()
 
         c.line("package ${pkg};")
@@ -28,12 +29,17 @@ class SessionGenerator {
         c.wrap("public class LocalSession") {
 
             c.line("private SQLiteDatabase mDB;")
+            tables.each { String name, Table table ->
+                def fieldName = "${name}_record";
+                c.line("private final ${table.javaClassName}Record ${fieldName} = new ${table.javaClassName}Record();")
+            }
 
             c.wrap("public LocalSession(SQLiteDatabase database)") {
                 c.line("this.mDB = database;")
             }
 
             tables.each { String name, Table table ->
+                def recordName = "${table.name}_record";
                 def javaClassName = table.javaClassName
                 def javaPluralCamel = Inflector.camelize(Inflector.pluralize(javaClassName));
                 c.wrap("public void save${javaClassName}(Abstract${javaClassName} obj)") {
@@ -41,8 +47,7 @@ class SessionGenerator {
                         c.line("throw new IllegalArgumentException(" +
                                 "\"Tried to save an instance of ${javaClassName} which was null. Cannot do that!\");")
                     }
-                    c.line("${javaClassName}Record record = ${javaClassName}Record.instance();")
-                    c.line("record.save(mDB, obj);")
+                    c.line("${recordName}.save(mDB, obj);")
                 }
 
                 c.wrap("public ${javaClassName} find${javaClassName}(java.lang.Long id)") {
@@ -51,8 +56,7 @@ class SessionGenerator {
                                 "\"why would you want to load a ${name} record with a null key?\");")
                     }
 
-                    c.line("${javaClassName}Record record = ${javaClassName}Record.instance();")
-                    c.line("return record.load(mDB, id);")
+                    c.line("return ${recordName}.load(mDB, id);")
                 }
 
                 c.wrap("public void destroy${javaClassName}(java.lang.Long id)") {
@@ -61,8 +65,7 @@ class SessionGenerator {
                                 "\"why would you want to delete a ${name} record with a null key?\");")
                     }
 
-                    c.line("${javaClassName}Record record = ${javaClassName}Record.instance();")
-                    c.line("record.delete(mDB, id);")
+                    c.line("${recordName}.delete(mDB, id);")
                 }
 
                 // relations

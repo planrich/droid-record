@@ -17,11 +17,12 @@ class RecordBuilderGenerator {
     void generate(String path, String pkg) {
 
         CodeGenerator c = new CodeGenerator();
+        c.copyrightHeader();
+        c.doNotModify();
 
         def javaClassName = table.javaClassName
 
         c.line("package ${pkg};")
-        c.doNotModify()
         c.line()
         c.line("import at.pasra.record.RecordBuilder;")
         c.line("import android.database.sqlite.SQLiteDatabase;")

@@ -113,6 +113,8 @@ class MigratiorGenerator {
         OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(target));
 
         CodeGenerator c = new CodeGenerator();
+        c.copyrightHeader()
+        c.doNotModify()
 
         c.line("package ${pkg};")
         c.line()

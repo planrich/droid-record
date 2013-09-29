@@ -1,5 +1,32 @@
 # Android Record
 
+## TODO
+
+########## v0.1.0 ############
+
+* caching
+* query interface, limit(0,1), limit(1), orderBy().orderBy(), where().where(), distinct()
+* relations has_one, has_and_belongs_to_many
+* doc show what json generates
+  json {   |  record.can()
+          --> record.do()
+  }        |  record.that()
+----------- 5.Oct.13 ------------
+* create table, null, unique and constraint
+* change type of column
+* gradle -> migrate on file changes
+* bugfix intellij start removes some files? wtf?
+---------- 11.Oct.13 ------------
+
+=> release v0.1.0
+
+########## v0.2.0 ############
+
+* query interface, join()
+* remote session
+
+* move to sonatype?
+
 ## Requirements
 
 Gradle
@@ -68,7 +95,7 @@ Gallery g = remote.findGallery(666, new Callback() { ... });
 
 ## Null and default values
 
-By default every value on a table gets a default value in the java objects constructor. 
+By default every value on a table gets a default value in the java objects constructor.
 This is due to the fact that allowing null objects to be deserialized from a table row can result in
 a null pointer exception.
 
@@ -90,3 +117,4 @@ fields: {
 
 Whenever you set any value explicitly to null (= farm.setPony(null); ) and save this
 record the value will stay null.
+

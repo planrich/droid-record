@@ -7,7 +7,7 @@ import org.gradle.api.Project
 
 class AndroidRecordPlugin implements Plugin<Project> {
 
-    public static String VERSION = "0.0.1"
+    public static String VERSION = "0.0.2"
 
     @Override
     void apply(Project project) {
@@ -32,9 +32,7 @@ class AndroidRecordPlugin implements Plugin<Project> {
         File relationShip = new File(migPath, ext.relationship)
         if (!relationShip.exists()) {
             CodeGenerator c = new CodeGenerator(2, "json");
-            c.wrap() {
-                c.line("comment: 'Insert your model relationships here! See the documentation for details.',")
-            }
+            c.line("comment: 'Insert your model relationships here! See http://recrod.pasra.at/android_record#relations.'")
             OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(relationShip));
             w.write(c.toString())
             w.close()

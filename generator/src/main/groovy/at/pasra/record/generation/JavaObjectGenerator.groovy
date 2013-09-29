@@ -21,6 +21,8 @@ class JavaObjectGenerator {
     void generate(String source, String pkg) {
 
         CodeGenerator c = new CodeGenerator();
+        c.copyrightHeader()
+        c.doNotModify()
 
         def javaClassName = Inflector.camelize(table.name)
 
@@ -65,6 +67,8 @@ class JavaObjectGenerator {
         file = AndroidRecordPlugin.file(source, pkg, "${Inflector.camelize(table.name)}.java", false)
         if (!file.exists()) {
             c = new CodeGenerator();
+            c.copyrightHeader()
+            c.doNotModify()
 
             c.line("package ${pkg};")
             c.line();

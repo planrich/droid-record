@@ -17,6 +17,7 @@ class RecordGenerator {
     void generateSQLite(String source, String pkg) {
 
         CodeGenerator c = new CodeGenerator();
+        c.copyrightHeader()
         def javaClassName = table.javaClassName
 
         def recordname = "${javaClassName}Record";

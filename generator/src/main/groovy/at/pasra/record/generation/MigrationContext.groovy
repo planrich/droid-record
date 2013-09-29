@@ -158,6 +158,19 @@ class MigrationContext {
                             String javaClassName = e.value.asString
                             migGen.dataMigrator(javaClassName, file, version);
                         }
+
+                        if (cmd_name == "drop_table") {
+                            def name = e.value.asString
+                            def table = tables[name];
+
+                            if (table == null) {
+                                throw new IllegalStateException("Table ${name} is missing but should be present.");
+                            }
+
+                            tables[name] = null;
+
+                            migGen.rmTable(name, file, version);
+                        }
                     }
                 }
             }

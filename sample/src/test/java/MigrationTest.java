@@ -5,9 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.test.AndroidTestCase;
 
-import com.pasra.android.record.sample.generate.LocalSession;
-import com.pasra.android.record.sample.generate.RecordMigrator;
-import com.pasra.android.record.sample.generate.User;
+import at.pasra.record.sample.generate.LocalSession;
+import at.pasra.record.sample.generate.RecordMigrator;
+import at.pasra.record.sample.generate.User;
 
 /**
  * Created by rich on 9/15/13.
