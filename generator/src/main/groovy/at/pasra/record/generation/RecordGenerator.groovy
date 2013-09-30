@@ -33,13 +33,11 @@ class RecordGenerator {
         c.line();
 
         c.wrap("public class ${recordname}") {
-            c.line("private static ${recordname} mInstance;")
-            c.wrap("public static ${recordname} instance()") {
-                c.wrap("if (mInstance == null)") {
-                    c.line("mInstance = new ${recordname}();")
-                }
 
-                c.line("return mInstance;")
+            c.line("""private final java.util.Map<Long, ${javaClassName}> primaryKeyCache = new java.util.HashMap<Long, ${javaClassName}>();""")
+
+            c.wrap("public void clearCache()") {
+                c.line("primaryKeyCache.clear();")
             }
 
             // SAVE
@@ -60,14 +58,23 @@ class RecordGenerator {
                 }
                 c.line("long id = db.insert(\"${table.sqlTableName}\", null, values);")
                 c.line("record.setId(id);")
+
+                c.line("primaryKeyCache.put(id, (${javaClassName})record);")
             }
 
             // LOAD
             c.wrap("public ${javaClassName} load(SQLiteDatabase db, long id)") {
+
+                c.line("${javaClassName} cached = primaryKeyCache.get(id);")
+                c.wrap("if (cached != null)") {
+                    c.line("return cached;")
+                }
+
                 c.line("Cursor c = db.rawQuery(\"select * from ${table.sqlTableName} where ${table.primary.name} = ?;\", new String[] { Long.toString(id) });")
                 c.wrap("if (c.moveToFirst())") {
 
                     table.javaCallsNewObjectFromCursor(c, "record", "c");
+                    c.line("primaryKeyCache.put(id, record);")
                     c.line("return record;")
                 }
 
@@ -76,6 +83,7 @@ class RecordGenerator {
 
             c.wrap("public void delete(SQLiteDatabase db, long id)") {
                 c.line("db.execSQL(\"delete from ${table.sqlTableName} where  ${table.primary.name} = ?;\", new String[] { Long.toString(id) });")
+                c.line("primaryKeyCache.remove(id);")
             }
 
             c.wrap("public void update(SQLiteDatabase db, Abstract${javaClassName} record)") {

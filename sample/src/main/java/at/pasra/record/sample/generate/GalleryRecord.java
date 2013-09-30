@@ -23,12 +23,9 @@ import android.database.Cursor;
 import at.pasra.record.SQLiteConverter;
 
 public class GalleryRecord{
-    private static GalleryRecord mInstance;
-    public static GalleryRecord instance(){
-        if (mInstance == null){
-            mInstance = new GalleryRecord();
-        }
-        return mInstance;
+    private final java.util.Map<Long, Gallery> primaryKeyCache = new java.util.HashMap<Long, Gallery>();
+    public void clearCache(){
+        primaryKeyCache.clear();
     }
     public void save(SQLiteDatabase db, AbstractGallery record){
         if (record.getId() == null){
@@ -44,20 +41,27 @@ public class GalleryRecord{
         values.put("user_id", record.getUserId());
         long id = db.insert("galleries", null, values);
         record.setId(id);
+        primaryKeyCache.put(id, (Gallery)record);
     }
     public Gallery load(SQLiteDatabase db, long id){
+        Gallery cached = primaryKeyCache.get(id);
+        if (cached != null){
+            return cached;
+        }
         Cursor c = db.rawQuery("select * from galleries where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             Gallery record = new Gallery();
             record.setId(c.getLong(0));
             record.setName(c.getString(1));
             record.setUserId(c.getInt(2));
+            primaryKeyCache.put(id, record);
             return record;
         }
         return null;
     }
     public void delete(SQLiteDatabase db, long id){
         db.execSQL("delete from galleries where  _id = ?;", new String[] { Long.toString(id) });
+        primaryKeyCache.remove(id);
     }
     public void update(SQLiteDatabase db, AbstractGallery record){
         ContentValues values = new ContentValues(2);

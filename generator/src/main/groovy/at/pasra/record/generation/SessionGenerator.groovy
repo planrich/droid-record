@@ -78,6 +78,22 @@ class SessionGenerator {
                     c.line("return new ${javaClassName}RecordBuilder(mDB);")
                 }
             }
+
+            c.wrap("public void clearCache()") {
+                tables.each { String name, Table table ->
+                    def fieldName = "${name}_record";
+                    c.line("${fieldName}.clearCache();")
+                }
+            }
+
+            tables.each { String name, Table table ->
+                def fieldName = "${name}_record";
+                def javaClassName = "${table.javaClassName}Record";
+                c.wrap("public ${javaClassName} get${javaClassName}()") {
+                    c.line("return ${fieldName};")
+                }
+            }
+
         }
 
 

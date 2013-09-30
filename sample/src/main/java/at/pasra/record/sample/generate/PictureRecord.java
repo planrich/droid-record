@@ -23,12 +23,9 @@ import android.database.Cursor;
 import at.pasra.record.SQLiteConverter;
 
 public class PictureRecord{
-    private static PictureRecord mInstance;
-    public static PictureRecord instance(){
-        if (mInstance == null){
-            mInstance = new PictureRecord();
-        }
-        return mInstance;
+    private final java.util.Map<Long, Picture> primaryKeyCache = new java.util.HashMap<Long, Picture>();
+    public void clearCache(){
+        primaryKeyCache.clear();
     }
     public void save(SQLiteDatabase db, AbstractPicture record){
         if (record.getId() == null){
@@ -46,8 +43,13 @@ public class PictureRecord{
         values.put("gallery_id", record.getGalleryId());
         long id = db.insert("pictures", null, values);
         record.setId(id);
+        primaryKeyCache.put(id, (Picture)record);
     }
     public Picture load(SQLiteDatabase db, long id){
+        Picture cached = primaryKeyCache.get(id);
+        if (cached != null){
+            return cached;
+        }
         Cursor c = db.rawQuery("select * from pictures where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             Picture record = new Picture();
@@ -56,12 +58,14 @@ public class PictureRecord{
             record.setImage(c.getBlob(2));
             record.setDate(SQLiteConverter.stringToDate(c.getString(3)));
             record.setGalleryId(c.getLong(4));
+            primaryKeyCache.put(id, record);
             return record;
         }
         return null;
     }
     public void delete(SQLiteDatabase db, long id){
         db.execSQL("delete from pictures where  _id = ?;", new String[] { Long.toString(id) });
+        primaryKeyCache.remove(id);
     }
     public void update(SQLiteDatabase db, AbstractPicture record){
         ContentValues values = new ContentValues(4);

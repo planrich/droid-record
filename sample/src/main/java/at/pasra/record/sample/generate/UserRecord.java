@@ -23,12 +23,9 @@ import android.database.Cursor;
 import at.pasra.record.SQLiteConverter;
 
 public class UserRecord{
-    private static UserRecord mInstance;
-    public static UserRecord instance(){
-        if (mInstance == null){
-            mInstance = new UserRecord();
-        }
-        return mInstance;
+    private final java.util.Map<Long, User> primaryKeyCache = new java.util.HashMap<Long, User>();
+    public void clearCache(){
+        primaryKeyCache.clear();
     }
     public void save(SQLiteDatabase db, AbstractUser record){
         if (record.getId() == null){
@@ -44,20 +41,27 @@ public class UserRecord{
         values.put("last_name", record.getLastName());
         long id = db.insert("users", null, values);
         record.setId(id);
+        primaryKeyCache.put(id, (User)record);
     }
     public User load(SQLiteDatabase db, long id){
+        User cached = primaryKeyCache.get(id);
+        if (cached != null){
+            return cached;
+        }
         Cursor c = db.rawQuery("select * from users where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             User record = new User();
             record.setId(c.getLong(0));
             record.setFirstName(c.getString(1));
             record.setLastName(c.getString(2));
+            primaryKeyCache.put(id, record);
             return record;
         }
         return null;
     }
     public void delete(SQLiteDatabase db, long id){
         db.execSQL("delete from users where  _id = ?;", new String[] { Long.toString(id) });
+        primaryKeyCache.remove(id);
     }
     public void update(SQLiteDatabase db, AbstractUser record){
         ContentValues values = new ContentValues(2);

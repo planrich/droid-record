@@ -3,19 +3,23 @@ package at.pasra.record;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by rich on 9/19/13.
  */
 public abstract class RecordBuilder<E> {
-    private String tableName;
-    private SQLiteDatabase db;
-    private String selection = null;
-    private String[] bindings = null;
-    private String order = null;
-    private boolean distinct = false;
-    private String[] columns;
+    protected String tableName;
+    protected SQLiteDatabase db;
+    protected String selection = null;
+    protected String[] bindings = null;
+    protected String order = null;
+    protected boolean distinct = false;
+    protected String[] columns;
+    protected boolean modified = false;
+    protected List<E> cachedAll;
+    protected E cachedFirst = null;
 
     public RecordBuilder(String tableName, String[] columns, SQLiteDatabase db) {
         this.tableName = tableName;
@@ -24,12 +28,18 @@ public abstract class RecordBuilder<E> {
     }
 
     public RecordBuilder<E> where(String selection, String ... args) {
+        modified = true;
+        cachedFirst = null;
+
         this.selection = selection;
         this.bindings = args;
         return this;
     }
 
     public RecordBuilder<E> orderBy(String order) {
+        modified = true;
+        cachedFirst = null;
+
         this.order = order;
 
         return this;
@@ -50,4 +60,12 @@ public abstract class RecordBuilder<E> {
      * @return the first entry if it exists. null otherwise
      */
     public abstract E first();
+
+    public boolean isModified() {
+        return modified;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
+    }
 }

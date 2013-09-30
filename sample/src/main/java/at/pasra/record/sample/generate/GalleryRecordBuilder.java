@@ -17,7 +17,6 @@
  */
 // This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 package at.pasra.record.sample.generate;
-// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 
 import at.pasra.record.RecordBuilder;
 import android.database.sqlite.SQLiteDatabase;
@@ -33,6 +32,8 @@ public class GalleryRecordBuilder extends RecordBuilder<Gallery>{
         while (c.moveToNext()){
             list.add(Gallery.fromCursor(c));
         }
+        cachedAll = list;
+        modified = false;
         return list;
     }
     @Override
@@ -40,6 +41,7 @@ public class GalleryRecordBuilder extends RecordBuilder<Gallery>{
         android.database.Cursor c = cursor();
         if (c.moveToFirst()){
             Gallery record = Gallery.fromCursor(c);
+            cachedFirst = record;
             c.close();
             return record;
         }

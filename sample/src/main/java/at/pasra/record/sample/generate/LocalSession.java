@@ -92,4 +92,18 @@ public class LocalSession{
     public UserRecordBuilder queryUsers(){
         return new UserRecordBuilder(mDB);
     }
+    public void clearCache(){
+        gallery_record.clearCache();
+        picture_record.clearCache();
+        user_record.clearCache();
+    }
+    public GalleryRecord getGalleryRecord(){
+        return gallery_record;
+    }
+    public PictureRecord getPictureRecord(){
+        return picture_record;
+    }
+    public UserRecord getUserRecord(){
+        return user_record;
+    }
 }
