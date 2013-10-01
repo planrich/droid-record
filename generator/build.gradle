@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 
 version = "0.0.2"
-group = "at.pasra.record.generator"
+group = "at.pasra.record"
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ dependencies {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri('../repo'))
+            repository(url: uri('../../richpage/public/repo'))
         }
     }
 }

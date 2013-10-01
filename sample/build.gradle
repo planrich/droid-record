@@ -1,12 +1,12 @@
 buildscript {
     repositories {
         maven {
-            url uri('../repo')
+            url uri('../../richpage/public/repo')
         }
         mavenCentral()
     }
     dependencies {
-        classpath 'at.pasra.record.generator:generator:0.0.+'
+        classpath 'at.pasra.record:generator:0.0.+'
         classpath 'com.android.tools.build:gradle:0.5.+'
         classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.+'
     }
@@ -33,7 +33,7 @@ android_record {
 
 repositories {
     maven {
-        url uri('../repo')
+        url uri('../../richpage/public/repo')
     }
     mavenCentral()
 }

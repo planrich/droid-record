@@ -14,11 +14,11 @@ apply plugin: 'maven'
 apply plugin: 'android-library'
 
 group="at.pasra.record"
-version="0.0.1"
+version="0.0.2"
 
 repositories {
     maven {
-        url uri('../repo')
+        url uri('../../richpage/public/repo')
     }
     mavenCentral()
 }
@@ -36,7 +36,7 @@ android {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri('../repo'))
+            repository(url: uri('../../richpage/public/repo'))
         }
     }
 }
