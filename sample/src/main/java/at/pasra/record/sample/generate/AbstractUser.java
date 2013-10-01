@@ -39,6 +39,9 @@ public class AbstractUser{
     public void setLastName(java.lang.String value) { mLastName = value; }
     public java.lang.Long getId() { return mId; }
     public void setId(java.lang.Long value) { mId = value; }
+    public Gallery loadGallery(LocalSession session){
+        return session.queryGalleries().where("user_id = ?", Long.toString(mId)).limit(1).first();
+    }
     public static User fromCursor(android.database.Cursor cursor){
         User record = new User();
         record.setId(cursor.getLong(0));

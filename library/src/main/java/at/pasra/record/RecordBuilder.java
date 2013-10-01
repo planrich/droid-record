@@ -20,6 +20,8 @@ public abstract class RecordBuilder<E> {
     protected boolean modified = false;
     protected List<E> cachedAll;
     protected E cachedFirst = null;
+    protected int offset = -1;
+    protected int limit = -1;
 
     public RecordBuilder(String tableName, String[] columns, SQLiteDatabase db) {
         this.tableName = tableName;
@@ -45,8 +47,35 @@ public abstract class RecordBuilder<E> {
         return this;
     }
 
+    public RecordBuilder<E> distinct() {
+        return distinct(true);
+    }
+
+    public RecordBuilder<E> distinct(boolean distinct) {
+        this.distinct = distinct;
+        return this;
+    }
+
+    public RecordBuilder<E> limit(int count) {
+        this.limit = count;
+        return this;
+    }
+
+    public RecordBuilder<E> limit(int offset, int count) {
+        this.offset = offset;
+        this.limit = count;
+        return this;
+    }
+
     public Cursor cursor() {
-        return db.query(distinct, tableName, columns, selection, bindings, null, null, order, null);
+        String lim = null;
+        if (offset >= 0 && this.limit >= 0) {
+            lim = offset + " , " + Integer.toString(limit);
+        } else if (this.limit >= 0) {
+            lim = Integer.toString(limit);
+        }
+
+        return db.query(distinct, tableName, columns, selection, bindings, null, null, order, lim);
     }
 
     /**

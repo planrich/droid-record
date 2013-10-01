@@ -35,9 +35,6 @@ class RecordBuilderGenerator {
 
             c.line("@Override")
             c.wrap("public java.util.List<${javaClassName}> all()") {
-                /*c.wrap("if (!modified)") {
-                    c.line("return cachedAll;")
-                }*/
 
                 c.line("java.util.List<${javaClassName}> list = new java.util.ArrayList<${javaClassName}>();")
 
@@ -46,23 +43,15 @@ class RecordBuilderGenerator {
                     c.line("list.add(${javaClassName}.fromCursor(c));");
                 }
 
-                c.line("cachedAll = list;");
-                c.line("modified = false;")
-
                 c.line("return list;")
             }
 
             c.line("@Override")
             c.wrap("public ${javaClassName} first()") {
 
-                /*c.wrap("if (cachedFirst != null)") {
-                    c.line("return cachedFirst;")
-                }*/
-
                 c.line("android.database.Cursor c = cursor();")
                 c.wrap("if (c.moveToFirst())") {
                     c.line("${javaClassName} record = ${javaClassName}.fromCursor(c);");
-                    c.line("cachedFirst = record;")
                     c.line("c.close();")
                     c.line("return record;")
                 }

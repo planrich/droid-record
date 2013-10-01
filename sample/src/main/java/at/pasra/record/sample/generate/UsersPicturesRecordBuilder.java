@@ -21,24 +21,24 @@ package at.pasra.record.sample.generate;
 import at.pasra.record.RecordBuilder;
 import android.database.sqlite.SQLiteDatabase;
 
-public class GalleryRecordBuilder extends RecordBuilder<Gallery>{
-    public GalleryRecordBuilder(SQLiteDatabase db){
-        super("galleries", new String[] { "_id", "name", "user_id" }, db);
+public class UsersPicturesRecordBuilder extends RecordBuilder<UsersPictures>{
+    public UsersPicturesRecordBuilder(SQLiteDatabase db){
+        super("users_pictures", new String[] { "_id", "user_id", "picture_id" }, db);
     }
     @Override
-    public java.util.List<Gallery> all(){
-        java.util.List<Gallery> list = new java.util.ArrayList<Gallery>();
+    public java.util.List<UsersPictures> all(){
+        java.util.List<UsersPictures> list = new java.util.ArrayList<UsersPictures>();
         android.database.Cursor c = cursor();
         while (c.moveToNext()){
-            list.add(Gallery.fromCursor(c));
+            list.add(UsersPictures.fromCursor(c));
         }
         return list;
     }
     @Override
-    public Gallery first(){
+    public UsersPictures first(){
         android.database.Cursor c = cursor();
         if (c.moveToFirst()){
-            Gallery record = Gallery.fromCursor(c);
+            UsersPictures record = UsersPictures.fromCursor(c);
             c.close();
             return record;
         }

@@ -1,7 +1,13 @@
 comment: "Insert your model relationships here! See the documentation for details.",
 gallery: {
-  has_many: '#picture'
+  has_many: ['#picture'],
+  belongs_to: ['user']
 },
 picture: {
-  belongs_to: 'gallery'
+  belongs_to: ['gallery'],
+  has_and_belongs_to: { many: 'users', through: 'users_pictures' }
+},
+user: {
+  has_one: ['gallery'],
+  has_and_belongs_to: { many: 'pictures', through: 'users_pictures' }
 }

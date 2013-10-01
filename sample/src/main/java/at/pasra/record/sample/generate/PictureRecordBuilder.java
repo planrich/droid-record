@@ -32,8 +32,6 @@ public class PictureRecordBuilder extends RecordBuilder<Picture>{
         while (c.moveToNext()){
             list.add(Picture.fromCursor(c));
         }
-        cachedAll = list;
-        modified = false;
         return list;
     }
     @Override
@@ -41,7 +39,6 @@ public class PictureRecordBuilder extends RecordBuilder<Picture>{
         android.database.Cursor c = cursor();
         if (c.moveToFirst()){
             Picture record = Picture.fromCursor(c);
-            cachedFirst = record;
             c.close();
             return record;
         }

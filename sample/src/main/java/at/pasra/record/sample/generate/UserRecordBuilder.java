@@ -32,8 +32,6 @@ public class UserRecordBuilder extends RecordBuilder<User>{
         while (c.moveToNext()){
             list.add(User.fromCursor(c));
         }
-        cachedAll = list;
-        modified = false;
         return list;
     }
     @Override
@@ -41,7 +39,6 @@ public class UserRecordBuilder extends RecordBuilder<User>{
         android.database.Cursor c = cursor();
         if (c.moveToFirst()){
             User record = User.fromCursor(c);
-            cachedFirst = record;
             c.close();
             return record;
         }

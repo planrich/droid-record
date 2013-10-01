@@ -24,7 +24,7 @@ import android.content.ContentValues;
 import at.pasra.record.Migrator;
 
 public class RecordMigrator implements Migrator{
-    public static final long MIGRATION_LEVEL = 20130922093633L;
+    public static final long MIGRATION_LEVEL = 20131001095638L;
     
     private final SQLiteDatabase db;
     public RecordMigrator(SQLiteDatabase db){
@@ -145,6 +145,10 @@ public class RecordMigrator implements Migrator{
             db.execSQL("drop table users_mig_temp_table");
             new at.pasra.record.sample.NullMigrator().migrate(db, currentVersion, targetVersion);
             currentVersion = 20130922093633L;
+        }
+        if (currentVersion < targetVersion && currentVersion < 20131001095638L){
+            db.execSQL("create table users_pictures (_id integer primary key, user_id integer , picture_id integer );");
+            currentVersion = 20131001095638L;
         }
 
         db.execSQL("insert or replace into android_record_configs (key,value) values (?,?)", new Object[] { "version", new Long(currentVersion) });

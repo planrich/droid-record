@@ -4,16 +4,15 @@
 
 ########## v0.1.0 ############
 
-* caching
-* query interface, limit(0,1), limit(1), orderBy().orderBy(), where().where(), distinct()
-* relations has_one, has_and_belongs_to_many
++ cache findBy()
++ query interface, limit(0,1), limit(1), distinct()
++ relations has_one
 * doc show what json generates
   json {   |  record.can()
           --> record.do()
   }        |  record.that()
 ----------- 5.Oct.13 ------------
 * create table, null, unique and constraint
-* change type of column
 * gradle -> migrate on file changes
 * bugfix intellij start removes some files? wtf?
 ---------- 11.Oct.13 ------------
@@ -22,7 +21,11 @@
 
 ########## v0.2.0 ############
 
-* query interface, join()
+* change type of column
+* relations has_and_belongs_to_many
+* implements list
+* caching
+* query interface, orderBy().orderBy(), where().where(), join()
 * remote session
 
 * move to sonatype?

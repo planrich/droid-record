@@ -8,5 +8,5 @@ change:{
     }
   },
 
-  add_column: { table: "gallery", column: "usr_id", type: "integer" }
+  add_column: { table: "gallery", column: "usr_id", type: "long" }
 }

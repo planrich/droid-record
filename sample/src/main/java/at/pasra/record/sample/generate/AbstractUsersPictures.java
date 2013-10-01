@@ -17,32 +17,33 @@
  */
 // This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 package at.pasra.record.sample.generate;
+// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 
+import at.pasra.record.SQLiteConverter;
 import at.pasra.record.RecordBuilder;
-import android.database.sqlite.SQLiteDatabase;
 
-public class GalleryRecordBuilder extends RecordBuilder<Gallery>{
-    public GalleryRecordBuilder(SQLiteDatabase db){
-        super("galleries", new String[] { "_id", "name", "user_id" }, db);
+public class AbstractUsersPictures{
+    protected java.lang.Long mUserId;
+    protected java.lang.Long mPictureId;
+    protected java.lang.Long mId;
+    
+    public AbstractUsersPictures(java.lang.Long id){
+        this.mId = id;
+        this.mUserId = new Long(0L);
+        this.mPictureId = new Long(0L);
     }
-    @Override
-    public java.util.List<Gallery> all(){
-        java.util.List<Gallery> list = new java.util.ArrayList<Gallery>();
-        android.database.Cursor c = cursor();
-        while (c.moveToNext()){
-            list.add(Gallery.fromCursor(c));
-        }
-        return list;
-    }
-    @Override
-    public Gallery first(){
-        android.database.Cursor c = cursor();
-        if (c.moveToFirst()){
-            Gallery record = Gallery.fromCursor(c);
-            c.close();
-            return record;
-        }
-        c.close();
-        return null;
+    
+    public java.lang.Long getUserId() { return mUserId; }
+    public void setUserId(java.lang.Long value) { mUserId = value; }
+    public java.lang.Long getPictureId() { return mPictureId; }
+    public void setPictureId(java.lang.Long value) { mPictureId = value; }
+    public java.lang.Long getId() { return mId; }
+    public void setId(java.lang.Long value) { mId = value; }
+    public static UsersPictures fromCursor(android.database.Cursor cursor){
+        UsersPictures record = new UsersPictures();
+        record.setId(cursor.getLong(0));
+        record.setUserId(cursor.getLong(1));
+        record.setPictureId(cursor.getLong(2));
+        return record;
     }
 }

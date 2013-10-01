@@ -1,5 +1,7 @@
 package at.pasra.record.generation
 
+import at.pasra.record.database.HasOne
+import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import at.pasra.record.AndroidRecordPlugin
@@ -190,21 +192,46 @@ class MigrationContext {
                     throw InvalidUserDataException("Relation expects table '${origin_name}' to exist. But it does not!")
                 }
 
-                has_man_relations(relation, origin_name, origin)
+                has_many_relations(relation, origin_name, origin)
 
                 belongs_to_relations(relation, origin_name, origin)
 
-                /*
-                if (relation.has("has_one")) {
-                    def has_one = relation.get("has_one")
-                    if (has_one.isJsonPrimitive()) {
-                        relations << new HasOne(this, has_one.asString)
-                    }
-                }*/
+                has_one_relations(relation, origin_name, origin)
 
 
             }
         }
+
+    }
+
+    def has_one_relations(JsonObject relation, String origin_name, Table origin) {
+
+        if (relation.has("has_one")) {
+            def belongs_to = relation.get("has_one")
+
+            def relations = []
+            if (belongs_to.isJsonArray()) {
+                JsonArray array = belongs_to.getAsJsonArray();
+                for (int i = 0; i < array.size(); i++) {
+                    relations << array.get(i).asString;
+                }
+            } else if (belongs_to.isJsonPrimitive()) {
+                relations << belongs_to.asString
+            }
+
+            relations.each { target_name ->
+                def target = tables[target_name]
+                if (target == null) {
+                    throw InvalidUserDataException(
+                            "Has one relation expects table '${target_name}' to exist. But it does not!"
+                    )
+                }
+                Relation r = new HasOne(origin, target)
+                r.checkIntegrity();
+                origin.relations << r
+            }
+        }
+
 
     }
 
@@ -215,16 +242,19 @@ class MigrationContext {
 
             def relations = []
             if (belongs_to.isJsonArray()) {
-                relations = belongs_to.getAsJsonArray();
+                JsonArray array = belongs_to.getAsJsonArray();
+                for (int i = 0; i < array.size(); i++) {
+                    relations << array.get(i).asString;
+                }
             } else if (belongs_to.isJsonPrimitive()) {
-                relations = [belongs_to.getAsString()];
+                relations << belongs_to.asString
             }
 
             relations.each { target_name ->
                 def target = tables[target_name]
                 if (target == null) {
                     throw InvalidUserDataException(
-                            "Belongs to relation expects table '${origin_name}' to exist. But it does not!"
+                            "Belongs to relation expects table '${target_name}' to exist. But it does not!"
                     )
                 }
                 Relation r = new BelongsTo(origin, target)
@@ -235,24 +265,27 @@ class MigrationContext {
 
     }
 
-    def has_man_relations(JsonObject relation, String origin_name, Table origin) {
+    def has_many_relations(JsonObject relation, String origin_name, Table origin) {
 
         if (relation.has("has_many")) {
             def has_many = relation.get("has_many")
 
             def many = []
             if (has_many.isJsonArray()) {
-                many = has_many.getAsJsonArray();
+                JsonArray array = has_many.getAsJsonArray();
+                for (int i = 0; i < array.size(); i++) {
+                    many << array.get(i).asString;
+                }
             } else if (has_many.isJsonPrimitive()) {
                 many = [has_many.getAsString()];
             }
 
-            many.each { plural_name ->
+            many.each { String plural_name ->
                 def target_name = Inflector.singularize(plural_name)
                 def target = tables[target_name]
                 if (target == null) {
                     throw InvalidUserDataException(
-                            "Has many relation expects table '${origin_name}' to exist. But it does not! " +
+                            "Has many relation expects table '${target_name}' to exist. But it does not! " +
                                     "If it does and the singularize function messed it up, use a " +
                                     "hash in front of the table name. e.g. 'has_many': '#singular_table_name'"
                     )
