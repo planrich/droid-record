@@ -70,7 +70,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Android 4.2.2 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="AtPasraRecordLibrary001.aar" level="project" />
+    <orderEntry type="library" exported="" name="AtPasraRecordLibrary002.aar" level="project" />
   </component>
 </module>
 

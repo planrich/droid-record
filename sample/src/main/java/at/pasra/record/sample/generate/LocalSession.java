@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.2 generated this file. For more
+ * Android Record version 0.0.4 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -30,7 +30,7 @@ public class LocalSession{
     public LocalSession(SQLiteDatabase database){
         this.mDB = database;
     }
-    public void saveGallery(AbstractGallery obj){
+    public void saveGallery(Gallery obj){
         if (obj == null){
             throw new IllegalArgumentException("Tried to save an instance of Gallery which was null. Cannot do that!");
         }
@@ -42,16 +42,16 @@ public class LocalSession{
         }
         return gallery_record.load(mDB, id);
     }
-    public void destroyGallery(java.lang.Long id){
-        if (id == null){
-            throw new IllegalArgumentException("why would you want to delete a gallery record with a null key?");
+    public void destroyGallery(Gallery obj){
+        if (obj == null){
+            throw new IllegalArgumentException("why would you want to delete a gallery record with a null obj?");
         }
-        gallery_record.delete(mDB, id);
+        gallery_record.delete(mDB, obj.getId());
     }
     public GalleryRecordBuilder queryGalleries(){
         return new GalleryRecordBuilder(mDB);
     }
-    public void savePicture(AbstractPicture obj){
+    public void savePicture(Picture obj){
         if (obj == null){
             throw new IllegalArgumentException("Tried to save an instance of Picture which was null. Cannot do that!");
         }
@@ -63,16 +63,16 @@ public class LocalSession{
         }
         return picture_record.load(mDB, id);
     }
-    public void destroyPicture(java.lang.Long id){
-        if (id == null){
-            throw new IllegalArgumentException("why would you want to delete a picture record with a null key?");
+    public void destroyPicture(Picture obj){
+        if (obj == null){
+            throw new IllegalArgumentException("why would you want to delete a picture record with a null obj?");
         }
-        picture_record.delete(mDB, id);
+        picture_record.delete(mDB, obj.getId());
     }
     public PictureRecordBuilder queryPictures(){
         return new PictureRecordBuilder(mDB);
     }
-    public void saveUser(AbstractUser obj){
+    public void saveUser(User obj){
         if (obj == null){
             throw new IllegalArgumentException("Tried to save an instance of User which was null. Cannot do that!");
         }
@@ -84,16 +84,16 @@ public class LocalSession{
         }
         return user_record.load(mDB, id);
     }
-    public void destroyUser(java.lang.Long id){
-        if (id == null){
-            throw new IllegalArgumentException("why would you want to delete a user record with a null key?");
+    public void destroyUser(User obj){
+        if (obj == null){
+            throw new IllegalArgumentException("why would you want to delete a user record with a null obj?");
         }
-        user_record.delete(mDB, id);
+        user_record.delete(mDB, obj.getId());
     }
     public UserRecordBuilder queryUsers(){
         return new UserRecordBuilder(mDB);
     }
-    public void saveUsersPictures(AbstractUsersPictures obj){
+    public void saveUsersPictures(UsersPictures obj){
         if (obj == null){
             throw new IllegalArgumentException("Tried to save an instance of UsersPictures which was null. Cannot do that!");
         }
@@ -105,11 +105,11 @@ public class LocalSession{
         }
         return users_pictures_record.load(mDB, id);
     }
-    public void destroyUsersPictures(java.lang.Long id){
-        if (id == null){
-            throw new IllegalArgumentException("why would you want to delete a users_pictures record with a null key?");
+    public void destroyUsersPictures(UsersPictures obj){
+        if (obj == null){
+            throw new IllegalArgumentException("why would you want to delete a users_pictures record with a null obj?");
         }
-        users_pictures_record.delete(mDB, id);
+        users_pictures_record.delete(mDB, obj.getId());
     }
     public UsersPicturesRecordBuilder queryUserspictures(){
         return new UsersPicturesRecordBuilder(mDB);

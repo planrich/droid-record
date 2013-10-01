@@ -27,6 +27,7 @@ class Field {
 
     static final to_sqlite_type = ["integer": "integer",
             "long": "integer",
+            "boolean": "integer",
             "float": "real",
             "string": "text",
             "blob": "blob",

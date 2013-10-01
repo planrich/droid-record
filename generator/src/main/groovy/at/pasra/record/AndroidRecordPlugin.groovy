@@ -7,7 +7,7 @@ import org.gradle.api.Project
 
 class AndroidRecordPlugin implements Plugin<Project> {
 
-    public static String VERSION = "0.0.2"
+    public static String VERSION = "0.0.4"
 
     @Override
     void apply(Project project) {
@@ -39,8 +39,8 @@ class AndroidRecordPlugin implements Plugin<Project> {
         }
 
         File sourcePath = project.file(ext.output_path)
-        if (!sourcePath.exists()) {
-            throw new InvalidUserDataException("Output path '${migPath.path}' does not exist! Cannot proceed. Create the path manually or corret typos")
+        if (!sourcePath.isDirectory()) {
+            throw new InvalidUserDataException("Output path '${sourcePath.path}' does not exist! Cannot proceed. Create the path manually or corret typos")
         }
 
         if (ext.output_package == null) {

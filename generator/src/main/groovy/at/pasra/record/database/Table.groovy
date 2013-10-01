@@ -65,9 +65,18 @@ class Table {
     }
 
     void changeName(String name) {
+        def hash_in_front = name.startsWith("#")
+        if (hash_in_front) {
+            name = name.substring(1)
+        }
+
         this.name = Inflector.tabelize(name)
         this.javaClassName = Inflector.camelize(this.name);
         this.sqlTableName = Inflector.pluralize(this.name)
+
+        if (hash_in_front) {
+            this.sqlTableName = this.name;
+        }
     }
 
     Field removeField(String field_name) {

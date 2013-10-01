@@ -42,7 +42,7 @@ class SessionGenerator {
                 def recordName = "${table.name}_record";
                 def javaClassName = table.javaClassName
                 def javaPluralCamel = Inflector.camelize(Inflector.pluralize(javaClassName));
-                c.wrap("public void save${javaClassName}(Abstract${javaClassName} obj)") {
+                c.wrap("public void save${javaClassName}(${javaClassName} obj)") {
                     c.wrap("if (obj == null)") {
                         c.line("throw new IllegalArgumentException(" +
                                 "\"Tried to save an instance of ${javaClassName} which was null. Cannot do that!\");")
@@ -59,13 +59,13 @@ class SessionGenerator {
                     c.line("return ${recordName}.load(mDB, id);")
                 }
 
-                c.wrap("public void destroy${javaClassName}(java.lang.Long id)") {
-                    c.wrap("if (id == null)") {
+                c.wrap("public void destroy${javaClassName}(${javaClassName} obj)") {
+                    c.wrap("if (obj == null)") {
                         c.line("throw new IllegalArgumentException(" +
-                                "\"why would you want to delete a ${name} record with a null key?\");")
+                                "\"why would you want to delete a ${name} record with a null obj?\");")
                     }
 
-                    c.line("${recordName}.delete(mDB, id);")
+                    c.line("${recordName}.delete(mDB, obj.getId());")
                 }
 
                 // relations

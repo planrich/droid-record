@@ -1,8 +1,8 @@
-change: {
-    create_table: {
-        name: 'gallery',
-        fields: {
-            name: 'string'
-        }
+change: [
+  { cmd: create_table,
+    name: 'gallery',
+    fields: {
+      name: 'string'
     }
-}
+  }
+]

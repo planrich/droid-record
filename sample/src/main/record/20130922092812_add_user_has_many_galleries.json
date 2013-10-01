@@ -1,5 +1,5 @@
-change:{
-  create_table: {
+change: [
+  { cmd: create_table,
     name: 'usr',
     fields: {
       first_name: "string",
@@ -8,5 +8,5 @@ change:{
     }
   },
 
-  add_column: { table: "gallery", column: "usr_id", type: "long" }
-}
+  { cmd: add_column, table: "gallery", column: "usr_id", type: "long" }
+]
