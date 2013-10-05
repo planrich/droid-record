@@ -60,7 +60,7 @@ public class RecordMigrator implements Migrator{
             currentVersion = 20130913154915L;
         }
         if (currentVersion < targetVersion && currentVersion < 20130913165751L){
-            db.execSQL("create table pictures (_id integer primary key, name text , image blob , date text , gallery_id integer );");
+            db.execSQL("create table pictures (_id integer primary key, name text , image blob , date integer , gallery_id integer );");
             currentVersion = 20130913165751L;
         }
         if (currentVersion < targetVersion && currentVersion < 20130922092812L){
@@ -69,6 +69,7 @@ public class RecordMigrator implements Migrator{
             currentVersion = 20130922092812L;
         }
         if (currentVersion < targetVersion && currentVersion < 20130922093131L){
+            db.execSQL("drop table if exists users;");
             db.execSQL("create table users (_id integer primary key, first_name text , last_name text , age integer );");
             {
                 Cursor c = db.rawQuery("select * from usrs", null);
@@ -84,6 +85,7 @@ public class RecordMigrator implements Migrator{
                 db.execSQL("commit");
             }
             db.execSQL("drop table usrs");
+            db.execSQL("drop table if exists galleries_mig_temp_table;");
             db.execSQL("create table galleries_mig_temp_table (_id integer primary key, name text , user_id integer );");
             {
                 Cursor c = db.rawQuery("select * from galleries", null);
@@ -115,6 +117,7 @@ public class RecordMigrator implements Migrator{
             currentVersion = 20130922093131L;
         }
         if (currentVersion < targetVersion && currentVersion < 20130922093633L){
+            db.execSQL("drop table if exists users_mig_temp_table;");
             db.execSQL("create table users_mig_temp_table (_id integer primary key, first_name text , last_name text );");
             {
                 Cursor c = db.rawQuery("select * from users", null);

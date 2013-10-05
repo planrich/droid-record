@@ -21,8 +21,9 @@ class GenerateMigrationTask extends DefaultTask {
         File migration = new File(root, "${timestamp(new Date())}_${name}.json")
         OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(migration));
         CodeGenerator c = new CodeGenerator();
-        c.wrap("change: ") {
-        }
+        c.line("change: [")
+        c.line("")
+        c.line("]")
 
         w.write(c.toString());
         w.close()

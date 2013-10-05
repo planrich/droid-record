@@ -27,7 +27,6 @@ class JavaObjectGenerator {
         def javaClassName = Inflector.camelize(table.name)
 
         c.line("package ${pkg};")
-        c.doNotModify();
         c.line()
         c.line("import at.pasra.record.SQLiteConverter;");
         c.line("import at.pasra.record.RecordBuilder;");
@@ -68,7 +67,6 @@ class JavaObjectGenerator {
         if (!file.exists()) {
             c = new CodeGenerator();
             c.copyrightHeader()
-            c.doNotModify()
 
             c.line("package ${pkg};")
             c.line();

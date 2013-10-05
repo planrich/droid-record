@@ -3,11 +3,9 @@
 ## TODO
 
 docu:
-* rich.pasra.at -> record.pasra.at
 * build.gradle wget
 * build.gradle without +
 * relationship comment not valid?
-* boolean as type
 
 ########## v0.1.0 ############
 

@@ -55,7 +55,7 @@ public class BasicRecordTest extends AndroidTestCase {
         gallery = mSession.findGallery(id);
         assertEquals(gallery.getName(), "example");
 
-        mSession.destroyGallery(id);
+        mSession.destroyGallery(gallery);
         gallery = mSession.findGallery(id);
         assertNull(gallery);
     }

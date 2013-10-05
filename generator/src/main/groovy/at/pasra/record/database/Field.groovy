@@ -11,8 +11,9 @@ import at.pasra.record.Inflector
  */
 class Field {
 
-    String javaName; // camelized
+    String javaFieldName; // camelized
     String name; // original
+    String sqlName;
     JsonElement json;
     String type;
     boolean allowNull = false;
@@ -31,7 +32,7 @@ class Field {
             "float": "real",
             "string": "text",
             "blob": "blob",
-            "date": "text", ]
+            "date": "integer", ]
 
     Field(String name, JsonElement json) {
         changeName(name)
@@ -57,6 +58,10 @@ class Field {
             if (obj.has("null") && obj.get("null").asBoolean) {
                 allowNull = true;
             }
+
+            if (obj.has("sql_name") && obj.get("sql_name").isJsonPrimitive()) {
+                this.sqlName = obj.get("sql_name").asString
+            }
         }
 
         if (to_java_type[type] == null) {
@@ -65,8 +70,9 @@ class Field {
     }
 
     void changeName(String new_name) {
-        this.javaName = Inflector.camelize(new_name)
-        this.name = new_name
+        this.name = Inflector.internalName(new_name)
+        this.sqlName = Inflector.internalName(new_name)
+        this.javaFieldName = Inflector.javaClassName(new_name)
     }
 
     String javaType() {
@@ -74,11 +80,11 @@ class Field {
     }
 
     String javaPrivateFieldName() {
-        return "m${Inflector.camelize(name)}"
+        return "m${javaFieldName}"
     }
 
     String javaGetCall() {
-        return "get${Inflector.camelize(name)}()"
+        return "get${javaFieldName}()"
     }
 
     String javaCallToSerialize(String objname) {
@@ -86,17 +92,19 @@ class Field {
         def suffix = "";
         def prefix = "";
         if (type == "java.util.Date") {
-            prefix = "SQLiteConverter.dateToString("
-            suffix = ")";
+            //prefix = "SQLiteConverter.dateToString("
+            //suffix = ")";
+            //prefix = ""
+            suffix = ".getTime()"
         }
 
-        return "${prefix}${objname}.get${Inflector.camelize(name)}()${suffix}";
+        return "${prefix}${objname}.get${javaFieldName}()${suffix}";
     }
 
     String javaCallToDeserialize(String objname, String cursorobj) {
         def call = javaCallGetCursor(cursorobj)
 
-        return "${objname}.set${Inflector.camelize(name)}(${call})"
+        return "${objname}.set${javaFieldName}(${call})"
     }
 
     String javaCallGetCursor(String c) {
@@ -106,7 +114,8 @@ class Field {
         if (type == "byte[]") {
             call = "${c}.getBlob(${i})"
         } else if (type == "java.util.Date") {
-            call = "SQLiteConverter.stringToDate(${c}.getString(${i}))"
+            //call = "SQLiteConverter.stringToDate(${c}.getString(${i}))"
+            call = "new java.util.Date(${c}.getLong(${i}))"
         } else if (type == "java.lang.String") {
             call = "${c}.getString(${i})";
         } else if (type == "java.lang.Integer") {
@@ -126,7 +135,7 @@ class Field {
      * @param c
      */
     void generateDaoJavaField(CodeGenerator c) {
-        c.line("protected ${javaType()} m${javaName};")
+        c.line("protected ${javaType()} m${javaFieldName};")
     }
 
     /**
@@ -142,8 +151,8 @@ class Field {
      * @param c
      */
     void generateDaoJavaFieldGetterSetter(CodeGenerator c) {
-        c.line("public ${javaType()} get${javaName}() { return m${javaName}; }")
-        c.line("public void set${javaName}(${javaType()} value) { m${javaName} = value; }")
+        c.line("public ${javaType()} get${javaFieldName}() { return m${javaFieldName}; }")
+        c.line("public void set${javaFieldName}(${javaType()} value) { m${javaFieldName} = value; }")
     }
 
     /**
@@ -186,7 +195,7 @@ class Field {
     }
 
     String privateFieldName() {
-        return "m${Inflector.camelize(name)}"
+        return "m${javaFieldName}"
     }
 
     String defaultValue() {

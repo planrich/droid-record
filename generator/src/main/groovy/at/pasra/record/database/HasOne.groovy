@@ -2,6 +2,7 @@ package at.pasra.record.database
 
 import at.pasra.record.Inflector
 import at.pasra.record.generation.CodeGenerator
+import com.google.gson.JsonObject
 import org.gradle.api.InvalidUserDataException
 
 /**
@@ -9,35 +10,29 @@ import org.gradle.api.InvalidUserDataException
  */
 class HasOne extends Relation {
 
-    HasOne(Table origin, Table target) {
-        super(origin, target)
+    HasOne(Table origin, Table target, JsonObject options) {
+        super(origin, target, options)
     }
 
     @Override
-    void generateSessionMethods(CodeGenerator c) {
-
-    }
+    void generateSessionMethods(CodeGenerator c) {}
 
     @Override
     void generateJavaMethods(CodeGenerator c) {
-
-        def javaClassName = target.javaClassName
-        def pluralJavaClassName = Inflector.camelize(Inflector.pluralize(javaClassName))
-        c.wrap("public ${javaClassName} load${javaClassName}(LocalSession session)") {
-            c.line("return session.query${pluralJavaClassName}().where(\"${origin.name}_id = ?\", Long.toString(${origin.primary.javaPrivateFieldName()})).limit(1).first();")
+        c.wrap("public ${target.javaClassName} load${target.javaClassName}(LocalSession session)") {
+            c.line("return session.query${Inflector.camelize(Inflector.pluralize(target.javaClassName))}().where(\"${origin.name}_id = ?\", Long.toString(${origin.primary.javaPrivateFieldName()})).limit(1).first();")
         }
     }
 
     @Override
-    void generateRecordMethods(CodeGenerator c) {
-    }
+    void generateRecordMethods(CodeGenerator c) {}
 
     @Override
     void checkIntegrity() {
         def has_foreign_key = false
         def type_match = false
         def type = null
-        def foreign_key = "${origin.name}_id"
+        def foreign_key = foreign_key()
         target.fields.values().each { Field f ->
             if (f.name == foreign_key) {
                 has_foreign_key = true

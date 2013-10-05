@@ -67,7 +67,27 @@ public abstract class RecordBuilder<E> {
         return this;
     }
 
-    public Cursor cursor() {
+    public long sum(String name) {
+        Cursor cursor = db.query(distinct, tableName, new String[] { "sum(" + name + ")" }, selection, bindings, null, null, order, limit());
+
+        cursor.moveToFirst();
+        long value = cursor.getLong(0);
+        cursor.close();
+
+        return value;
+    }
+
+    public double sumDouble(String name) {
+        Cursor cursor = db.query(distinct, tableName, new String[] { "sum(" + name + ")" }, selection, bindings, null, null, order, limit());
+
+        cursor.moveToFirst();
+        double value = cursor.getDouble(0);
+        cursor.close();
+
+        return value;
+    }
+
+    private String limit() {
         String lim = null;
         if (offset >= 0 && this.limit >= 0) {
             lim = offset + " , " + Integer.toString(limit);
@@ -75,7 +95,11 @@ public abstract class RecordBuilder<E> {
             lim = Integer.toString(limit);
         }
 
-        return db.query(distinct, tableName, columns, selection, bindings, null, null, order, lim);
+        return lim;
+    }
+
+    public Cursor cursor() {
+        return db.query(distinct, tableName, columns, selection, bindings, null, null, order, limit());
     }
 
     /**

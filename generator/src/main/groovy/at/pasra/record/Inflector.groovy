@@ -39,6 +39,10 @@ class Inflector {
     }
 
     static String pluralize(String name) {
+        if (name.startsWith("#")) {
+            return name.substring(1)
+        }
+
         def plural = mInstance.irregularSingular[name.toLowerCase()]
         if (plural) {
             return plural;
@@ -59,6 +63,32 @@ class Inflector {
         }
 
         return name;
+    }
+
+    static String internalName(String name) {
+        if (name.startsWith("#")) {
+            return name.substring(1)
+        } else {
+            return Inflector.tabelize(name)
+        }
+    }
+
+    static String javaClassName(String name) {
+
+        if (name.startsWith("#")) {
+            return Inflector.camelize(name.substring(1).toLowerCase());
+        }
+
+        return Inflector.camelize(Inflector.tabelize(name));
+
+    }
+
+    static String sqlTableName(String name) {
+        if (name.startsWith("#")) {
+            return name.substring(1)
+
+        }
+        return Inflector.pluralize(Inflector.tabelize(name))
     }
 
 

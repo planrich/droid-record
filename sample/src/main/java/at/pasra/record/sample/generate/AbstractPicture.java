@@ -17,7 +17,6 @@
  */
 // This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 package at.pasra.record.sample.generate;
-// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 
 import at.pasra.record.SQLiteConverter;
 import at.pasra.record.RecordBuilder;
@@ -60,7 +59,7 @@ public class AbstractPicture{
         record.setId(cursor.getLong(0));
         record.setName(cursor.getString(1));
         record.setImage(cursor.getBlob(2));
-        record.setDate(SQLiteConverter.stringToDate(cursor.getString(3)));
+        record.setDate(new java.util.Date(cursor.getLong(3)));
         record.setGalleryId(cursor.getLong(4));
         return record;
     }

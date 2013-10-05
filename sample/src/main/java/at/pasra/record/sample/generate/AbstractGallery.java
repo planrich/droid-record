@@ -17,7 +17,6 @@
  */
 // This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 package at.pasra.record.sample.generate;
-// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 
 import at.pasra.record.SQLiteConverter;
 import at.pasra.record.RecordBuilder;

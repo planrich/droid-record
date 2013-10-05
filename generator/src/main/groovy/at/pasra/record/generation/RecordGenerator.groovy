@@ -92,7 +92,7 @@ class RecordGenerator {
                     c.line("values.put(\"${f.name}\", ${f.javaCallToSerialize("record")});")
                 }
 
-                c.line("long id = record.get${table.primary.javaName}();")
+                c.line("long id = record.get${table.primary.javaFieldName}();")
                 c.line("db.update(\"${table.sqlTableName}\", values, \"${table.primary.name} = ?\", new String[] { Long.toString(id) });")
             }
 

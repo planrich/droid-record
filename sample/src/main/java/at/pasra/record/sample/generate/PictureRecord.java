@@ -39,7 +39,7 @@ public class PictureRecord{
         ContentValues values = new ContentValues(4);
         values.put("name", record.getName());
         values.put("image", record.getImage());
-        values.put("date", SQLiteConverter.dateToString(record.getDate()));
+        values.put("date", record.getDate().getTime());
         values.put("gallery_id", record.getGalleryId());
         long id = db.insert("pictures", null, values);
         record.setId(id);
@@ -56,7 +56,7 @@ public class PictureRecord{
             record.setId(c.getLong(0));
             record.setName(c.getString(1));
             record.setImage(c.getBlob(2));
-            record.setDate(SQLiteConverter.stringToDate(c.getString(3)));
+            record.setDate(new java.util.Date(c.getLong(3)));
             record.setGalleryId(c.getLong(4));
             primaryKeyCache.put(id, record);
             return record;
@@ -71,7 +71,7 @@ public class PictureRecord{
         ContentValues values = new ContentValues(4);
         values.put("name", record.getName());
         values.put("image", record.getImage());
-        values.put("date", SQLiteConverter.dateToString(record.getDate()));
+        values.put("date", record.getDate().getTime());
         values.put("gallery_id", record.getGalleryId());
         long id = record.getId();
         db.update("pictures", values, "_id = ?", new String[] { Long.toString(id) });
