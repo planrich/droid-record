@@ -8,6 +8,7 @@ import org.gradle.api.logging.Logging
 
 /*!
  * @getting_started Getting Started
+ * -#position 1
  * %p
  *   If you have use active record before you might find yourself
  *   very confortable with this toolkit. Note that this is not an
