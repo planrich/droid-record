@@ -33,28 +33,28 @@ import org.gradle.api.Project
  * %pre
  *   %code{ data: { language: 'javascript' } }
  *     :preserve
- *       buildscript {¬
- *         repositories {¬
- *            maven { url "http://record.pasra.at/repo" }¬
- *         }¬
- *         dependencies {¬
- *            classpath 'at.pasra.record.generator:generator:0.0.+'¬
- *         }¬
- *       }¬
- *       ¬
+ *       buildscript {
+ *         repositories {
+ *            maven { url "http://record.pasra.at/repo" }
+ *         }
+ *         dependencies {
+ *            classpath 'at.pasra.record.generator:generator:0.0.+'
+ *         }
+ *       }
+ *
  *       repositories {¬
- *         maven { url "http://record.pasra.at/repo" }¬
- *       }¬
- *       ¬
- *       dependencies {¬
- *         compile 'at.pasra.record:library:0.0.+@aar'¬
- *       }¬
+ *         maven { url "http://record.pasra.at/repo" }
+ *       }
  *
- *        apply plugin: 'android_record'¬
+ *       dependencies {
+ *         compile 'at.pasra.record:library:0.0.+@aar'
+ *       }
  *
- *       android_record {¬
- *         output_package='com.example.sample.generate'¬
- *       }¬
+ *       apply plugin: 'android_record'
+ *
+ *       android_record {
+ *         output_package='com.example.sample.generate'
+ *       }
  * %p
  *   By applying the plugin 'android_record'
  *   %a{ href: '#commands' } two tasks

@@ -320,7 +320,134 @@ class MigrationContext {
             }
         }
     }
-
+    /*!
+     * @relations Relations
+     * -#after migrations
+     *
+     * %p
+     *   Relations are all specified in one file. By default this is
+     *   %span.migration-ref relations.json
+     *   \.
+     *   They do not change in migrations but are more like compile time information
+     *   to check if the association information is present on the tables and checks
+     *   if the types match.
+     *
+     * %p
+     *   In the following section the following migration is created before the relations
+     *   are added.
+     *
+     * %span.filename 123456_pre_migration.json
+     * %pre
+     *   %code{ data: { language: 'dsl' } }
+     *     :preserve
+     *       change: {
+     *         create_table: {
+     *           name: 'picture',
+     *           fields: {
+     *             gallery_id: 'long'
+     *           }
+     *         },
+     *
+     *         create_table: {
+     *           name: 'gallery',
+     *           fields: {
+     *             user_id: 'long'
+     *           }
+     *         },
+     *
+     *         create_table: {
+     *           name: 'user',
+     *           fields: {
+     *             name: 'string'
+     *           }
+     *         },
+     *
+     *         create_table: {
+     *           name: 'selected_picture',
+     *           fields: {
+     *             picture_id: 'long',
+     *             user_id: 'long'
+     *           }
+     *         }
+     *       }
+     *
+     * @relations|has_one Has One (1..1)
+     *
+     * %p
+     *   Limiting your self with the following rule 'a user has one gallery' the following
+     *   would be added:
+     *
+     * %span.filename relations.json
+     * %pre
+     *   %code{ data: { language: 'dsl' } }
+     *     :preserve
+     *       ...
+     *       user: {
+     *         has_one: [ 'gallery' ]
+     *       }
+     *
+     * @relations|has_may Has Many (1..n)
+     *
+     * %p Assuming that any gallery has many pictures (1..n):
+     *
+     * %span.filename relations.json
+     * %pre
+     *   %code{ data: { language: 'dsl' } }
+     *     :preserve
+     *       ...
+     *       gallery: {
+     *         has_many: [ 'pictures' ]
+     *       }
+     *
+     * %p
+     *   Note that the name in
+     *   %span.migration-ref has_many
+     *   array must be plural. This is more readable as you can simply read 'a gallery has many pictures'.
+     *   If Android Record cannot infer the table from the given name in plural you can specifiy the exact
+     *   table name by prepending a hash (#) infront of the name (e.g '#picture' instead of 'pictures').
+     *
+     * @relations|belongs_to Belong to
+     *
+     * %p
+     *   Looking at the two sections above it might be useful that given a picture object you can
+     *   retrieve it's gallery, or given a gallery you can lookup it's user. Add the following:
+     *
+     * %span.filename relations.json
+     * %pre
+     *   %code{ data: { language: 'javascript' } }
+     *     :preserve
+     *       ...
+     *       picture: {
+     *         belongs_to: [ 'gallery' ]
+     *       },
+     *       gallery: {
+     *         belongs_to: [ 'user' ]
+     *       }
+     *
+     * @relations|has_and_belong_to_many Has and belongs to many
+     *
+     * %p
+     *   This is not yet implemented
+     * %p
+     *   A user can select many (= has many) galleries and a gallery belongs to many users.
+     *   This is expressed the following way:
+     *
+     * %span.filename relations.json
+     * %pre
+     *   %code{ data: { language: 'dsl' } }
+     *     :preserve
+     *       ...
+     *       user: {
+     *         has_and_belongs_to: [
+     *           { many: 'galleries', through: 'selected_pictures' }
+     *         ]
+     *       },
+     *       gallery: {
+     *         has_and_belongs_to: [
+     *           { many: 'users', through: 'selected_pictures' }
+     *         ]
+     *       }
+     */
     void relations(JsonObject rels) {
 
         rels.entrySet().each { e ->
