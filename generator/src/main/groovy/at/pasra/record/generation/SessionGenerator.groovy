@@ -3,6 +3,8 @@ package at.pasra.record.generation
 import at.pasra.record.AndroidRecordPlugin
 import at.pasra.record.Inflector
 import at.pasra.record.database.Table
+import org.gradle.api.logging.Logger
+import org.gradle.api.tasks.TaskOutputs
 
 /**
  * Created by rich on 9/14/13.
@@ -96,10 +98,6 @@ class SessionGenerator {
 
         }
 
-
-        File file = AndroidRecordPlugin.file(path, pkg, "LocalSession.java", true)
-        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
-        writer.write(c.toString());
-        writer.close();
+        AndroidRecordPlugin.write(path, pkg, "LocalSession.java", c.toString(), true);
     }
 }

@@ -4,6 +4,7 @@ import at.pasra.record.generation.CodeGenerator
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.logging.Logging
 
 /*!
  * @getting_started Getting Started
@@ -42,7 +43,7 @@ import org.gradle.api.Project
  *         }
  *       }
  *
- *       repositories {¬
+ *       repositories {
  *         maven { url "http://record.pasra.at/repo" }
  *       }
  *
@@ -148,14 +149,28 @@ class AndroidRecordPlugin implements Plugin<Project> {
 
     public static String VERSION = "0.0.4"
 
+    static def outputFiles = []
+    static def project;
+
+    public static void write(String path, String pkg, String file, String content, boolean forcecreate) {
+        //File fh = AndroidRecordPlugin.file(path, pkg, file, forcecreate);
+
+        File fh = project.file("src/main/java/${pkg.replace('.','/')}")
+        fh.mkdirs();
+        fh = project.file("src/main/java/${pkg.replace('.','/')}/${file}")
+        Logging.getLogger("record_android").info("generating ${fh.path}")
+
+        fh.write(content)
+    }
+
     @Override
     void apply(Project project) {
 
         project.extensions.create("android_record", AndroidRecordPluginExtention)
 
-        project.tasks.create('migrate', MigrateTask)
+        project.task('migrate', type: MigrateTask)
         // move it to a ruby gem? really inflexible param passing in gradle
-        project.tasks.create('migration', GenerateMigrationTask)
+        project.task('migration', type: GenerateMigrationTask)
 
     }
 
@@ -186,6 +201,14 @@ class AndroidRecordPlugin implements Plugin<Project> {
             throw new InvalidUserDataException("Output package not specified. Please add output_package=your.package to the android record plugin!")
         }
 
+    }
+
+    static File dir(path, pkg) {
+        File file = new File(path.toString());
+        pkg.toString().split(/\./).each { folder ->
+            file = new File(file, folder)
+        }
+        return file;
     }
 
     static File file(path, pkg, name, boolean create) {

@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'at.pasra.record:generator:0.0.+'
-        classpath 'com.android.tools.build:gradle:0.5.+'
+        classpath 'com.android.tools.build:gradle:0.6.+'
         classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.+'
     }
 }
@@ -27,10 +27,6 @@ android {
     }
 }
 
-android_record {
-    output_package='at.pasra.record.sample.generate'
-}
-
 repositories {
     maven {
         url uri('../../richpage/public/repo')
@@ -40,4 +36,8 @@ repositories {
 
 dependencies {
     compile 'at.pasra.record:library:0.0.+@aar'
+}
+
+android_record {
+    output_package='at.pasra.record.sample.generate'
 }

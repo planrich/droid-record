@@ -4,6 +4,8 @@ import at.pasra.record.AndroidRecordPlugin
 import at.pasra.record.Inflector
 import at.pasra.record.database.Field
 import at.pasra.record.database.Table
+import org.apache.tools.ant.Project
+import org.gradle.api.logging.Logging
 
 /**
  * Created by rich on 9/10/13.
@@ -112,8 +114,6 @@ class MigratiorGenerator {
         def generator_version_key = "generator_version";
         def version_key = "version";
 
-        File target = new File(path);
-        OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(target));
 
         CodeGenerator c = new CodeGenerator();
         c.copyrightHeader()
@@ -179,8 +179,7 @@ class MigratiorGenerator {
 
         }
 
-        w.write(c.toString())
-        w.close();
+        AndroidRecordPlugin.write(path, pkg, "RecordMigrator.java", c.toString(), true);
     }
 
 }

@@ -58,12 +58,9 @@ class JavaObjectGenerator {
         }
 
 
-        File file = AndroidRecordPlugin.file(source, pkg, "Abstract${Inflector.camelize(table.name)}.java", true)
-        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
-        writer.write(c.toString());
-        writer.close();
+        AndroidRecordPlugin.write(source, pkg, "Abstract${table.javaClassName}.java", c.toString(), true)
 
-        file = AndroidRecordPlugin.file(source, pkg, "${Inflector.camelize(table.name)}.java", false)
+        def file = AndroidRecordPlugin.file(source, pkg, "${Inflector.camelize(table.name)}.java", false)
         if (!file.exists()) {
             c = new CodeGenerator();
             c.copyrightHeader()
@@ -80,9 +77,7 @@ class JavaObjectGenerator {
                 c.line("// add your code here")
             }
 
-            writer = new OutputStreamWriter(new FileOutputStream(file));
-            writer.write(c.toString());
-            writer.close();
+            AndroidRecordPlugin.write(source, pkg, "${Inflector.camelize(table.name)}.java", c.toString(), false)
         }
     }
 
@@ -90,7 +85,6 @@ class JavaObjectGenerator {
         table.fields.each { _, Field field ->
             field.generateDaoJavaFieldGetterSetter(c);
         }
-
 
         // CLEANUP
         def belongs_to = []

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gradle-reporting-1.8">
+    <CLASSES>
+      <root url="jar:///usr/share/java/gradle/lib/plugins/gradle-reporting-1.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

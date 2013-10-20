@@ -12,8 +12,11 @@ import at.pasra.record.database.HasMany
 import at.pasra.record.database.Relation
 import at.pasra.record.database.Table
 import com.google.gson.JsonPrimitive
+import org.apache.tools.ant.Project
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.internal.TaskOutputsInternal
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.TaskOutputs
 
 /**
  * Created by rich on 9/8/13.
@@ -44,15 +47,7 @@ class MigrationContext {
     MigrationContext(String path, String pkg) {
         this.path = path
         this.pkg = pkg
-        File target = AndroidRecordPlugin.file(path, pkg, "RecordMigrator.java", false);
-        this.migGen = new MigratiorGenerator(target.path, pkg);
-    }
-
-    private static String dehash(String name) {
-        if (name.startsWith("#")) {
-            return name.substring(1)
-        }
-        return name;
+        this.migGen = new MigratiorGenerator(path, pkg);
     }
 
     /**
@@ -580,16 +575,21 @@ class MigrationContext {
 
         logger.info("generating source to path '${path}' into package '${pkg}")
 
-        new SessionGenerator(tables).generate(path, pkg)
+        migGen.writeToFile();
+
+        SessionGenerator session = new SessionGenerator(tables);
+        session.generate(path, pkg)
 
         tables.each { String name, Table table ->
-            new JavaObjectGenerator(table).generate(path, pkg)
-            new RecordGenerator(table).generateSQLite(path, pkg)
-            new RecordBuilderGenerator(table).generate(path, pkg)
+            def objGen = new JavaObjectGenerator(table)
+            objGen.generate(path, pkg)
+
+            def recordGen = new RecordGenerator(table)
+            recordGen.generateSQLite(path, pkg)
+
+            def recordBuilder = new RecordBuilderGenerator(table)
+            recordBuilder.generate(path, pkg)
         }
 
-        logger.info("generating migrator")
-
-        migGen.writeToFile();
     }
 }

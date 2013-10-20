@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gradle-core-impl-1.8">
+    <CLASSES>
+      <root url="jar:///usr/share/java/gradle/lib/plugins/gradle-core-impl-1.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

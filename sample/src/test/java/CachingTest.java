@@ -2,9 +2,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
-import java.util.Collection;
-import java.util.List;
-
 import at.pasra.record.sample.generate.Gallery;
 import at.pasra.record.sample.generate.LocalSession;
 import at.pasra.record.sample.generate.Picture;

@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.2 generated this file. For more
+ * Android Record version 0.0.4 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -15,7 +15,6 @@
  *
  * This copyright notice must not be modified or deleted.
  */
-// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 package at.pasra.record.sample.generate;
 
 public class User extends AbstractUser {

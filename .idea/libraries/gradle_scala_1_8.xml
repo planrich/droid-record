@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gradle-scala-1.8">
+    <CLASSES>
+      <root url="jar:///usr/share/java/gradle/lib/plugins/gradle-scala-1.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

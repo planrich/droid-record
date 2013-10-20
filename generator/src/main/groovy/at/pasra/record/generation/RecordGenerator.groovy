@@ -101,10 +101,6 @@ class RecordGenerator {
             }
         }
 
-        File file = AndroidRecordPlugin.file(source, pkg, "${javaClassName}Record.java", true)
-        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
-        writer.write(c.toString());
-        writer.close();
-
+        AndroidRecordPlugin.write(source, pkg, "${javaClassName}Record.java", c.toString(), true);
     }
 }

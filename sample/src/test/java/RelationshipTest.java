@@ -1,11 +1,9 @@
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
 import at.pasra.record.sample.generate.Gallery;
 import at.pasra.record.sample.generate.LocalSession;
-import at.pasra.record.sample.generate.Picture;
 import at.pasra.record.sample.generate.RecordMigrator;
 import at.pasra.record.sample.generate.User;
 

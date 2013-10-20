@@ -1,12 +1,16 @@
 package at.pasra.record
 
+import at.pasra.record.database.Table
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import at.pasra.record.generation.MigrationContext
+import org.apache.tools.ant.taskdefs.ExecTask
+import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.InvalidUserCodeException
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.Task
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -15,18 +19,28 @@ import org.gradle.api.tasks.TaskAction
 class MigrateTask extends DefaultTask {
 
     def migrationRegex = /^(\d+)_([^.]*).json$/
+    def context;
+
+
+    public MigrateTask() {
+        super();
+
+        doLast { Task t ->
+            AndroidRecordPlugin.project = t.project
+            context.generate()
+        }
+    }
+
+
 
     @TaskAction
     void taskExec() {
-
-        AndroidRecordPlugin.sanitizeConfiguration(getProject())
-
         AndroidRecordPluginExtention ex = project.android_record;
+        AndroidRecordPlugin.sanitizeConfiguration(project)
+        context = new MigrationContext(project.file(ex.output_path).path, ex.output_package);
 
         File root = project.file(ex.migration_path);
         JsonParser parser = new JsonParser();
-
-        MigrationContext ctx = new MigrationContext(project.file(ex.output_path).path, ex.output_package);
 
         String[] files = root.list().sort()
         files.each { String file ->
@@ -37,7 +51,7 @@ class MigrateTask extends DefaultTask {
                     JsonObject obj = parser.parse(reader).getAsJsonObject();
 
                     long version = extractVersion(file)
-                    ctx.addMigrationStep(obj, new File(root, file), version);
+                    context.addMigrationStep(obj, new File(root, file), version);
                 } catch (Exception e) {
                     throw new InvalidUserCodeException("In file ${file}: " + e.message); // + e.stackTrace.take(15).collect({ StackTraceElement s -> s.toString() }).join("\n    "))
                 }
@@ -52,15 +66,13 @@ class MigrateTask extends DefaultTask {
             reader.setLenient(true);
             try {
                 JsonObject obj = parser.parse(reader).getAsJsonObject();
-                ctx.relations(obj);
+                context.relations(obj);
             } catch (Exception e) {
                 throw new InvalidUserCodeException("In file ${ex.relationship}: " + e.message)
             }
         } else {
             logger.info("could not find relation ship file '${ex.relationship}' in migration path")
         }
-
-        ctx.generate()
     }
 
     /**
