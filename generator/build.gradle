@@ -8,6 +8,7 @@ repositories {
     mavenCentral()
 }
 
+
 dependencies {
     compile gradleApi()
     compile localGroovy()
@@ -17,7 +18,7 @@ dependencies {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri('../../richpage/public/repo'))
+            repository(url: uri('../repo'))
         }
     }
 }

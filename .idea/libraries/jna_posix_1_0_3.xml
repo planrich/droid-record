@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="jna-posix-1.0.3">
-    <CLASSES>
-      <root url="jar:///opt/gradle-1.6/lib/jna-posix-1.0.3.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

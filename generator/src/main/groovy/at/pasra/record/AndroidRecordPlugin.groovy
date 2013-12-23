@@ -152,6 +152,7 @@ class AndroidRecordPlugin implements Plugin<Project> {
 
     static def outputFiles = []
     static def project;
+    static def logger = Logging.getLogger(AndroidRecordPlugin.class)
 
     public static void write(String path, String pkg, String file, String content, boolean forcecreate) {
         //File fh = AndroidRecordPlugin.file(path, pkg, file, forcecreate);
@@ -159,7 +160,7 @@ class AndroidRecordPlugin implements Plugin<Project> {
         File fh = project.file("src/main/java/${pkg.replace('.','/')}")
         fh.mkdirs();
         fh = project.file("src/main/java/${pkg.replace('.','/')}/${file}")
-        Logging.getLogger("record_android").info("generating ${fh.path}")
+        logger.info("generating ${fh.path}")
 
         fh.write(content)
     }
@@ -169,10 +170,16 @@ class AndroidRecordPlugin implements Plugin<Project> {
 
         project.extensions.create("android_record", AndroidRecordPluginExtention)
 
-        project.task('migrate', type: MigrateTask)
-        // move it to a ruby gem? really inflexible param passing in gradle
-        project.task('migration', type: GenerateMigrationTask)
+        def migrate = project.task('migrate', type: MigrateTask, )
+        migrate.group = "Build"
+        migrate.description = "Generates java source code for the database structure"
 
+        def migration = project.task('migration', type: GenerateMigrationTask)
+        migration.description = "Create a new migration file to transform the database"
+
+        project.afterEvaluate {
+            project.tasks.preBuild.dependsOn migrate
+        }
     }
 
     static void sanitizeConfiguration(Project project) {

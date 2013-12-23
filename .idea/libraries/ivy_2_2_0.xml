@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="ivy-2.2.0">
-    <CLASSES>
-      <root url="jar:///opt/gradle-1.6/lib/ivy-2.2.0.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

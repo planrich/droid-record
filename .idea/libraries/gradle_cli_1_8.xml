@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="gradle-cli-1.8">
-    <CLASSES>
-      <root url="jar:///usr/share/java/gradle/lib/gradle-cli-1.8.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="guava-11.0.2">
-    <CLASSES>
-      <root url="jar:///opt/gradle-1.6/lib/guava-11.0.2.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

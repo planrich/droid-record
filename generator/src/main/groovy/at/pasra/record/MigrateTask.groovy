@@ -21,7 +21,6 @@ class MigrateTask extends DefaultTask {
     def migrationRegex = /^(\d+)_([^.]*).json$/
     def context;
 
-
     public MigrateTask() {
         super();
 
@@ -30,8 +29,6 @@ class MigrateTask extends DefaultTask {
             context.generate()
         }
     }
-
-
 
     @TaskAction
     void taskExec() {

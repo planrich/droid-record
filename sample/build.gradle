@@ -1,41 +1,43 @@
 buildscript {
     repositories {
         maven {
-            url uri('../../richpage/public/repo')
+            url uri('../repo')
         }
         mavenCentral()
     }
     dependencies {
         classpath 'at.pasra.record:generator:0.0.+'
-        classpath 'com.android.tools.build:gradle:0.6.+'
-        classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.7.0'
+        //classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.+'
     }
 }
 
+
 apply plugin: 'android'
 apply plugin: 'android_record'
+
 
 group="at.pasra.record.sample"
 version="0.0.1"
 
 android {
-    compileSdkVersion 17
-    buildToolsVersion "17.0.0"
+    compileSdkVersion 19
+    buildToolsVersion "19"
     sourceSets {
-
         instrumentTest.setRoot('src/test')
     }
 }
 
 repositories {
     maven {
-        url uri('../../richpage/public/repo')
+        url uri('../repo')
     }
     mavenCentral()
 }
 
 dependencies {
-    compile 'at.pasra.record:library:0.0.+@aar'
+    //compile 'at.pasra.record:library:0.0.+@aar'
+    compile project(':library')
 }
 
 android_record {

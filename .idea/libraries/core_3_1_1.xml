@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="core-3.1.1">
-    <CLASSES>
-      <root url="jar:///opt/gradle-1.6/lib/plugins/core-3.1.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="plexus-component-annotations-1.5.2">
-    <CLASSES>
-      <root url="jar:///opt/gradle-1.6/lib/plugins/plexus-component-annotations-1.5.2.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

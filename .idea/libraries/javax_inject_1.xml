@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="javax.inject-1">
-    <CLASSES>
-      <root url="jar:///opt/gradle-1.6/lib/javax.inject-1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

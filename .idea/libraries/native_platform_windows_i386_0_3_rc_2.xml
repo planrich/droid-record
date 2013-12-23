@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="native-platform-windows-i386-0.3-rc-2">
-    <CLASSES>
-      <root url="jar:///opt/gradle-1.6/lib/native-platform-windows-i386-0.3-rc-2.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
