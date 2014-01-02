@@ -88,11 +88,10 @@ class RecordBuilderGenerator {
             }
 
             c.line("@Override")
-            c.wrap("public java.util.List<${javaClassName}> all()") {
+            c.wrap("public java.util.List<${javaClassName}> all(android.database.Cursor c)") {
 
                 c.line("java.util.List<${javaClassName}> list = new java.util.ArrayList<${javaClassName}>();")
 
-                c.line("android.database.Cursor c = cursor();")
                 c.wrap("while (c.moveToNext())") {
                     c.line("list.add(${javaClassName}.fromCursor(c));");
                 }
@@ -101,9 +100,8 @@ class RecordBuilderGenerator {
             }
 
             c.line("@Override")
-            c.wrap("public ${javaClassName} first()") {
+            c.wrap("public ${javaClassName} first(android.database.Cursor c)") {
 
-                c.line("android.database.Cursor c = cursor();")
                 c.wrap("if (c.moveToFirst())") {
                     c.line("${javaClassName} record = ${javaClassName}.fromCursor(c);");
                     c.line("c.close();")

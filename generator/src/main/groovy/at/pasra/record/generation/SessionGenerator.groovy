@@ -96,6 +96,9 @@ class SessionGenerator {
                 }
             }
 
+            c.wrap("public void queryRaw(String query, String ... args)") {
+                c.line("return mDB.rawQuery(query, args);");
+            }
         }
 
         AndroidRecordPlugin.write(path, pkg, "LocalSession.java", c.toString(), true);

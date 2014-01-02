@@ -1,5 +1,6 @@
 package at.pasra.record.generation
 
+import at.pasra.record.database.HasAndBelongsTo
 import at.pasra.record.database.HasOne
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -424,8 +425,8 @@ class MigrationContext {
      * %p
      *   This is not yet implemented
      * %p
-     *   A user can select many (= has many) galleries and a gallery belongs to many users.
-     *   This is expressed the following way:
+     *   As an example consider the following requirement: "A user has many favourite pictures and a picture can be the favorite of many users".
+     *   In a classic relational database this is called a n:m relation.
      *
      * %span.filename relations.json
      * %pre
@@ -434,14 +435,15 @@ class MigrationContext {
      *       ...
      *       user: {
      *         has_and_belongs_to: [
-     *           { many: 'galleries', through: 'selected_pictures' }
+     *           { many: 'galleries', through: 'favourite_pictures' }
      *         ]
      *       },
      *       gallery: {
      *         has_and_belongs_to: [
-     *           { many: 'users', through: 'selected_pictures' }
+     *           { many: 'users', through: 'favourite_pictures' }
      *         ]
      *       }
+     *
      */
     void relations(JsonObject rels) {
 
@@ -461,10 +463,37 @@ class MigrationContext {
 
                 hasOneRelation(relation, origin)
 
-
+                hasAndBelongsTo(relation, origin)
             }
         }
 
+    }
+
+    def hasAndBelongsTo(JsonObject relation, Table origin) {
+
+        if (relation.has("has_and_belongs_to")) {
+
+            def many_table_name = Inflector.internalName(relation.get("many"))
+            def through_table_name = Inflector.internalName(relation.get("through"))
+
+            def many_table = tables[many_table_name]
+            if (many_table == null) {
+                throw new InvalidUserDataException("Expected table '${many_table_name}' to exist, but it does not!")
+            }
+
+            def through_table = tables[through_table_name]
+            if (through_table == null) {
+                throw new InvalidUserDataException("Expected table '${through_table}' to exist, but it does not!")
+            }
+
+            def rel = new HasAndBelongsTo("many", origin, many_table, through_table)
+            rel.checkIntegrity()
+            origin.relations << rel
+
+            return true;
+        }
+
+        return false;
     }
 
     def hasOneRelation(JsonObject relation, Table origin) {

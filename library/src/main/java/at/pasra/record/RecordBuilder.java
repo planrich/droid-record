@@ -106,13 +106,21 @@ public abstract class RecordBuilder<E> {
      * Performs the actual fetching from the database
      * @return fetch all entries and insert it into a list
      */
-    public abstract List<E> all();
+    public List<E> all() {
+        return all(cursor());
+    }
+
+    public abstract List<E> all(Cursor c);
 
     /**
      *
      * @return the first entry if it exists. null otherwise
      */
-    public abstract E first();
+    public E first() {
+        return first(cursor());
+    }
+
+    public abstract E first(Cursor c);
 
     public boolean isModified() {
         return modified;
