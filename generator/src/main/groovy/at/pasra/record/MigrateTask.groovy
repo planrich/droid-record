@@ -50,7 +50,7 @@ class MigrateTask extends DefaultTask {
                     long version = extractVersion(file)
                     context.addMigrationStep(obj, new File(root, file), version);
                 } catch (Exception e) {
-                    throw new InvalidUserCodeException("In file ${file}: " + e.message); // + e.stackTrace.take(15).collect({ StackTraceElement s -> s.toString() }).join("\n    "))
+                    throw new InvalidUserCodeException("In file ${file}: " + e.message);
                 }
             } else {
                 logger.info("Did not parse json file '${file}' in migration path!")
@@ -61,12 +61,14 @@ class MigrateTask extends DefaultTask {
         if (relationShip.exists()) {
             JsonReader reader = new JsonReader(new StringReader("{"+relationShip.text+"}"));
             reader.setLenient(true);
+            JsonObject obj = null;
             try {
-                JsonObject obj = parser.parse(reader).getAsJsonObject();
-                context.relations(obj);
+                obj =  parser.parse(reader).getAsJsonObject();
             } catch (Exception e) {
                 throw new InvalidUserCodeException("In file ${ex.relationship}: " + e.message)
             }
+
+            context.relations(obj);
         } else {
             logger.info("could not find relation ship file '${ex.relationship}' in migration path")
         }

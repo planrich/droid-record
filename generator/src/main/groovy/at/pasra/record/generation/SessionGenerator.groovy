@@ -96,7 +96,7 @@ class SessionGenerator {
                 }
             }
 
-            c.wrap("public void queryRaw(String query, String ... args)") {
+            c.wrap("public android.database.Cursor queryRaw(String query, String ... args)") {
                 c.line("return mDB.rawQuery(query, args);");
             }
         }

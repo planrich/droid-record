@@ -17,8 +17,8 @@
  */
 package at.pasra.record.sample.generate;
 
-public class UsersPictures extends AbstractUsersPictures {
-    public UsersPictures(){
+public class UserPicture extends AbstractUserPicture {
+    public UserPicture(){
         super(null);
     }
     

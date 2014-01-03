@@ -26,17 +26,15 @@ public class GalleryRecordBuilder extends RecordBuilder<Gallery>{
         super("galleries", new String[] { "_id", "name", "user_id" }, db);
     }
     @Override
-    public java.util.List<Gallery> all(){
+    public java.util.List<Gallery> all(android.database.Cursor c){
         java.util.List<Gallery> list = new java.util.ArrayList<Gallery>();
-        android.database.Cursor c = cursor();
         while (c.moveToNext()){
             list.add(Gallery.fromCursor(c));
         }
         return list;
     }
     @Override
-    public Gallery first(){
-        android.database.Cursor c = cursor();
+    public Gallery first(android.database.Cursor c){
         if (c.moveToFirst()){
             Gallery record = Gallery.fromCursor(c);
             c.close();

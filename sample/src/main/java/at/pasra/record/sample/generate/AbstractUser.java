@@ -41,6 +41,16 @@ public class AbstractUser{
     public Gallery loadGallery(LocalSession session){
         return session.queryGalleries().where("user_id = ?", Long.toString(mId)).limit(1).first();
     }
+    public java.util.List<Picture> loadPictures(LocalSession session){
+        String query = "select d.* from users o, user_pictures t, pictures d" +
+                       " where" +
+                       " o._id = ? and" +
+                       " o._id = t.user_id and" +
+                       " d._id = t.picture_id";
+        android.database.Cursor c = session.queryRaw(query, Long.toString(mId));
+        RecordBuilder<Picture> rb = session.queryPictures();
+        return rb.all(c);
+    }
     public static User fromCursor(android.database.Cursor cursor){
         User record = new User();
         record.setId(cursor.getLong(0));

@@ -19,6 +19,8 @@ class Table {
 
     def relations = [];
 
+    def javaclass_codegen = []
+
     def table_order = 1;
 
     Table(JsonObject json) {

@@ -21,12 +21,12 @@ package at.pasra.record.sample.generate;
 import at.pasra.record.SQLiteConverter;
 import at.pasra.record.RecordBuilder;
 
-public class AbstractUsersPictures{
+public class AbstractUserPicture{
     protected java.lang.Long mUserId;
     protected java.lang.Long mPictureId;
     protected java.lang.Long mId;
     
-    public AbstractUsersPictures(java.lang.Long id){
+    public AbstractUserPicture(java.lang.Long id){
         this.mId = id;
         this.mUserId = new Long(0L);
         this.mPictureId = new Long(0L);
@@ -38,8 +38,20 @@ public class AbstractUsersPictures{
     public void setPictureId(java.lang.Long value) { mPictureId = value; }
     public java.lang.Long getId() { return mId; }
     public void setId(java.lang.Long value) { mId = value; }
-    public static UsersPictures fromCursor(android.database.Cursor cursor){
-        UsersPictures record = new UsersPictures();
+    public static UserPicture of(User user, Picture picture){
+        UserPicture obj = new UserPicture();
+        obj.setUserId(user.getId());
+        obj.setPictureId(picture.getId());
+        return obj;
+    }
+    public static UserPicture of(Picture picture, User user){
+        UserPicture obj = new UserPicture();
+        obj.setPictureId(picture.getId());
+        obj.setUserId(user.getId());
+        return obj;
+    }
+    public static UserPicture fromCursor(android.database.Cursor cursor){
+        UserPicture record = new UserPicture();
         record.setId(cursor.getLong(0));
         record.setUserId(cursor.getLong(1));
         record.setPictureId(cursor.getLong(2));

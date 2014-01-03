@@ -22,12 +22,12 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import at.pasra.record.SQLiteConverter;
 
-public class UsersPicturesRecord{
-    private final java.util.Map<Long, UsersPictures> primaryKeyCache = new java.util.HashMap<Long, UsersPictures>();
+public class UserPictureRecord{
+    private final java.util.Map<Long, UserPicture> primaryKeyCache = new java.util.HashMap<Long, UserPicture>();
     public void clearCache(){
         primaryKeyCache.clear();
     }
-    public void save(SQLiteDatabase db, AbstractUsersPictures record){
+    public void save(SQLiteDatabase db, AbstractUserPicture record){
         if (record.getId() == null){
             insert(db, record);
         }
@@ -35,22 +35,22 @@ public class UsersPicturesRecord{
             update(db, record);
         }
     }
-    public void insert(SQLiteDatabase db, AbstractUsersPictures record){
+    public void insert(SQLiteDatabase db, AbstractUserPicture record){
         ContentValues values = new ContentValues(2);
         values.put("user_id", record.getUserId());
         values.put("picture_id", record.getPictureId());
-        long id = db.insert("users_pictures", null, values);
+        long id = db.insert("user_pictures", null, values);
         record.setId(id);
-        primaryKeyCache.put(id, (UsersPictures)record);
+        primaryKeyCache.put(id, (UserPicture)record);
     }
-    public UsersPictures load(SQLiteDatabase db, long id){
-        UsersPictures cached = primaryKeyCache.get(id);
+    public UserPicture load(SQLiteDatabase db, long id){
+        UserPicture cached = primaryKeyCache.get(id);
         if (cached != null){
             return cached;
         }
-        Cursor c = db.rawQuery("select * from users_pictures where _id = ?;", new String[] { Long.toString(id) });
+        Cursor c = db.rawQuery("select * from user_pictures where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
-            UsersPictures record = new UsersPictures();
+            UserPicture record = new UserPicture();
             record.setId(c.getLong(0));
             record.setUserId(c.getLong(1));
             record.setPictureId(c.getLong(2));
@@ -60,14 +60,14 @@ public class UsersPicturesRecord{
         return null;
     }
     public void delete(SQLiteDatabase db, long id){
-        db.execSQL("delete from users_pictures where  _id = ?;", new String[] { Long.toString(id) });
+        db.execSQL("delete from user_pictures where  _id = ?;", new String[] { Long.toString(id) });
         primaryKeyCache.remove(id);
     }
-    public void update(SQLiteDatabase db, AbstractUsersPictures record){
+    public void update(SQLiteDatabase db, AbstractUserPicture record){
         ContentValues values = new ContentValues(2);
         values.put("user_id", record.getUserId());
         values.put("picture_id", record.getPictureId());
         long id = record.getId();
-        db.update("users_pictures", values, "_id = ?", new String[] { Long.toString(id) });
+        db.update("user_pictures", values, "_id = ?", new String[] { Long.toString(id) });
     }
 }

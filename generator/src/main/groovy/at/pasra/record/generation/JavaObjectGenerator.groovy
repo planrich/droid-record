@@ -106,5 +106,9 @@ class JavaObjectGenerator {
                 c.line("return obj;")
             }
         }
+
+        table.javaclass_codegen.each { Closure closure ->
+            closure.curry(c).run()
+        }
     }
 }

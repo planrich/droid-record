@@ -26,7 +26,7 @@ public class LocalSession{
     private final GalleryRecord gallery_record = new GalleryRecord();
     private final PictureRecord picture_record = new PictureRecord();
     private final UserRecord user_record = new UserRecord();
-    private final UsersPicturesRecord users_pictures_record = new UsersPicturesRecord();
+    private final UserPictureRecord user_picture_record = new UserPictureRecord();
     public LocalSession(SQLiteDatabase database){
         this.mDB = database;
     }
@@ -93,32 +93,32 @@ public class LocalSession{
     public UserRecordBuilder queryUsers(){
         return new UserRecordBuilder(mDB);
     }
-    public void saveUsersPictures(UsersPictures obj){
+    public void saveUserPicture(UserPicture obj){
         if (obj == null){
-            throw new IllegalArgumentException("Tried to save an instance of UsersPictures which was null. Cannot do that!");
+            throw new IllegalArgumentException("Tried to save an instance of UserPicture which was null. Cannot do that!");
         }
-        users_pictures_record.save(mDB, obj);
+        user_picture_record.save(mDB, obj);
     }
-    public UsersPictures findUsersPictures(java.lang.Long id){
+    public UserPicture findUserPicture(java.lang.Long id){
         if (id == null){
-            throw new IllegalArgumentException("why would you want to load a users_pictures record with a null key?");
+            throw new IllegalArgumentException("why would you want to load a user_picture record with a null key?");
         }
-        return users_pictures_record.load(mDB, id);
+        return user_picture_record.load(mDB, id);
     }
-    public void destroyUsersPictures(UsersPictures obj){
+    public void destroyUserPicture(UserPicture obj){
         if (obj == null){
-            throw new IllegalArgumentException("why would you want to delete a users_pictures record with a null obj?");
+            throw new IllegalArgumentException("why would you want to delete a user_picture record with a null obj?");
         }
-        users_pictures_record.delete(mDB, obj.getId());
+        user_picture_record.delete(mDB, obj.getId());
     }
-    public UsersPicturesRecordBuilder queryUserspictures(){
-        return new UsersPicturesRecordBuilder(mDB);
+    public UserPictureRecordBuilder queryUserpictures(){
+        return new UserPictureRecordBuilder(mDB);
     }
     public void clearCache(){
         gallery_record.clearCache();
         picture_record.clearCache();
         user_record.clearCache();
-        users_pictures_record.clearCache();
+        user_picture_record.clearCache();
     }
     public GalleryRecord getGalleryRecord(){
         return gallery_record;
@@ -129,7 +129,10 @@ public class LocalSession{
     public UserRecord getUserRecord(){
         return user_record;
     }
-    public UsersPicturesRecord getUsersPicturesRecord(){
-        return users_pictures_record;
+    public UserPictureRecord getUserPictureRecord(){
+        return user_picture_record;
+    }
+    public android.database.Cursor queryRaw(String query, String ... args){
+        return mDB.rawQuery(query, args);
     }
 }

@@ -26,17 +26,15 @@ public class PictureRecordBuilder extends RecordBuilder<Picture>{
         super("pictures", new String[] { "_id", "name", "image", "date", "gallery_id" }, db);
     }
     @Override
-    public java.util.List<Picture> all(){
+    public java.util.List<Picture> all(android.database.Cursor c){
         java.util.List<Picture> list = new java.util.ArrayList<Picture>();
-        android.database.Cursor c = cursor();
         while (c.moveToNext()){
             list.add(Picture.fromCursor(c));
         }
         return list;
     }
     @Override
-    public Picture first(){
-        android.database.Cursor c = cursor();
+    public Picture first(android.database.Cursor c){
         if (c.moveToFirst()){
             Picture record = Picture.fromCursor(c);
             c.close();

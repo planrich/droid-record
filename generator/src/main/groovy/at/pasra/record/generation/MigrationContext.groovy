@@ -469,28 +469,61 @@ class MigrationContext {
 
     }
 
-    def hasAndBelongsTo(JsonObject relation, Table origin) {
+    def hasAndBelongsTo(JsonObject relation, Table origin_table) {
 
         if (relation.has("has_and_belongs_to")) {
 
-            def many_table_name = Inflector.internalName(relation.get("many"))
-            def through_table_name = Inflector.internalName(relation.get("through"))
+            def list = jsonObjectOrArrayToList(relation.get("has_and_belongs_to"))
+            list.each { JsonObject habt ->
 
-            def many_table = tables[many_table_name]
-            if (many_table == null) {
-                throw new InvalidUserDataException("Expected table '${many_table_name}' to exist, but it does not!")
+                if (! habt.has("many") && ! habt.has("one") ) {
+                    throw new InvalidUserDataException("In relation 'has_and_belongs_to' at either 'one' or 'many' must be given. None exists!")
+                }
+
+                if (habt.has("many") && habt.has("one") ) {
+                    throw new InvalidUserDataException("In relation 'has_and_belongs_to' at either 'one' or 'many' must be given. Not both!")
+                }
+
+                if (!habt.has("through")) {
+                    throw new InvalidUserDataException("In relation 'has_and_belongs_to' the property 'through' is missing!")
+                }
+
+                def which = "many"
+                if (habt.has("one")) {
+                    which = "one"
+                }
+
+                def which_table_name = Inflector.internalName(Inflector.singularize(habt.get(which).asString))
+                def through_table_name = Inflector.internalName(Inflector.singularize(habt.get("through").asString))
+
+                def which_table = tables[which_table_name]
+                if (which_table == null) {
+                    throw new InvalidUserDataException("Expected table '${which_table_name}' to exist, but it does not!")
+                }
+
+                def through_table = tables[through_table_name]
+                if (through_table == null) {
+                    throw new InvalidUserDataException("Expected table '${through_table}' to exist, but it does not!")
+                }
+
+                def rel = new HasAndBelongsTo(which, origin_table, which_table, through_table, habt)
+                rel.checkIntegrity()
+                origin_table.relations << rel
+
+                through_table.javaclass_codegen << { CodeGenerator c ->
+                    def javaClassName = Inflector.javaClassName(through_table_name)
+                    def typeParam1 = Inflector.javaClassName(which_table_name)
+                    def nameParam1 = which_table_name
+                    def typeParam2 = origin_table.javaClassName
+                    def nameParam2 = origin_table.name
+                    c.wrap("public static ${javaClassName} of(${typeParam1} ${nameParam1}, ${typeParam2} ${nameParam2})") {
+                        c.line("${javaClassName} obj = new ${javaClassName}();")
+                        c.line("obj.set${typeParam1}Id(${nameParam1}.getId());")
+                        c.line("obj.set${typeParam2}Id(${nameParam2}.getId());")
+                        c.line("return obj;")
+                    }
+                }
             }
-
-            def through_table = tables[through_table_name]
-            if (through_table == null) {
-                throw new InvalidUserDataException("Expected table '${through_table}' to exist, but it does not!")
-            }
-
-            def rel = new HasAndBelongsTo("many", origin, many_table, through_table)
-            rel.checkIntegrity()
-            origin.relations << rel
-
-            return true;
         }
 
         return false;
@@ -567,10 +600,34 @@ class MigrationContext {
 
     }
 
+    /**
+     * Convert a json element that is either a JsonObject to a singleton list, or a JsonArray
+     * to a java list.
+     * @param element
+     * @return a list
+     */
+    def jsonObjectOrArrayToList(JsonElement element) {
+
+        def list = []
+        if (element.isJsonArray()) {
+            JsonArray array = element.asJsonArray
+            for (int i = 0; i < array.size(); i++) {
+                if (array.get(i).isJsonObject()) {
+                    list << array.get(i).asJsonObject
+                } else {
+                    throw new InvalidUserDataException("expected json object but got primitive")
+                }
+            }
+        } else if (element.isJsonObject()) {
+            list << element.asJsonObject
+        } else {
+            throw new InvalidUserDataException("expected json object but got primitive")
+        }
+
+        return list
+    }
+
     /*!
-     * relations|syntax
-     * %p
-     *   Every
      */
     def buildUniformRelations(JsonElement relation, String name_prop) {
 

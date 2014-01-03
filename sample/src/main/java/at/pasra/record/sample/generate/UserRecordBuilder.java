@@ -26,17 +26,15 @@ public class UserRecordBuilder extends RecordBuilder<User>{
         super("users", new String[] { "_id", "first_name", "last_name" }, db);
     }
     @Override
-    public java.util.List<User> all(){
+    public java.util.List<User> all(android.database.Cursor c){
         java.util.List<User> list = new java.util.ArrayList<User>();
-        android.database.Cursor c = cursor();
         while (c.moveToNext()){
             list.add(User.fromCursor(c));
         }
         return list;
     }
     @Override
-    public User first(){
-        android.database.Cursor c = cursor();
+    public User first(android.database.Cursor c){
         if (c.moveToFirst()){
             User record = User.fromCursor(c);
             c.close();

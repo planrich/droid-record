@@ -21,24 +21,22 @@ package at.pasra.record.sample.generate;
 import at.pasra.record.RecordBuilder;
 import android.database.sqlite.SQLiteDatabase;
 
-public class UsersPicturesRecordBuilder extends RecordBuilder<UsersPictures>{
-    public UsersPicturesRecordBuilder(SQLiteDatabase db){
-        super("users_pictures", new String[] { "_id", "user_id", "picture_id" }, db);
+public class UserPictureRecordBuilder extends RecordBuilder<UserPicture>{
+    public UserPictureRecordBuilder(SQLiteDatabase db){
+        super("user_pictures", new String[] { "_id", "user_id", "picture_id" }, db);
     }
     @Override
-    public java.util.List<UsersPictures> all(){
-        java.util.List<UsersPictures> list = new java.util.ArrayList<UsersPictures>();
-        android.database.Cursor c = cursor();
+    public java.util.List<UserPicture> all(android.database.Cursor c){
+        java.util.List<UserPicture> list = new java.util.ArrayList<UserPicture>();
         while (c.moveToNext()){
-            list.add(UsersPictures.fromCursor(c));
+            list.add(UserPicture.fromCursor(c));
         }
         return list;
     }
     @Override
-    public UsersPictures first(){
-        android.database.Cursor c = cursor();
+    public UserPicture first(android.database.Cursor c){
         if (c.moveToFirst()){
-            UsersPictures record = UsersPictures.fromCursor(c);
+            UserPicture record = UserPicture.fromCursor(c);
             c.close();
             return record;
         }

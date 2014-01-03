@@ -51,12 +51,15 @@ class HasAndBelongsTo extends Relation {
 
         def javaClassName = target.javaClassName
         def pluralJavaClassName = Inflector.camelize(Inflector.pluralize(javaClassName))
-        c.wrap("public List<${javaClassName}> load${pluralJavaClassName}(LocalSession session)") {
-            c.line("String query = \"select d.* from ${origin.name} o join ${through.name} t on o.${origin.primary.name} = t.${foreign_key(origin.name, "foreign_key_has")}\" + ")
-            c.line("               \"join ${target.name} d on d.${target.primary.name} = t.${foreign_key(target.name, "foreign_key_belongs_to")}\" + ")
-            c.line("RecordBuilder<${javaClassName}> rb = session.query${pluralJavaClassName}());");
-            c.line("android.database.Cursor c = session.queryRaw(query);")
-            c.line("return rb.all(c)");
+        c.wrap("public java.util.List<${javaClassName}> load${pluralJavaClassName}(LocalSession session)") {
+            c.line("String query = \"select d.* from ${origin.sqlTableName} o, ${through.sqlTableName} t, ${target.sqlTableName} d\" +")
+            c.line("               \" where\" +")
+            c.line("               \" o.${origin.primary.name} = ? and\" +")
+            c.line("               \" o.${origin.primary.name} = t.${foreign_key(origin.name, "foreign_key_has")} and\" +")
+            c.line("               \" d.${target.primary.name} = t.${foreign_key(target.name, "foreign_key_belongs_to")}\";")
+            c.line("android.database.Cursor c = session.queryRaw(query, Long.toString(m${origin.primary.javaFieldName}));")
+            c.line("RecordBuilder<${javaClassName}> rb = session.query${pluralJavaClassName}();")
+            c.line("return rb.all(c);");
         }
     }
 

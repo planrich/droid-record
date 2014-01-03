@@ -150,7 +150,7 @@ public class RecordMigrator implements Migrator{
             currentVersion = 20130922093633L;
         }
         if (currentVersion < targetVersion && currentVersion < 20131001095638L){
-            db.execSQL("create table users_pictures (_id integer primary key, user_id integer , picture_id integer );");
+            db.execSQL("create table user_pictures (_id integer primary key, user_id integer , picture_id integer );");
             currentVersion = 20131001095638L;
         }
 
