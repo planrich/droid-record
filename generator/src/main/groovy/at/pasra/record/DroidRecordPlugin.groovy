@@ -54,7 +54,7 @@ import org.gradle.api.logging.Logging
  *            maven { url "http://record.pasra.at/repo" }
  *         }
  *         dependencies {
- *            classpath 'at.pasra.record.generator:generator:0.0.+'
+ *            classpath 'at.pasra.record:generator:0.0.+'
  *         }
  *       }
  *

@@ -16,7 +16,7 @@ class GenerateMigrationTask extends DefaultTask {
 
         def name = System.getProperty("name", "migration").replaceAll(" ","_")
 
-        File root = project.file(project.android_record.migration_path)
+        File root = project.file(project.droid_record.migration_path)
 
         File migration = new File(root, "${timestamp(new Date())}_${name}.json")
         OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(migration));
