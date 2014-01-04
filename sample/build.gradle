@@ -14,7 +14,7 @@ buildscript {
 
 
 apply plugin: 'android'
-apply plugin: 'android_record'
+apply plugin: 'droid_record'
 
 
 group="at.pasra.record.sample"
@@ -40,6 +40,6 @@ dependencies {
     compile project(':library')
 }
 
-android_record {
+droid_record {
     output_package='at.pasra.record.sample.generate'
 }

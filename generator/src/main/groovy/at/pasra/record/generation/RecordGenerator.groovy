@@ -1,6 +1,6 @@
 package at.pasra.record.generation
 
-import at.pasra.record.AndroidRecordPlugin
+import at.pasra.record.DroidRecordPlugin
 import at.pasra.record.database.Relation
 import at.pasra.record.database.Table
 /**
@@ -101,6 +101,6 @@ class RecordGenerator {
             }
         }
 
-        AndroidRecordPlugin.write(source, pkg, "${javaClassName}Record.java", c.toString(), true);
+        DroidRecordPlugin.write(source, pkg, "${javaClassName}Record.java", c.toString(), true);
     }
 }

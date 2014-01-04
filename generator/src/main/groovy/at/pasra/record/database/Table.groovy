@@ -66,27 +66,6 @@ class Table {
         }
     }
 
-    /*!
-     * @table_name
-     * %p
-     *   Given a name 'stock_item' will create the table 'stock_items' and generate
-     *   a java record with the name 'StockItem'. If you prefer to write the
-     *   java class name instead of the proposed name you can give the table
-     *   the name 'StockItem' which leads to the same result.
-     * .alert.alert-warning
-     *   It is important that you keep your naming convention. Internally
-     *   the name you provide is used to reference to the table.
-     * %p
-     *   If you have a legacy database which you would like to migrate
-     *   checkout this
-     *   %a{ href: '#table_name_legacy' } section
-     *
-     * @table_name_legacy
-     * %p
-     *   The name of a table can start with a hash (#) symbol. This means
-     *   that the name should be used literally. Given a table name 'SToCK_ITem',
-     *   will use the same table and uses the java class name 'StockItem'.
-     */
     void changeName(String name) {
         def hash_in_front = name.startsWith("#")
         if (hash_in_front) {

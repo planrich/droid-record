@@ -3,7 +3,7 @@ package at.pasra.record
 /**
  * Created by rich on 9/13/13.
  */
-class AndroidRecordPluginExtention {
+class DroidRecordPluginExtention {
     def migration_path = 'src/main/record'
     def output_path = 'src/main/java'
     def relationship = 'relationship.json'

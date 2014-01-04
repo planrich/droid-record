@@ -11,9 +11,10 @@ import org.gradle.api.InvalidUserDataException
 class HasMany extends Relation {
 
     /*!
-     * @relations|has_many_options Options has many
+     * @relations|has_many_options Has many options
+     * -#after relations|has_many
      * %p
-     *   You can specify the following options in the has_many value array:
+     *   You can specify the following options:
      *   %ul
      *     %li
      *       %strong foreign_key

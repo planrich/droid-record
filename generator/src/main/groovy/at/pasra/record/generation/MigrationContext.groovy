@@ -5,7 +5,6 @@ import at.pasra.record.database.HasOne
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import at.pasra.record.AndroidRecordPlugin
 import at.pasra.record.Inflector
 import at.pasra.record.database.BelongsTo
 import at.pasra.record.database.Field
@@ -13,32 +12,27 @@ import at.pasra.record.database.HasMany
 import at.pasra.record.database.Relation
 import at.pasra.record.database.Table
 import com.google.gson.JsonPrimitive
-import org.apache.tools.ant.Project
 import org.gradle.api.InvalidUserDataException
-import org.gradle.api.internal.TaskOutputsInternal
 import org.gradle.api.logging.Logging
-import org.gradle.api.tasks.TaskOutputs
-
 /**
  * Created by rich on 9/8/13.
  */
 
 /*!
  * @migrations Migrations
- * -#after getting_started
  * %p
- *   To handle changes in the database schema AR supports several commands in
+ *   To handle changes in the database schema {?class:arname;DR} supports several commands in
  *   a migration change array.
- *   The items in the change array are evaluated on after another. That means
- *   that modifications take place in order you define it.
+ *   The items are evaluated one after another. That means
+ *   that modifications take place in the order you define it.
  * %p
- *   AR provides migrations to create, drop, rename tables and add, remove
- *   and rename columns.
+ *   {?class:arname;DR} provides migrations to create, drop, rename tables and add, remove
+ *   and rename columns and a custom migration which gives you full control over the database.
  *
  */
 class MigrationContext {
 
-    def logger = Logging.getLogger("android_record")
+    def logger = Logging.getLogger("droid_record")
     def path;
     def pkg;
     MigratiorGenerator migGen;
@@ -94,10 +88,8 @@ class MigrationContext {
                      *       ]
                      *
                      * %p
-                     *   In the example above a 'pictures' table will be created when the migration is run on android.
-                     *   The plural {?ref:name} will be used to address this table.
-                     *   If this behaviour is not desired read this
-                     *   %a{ href: '#legacy_database' } section.
+                     *   In the example above a 'pictures' sql table will be created when the migration is run on Android.
+                     *   The singular {?ref:name} will be used to address this relation.
                      *
                      * %p
                      *   Each key value pair of {?ref:fields}
@@ -172,7 +164,7 @@ class MigrationContext {
                      *   {?ref:2} will be removed. Note that after this migration has been run the data is lost forever!
                      *
                      * %p
-                     *   {?ref:3} gets a new name. No data will be lost! Note that data conversion cannot be made here!
+                     *   {?ref:3} gets a new name. Note that data conversion cannot be made here!
                      */
                     if (cmd_name == "add_column") {
                         if (!change.has("column") || !change.has("table") || !change.has("type")) {
@@ -289,7 +281,7 @@ class MigrationContext {
                     *     :preserve
                     *       public interface DataMigrator {
                     *           //This custom migrator can be used when the normal migrations cannot handle the conversion.
-                    *           //Do _NOT_ create, drop or alter tables. Android Record cannot track these changes and this
+                    *           //Do _NOT_ create, drop or alter tables. Droid Record cannot track these changes and this
                     *           //will lead to undefined behaviour.
                     *
                     *           //It is not advisable to use any generated class here. As this class might disappear in
@@ -324,9 +316,8 @@ class MigrationContext {
      *   Relations are all specified in one file. By default this is
      *   %span.migration-ref relations.json
      *   \.
-     *   They do not change in migrations but are more like compile time information
-     *   to check if the association information is present on the tables and checks
-     *   if the types match.
+     *   Relationship between tables is just meta information. At migration time this meta
+     *   information is used to type check the primary and foreign keys on the relation.
      *
      * %p
      *   In the following section the following migration is created before the relations
@@ -336,42 +327,43 @@ class MigrationContext {
      * %pre
      *   %code{ data: { language: 'dsl' } }
      *     :preserve
-     *       change: {
-     *         create_table: {
+     *       change: [
+     *         { cmd: 'create_table',
      *           name: 'picture',
      *           fields: {
+     *             name: 'string',
+     *             data: 'blob',
      *             gallery_id: 'long'
      *           }
      *         },
-     *
-     *         create_table: {
+     *         { cmd: 'create_table',
      *           name: 'gallery',
      *           fields: {
-     *             user_id: 'long'
+     *             name: 'string',
+     *             user_id: 'long',
      *           }
      *         },
-     *
-     *         create_table: {
+     *         { cmd: 'create_table',
      *           name: 'user',
      *           fields: {
-     *             name: 'string'
+     *             name: 'string',
+     *             age: 'int'
      *           }
      *         },
-     *
-     *         create_table: {
-     *           name: 'selected_picture',
+     *         { cmd: 'create_table',
+     *           name: 'user_picture',
      *           fields: {
-     *             picture_id: 'long',
      *             user_id: 'long'
+     *             picture_id: 'long'
      *           }
      *         }
-     *       }
+     *       ]
      *
      * @relations|has_one Has One (1..1)
      *
      * %p
-     *   Limiting your self with the following rule 'a user has one gallery' the following
-     *   would be added:
+     *   Given the following requirement: 'a user has one gallery' add this
+     *   rule to your relationships:
      *
      * %span.filename relations.json
      * %pre
@@ -399,10 +391,10 @@ class MigrationContext {
      *   Note that the name in
      *   %span.migration-ref has_many
      *   array must be plural. This is more readable as you can simply read 'a gallery has many pictures'.
-     *   If Android Record cannot infer the table from the given name in plural you can specifiy the exact
+     *   If {?class:arname;DR} cannot infer the table from the given name in plural you can specifiy the exact
      *   table name by prepending a hash (#) infront of the name (e.g '#picture' instead of 'pictures').
      *
-     * @relations|belongs_to Belong to
+     * @relations|belongs_to Belongs to
      *
      * %p
      *   Looking at the two sections above it might be useful that given a picture object you can
@@ -420,10 +412,8 @@ class MigrationContext {
      *         belongs_to: [ 'user' ]
      *       }
      *
-     * @relations|has_and_belong_to_many Has and belongs to many
+     * @relations|has_and_belongs_to Has and belongs to
      *
-     * %p
-     *   This is not yet implemented
      * %p
      *   As an example consider the following requirement: "A user has many favourite pictures and a picture can be the favorite of many users".
      *   In a classic relational database this is called a n:m relation.
@@ -435,12 +425,12 @@ class MigrationContext {
      *       ...
      *       user: {
      *         has_and_belongs_to: [
-     *           { many: 'galleries', through: 'favourite_pictures' }
+     *           { many: 'galleries', through: 'user_picture' }
      *         ]
      *       },
      *       gallery: {
      *         has_and_belongs_to: [
-     *           { many: 'users', through: 'favourite_pictures' }
+     *           { many: 'users', through: 'user_picture' }
      *         ]
      *       }
      *
@@ -476,29 +466,21 @@ class MigrationContext {
             def list = jsonObjectOrArrayToList(relation.get("has_and_belongs_to"))
             list.each { JsonObject habt ->
 
-                if (! habt.has("many") && ! habt.has("one") ) {
-                    throw new InvalidUserDataException("In relation 'has_and_belongs_to' at either 'one' or 'many' must be given. None exists!")
-                }
-
-                if (habt.has("many") && habt.has("one") ) {
-                    throw new InvalidUserDataException("In relation 'has_and_belongs_to' at either 'one' or 'many' must be given. Not both!")
+                if (! habt.has("many") ) {
+                    throw new InvalidUserDataException("In relation 'has_and_belongs_to' 'many' must be given. None exists!")
                 }
 
                 if (!habt.has("through")) {
                     throw new InvalidUserDataException("In relation 'has_and_belongs_to' the property 'through' is missing!")
                 }
 
-                def which = "many"
-                if (habt.has("one")) {
-                    which = "one"
-                }
 
-                def which_table_name = Inflector.internalName(Inflector.singularize(habt.get(which).asString))
+                def many_table_name = Inflector.internalName(Inflector.singularize(habt.get("many").asString))
                 def through_table_name = Inflector.internalName(Inflector.singularize(habt.get("through").asString))
 
-                def which_table = tables[which_table_name]
-                if (which_table == null) {
-                    throw new InvalidUserDataException("Expected table '${which_table_name}' to exist, but it does not!")
+                def many_table = tables[many_table_name]
+                if (many_table == null) {
+                    throw new InvalidUserDataException("Expected table '${many_table_name}' to exist, but it does not!")
                 }
 
                 def through_table = tables[through_table_name]
@@ -506,14 +488,14 @@ class MigrationContext {
                     throw new InvalidUserDataException("Expected table '${through_table}' to exist, but it does not!")
                 }
 
-                def rel = new HasAndBelongsTo(which, origin_table, which_table, through_table, habt)
+                def rel = new HasAndBelongsTo(origin_table, many_table, through_table, habt)
                 rel.checkIntegrity()
                 origin_table.relations << rel
 
                 through_table.javaclass_codegen << { CodeGenerator c ->
                     def javaClassName = Inflector.javaClassName(through_table_name)
-                    def typeParam1 = Inflector.javaClassName(which_table_name)
-                    def nameParam1 = which_table_name
+                    def typeParam1 = Inflector.javaClassName(many_table_name)
+                    def nameParam1 = many_table_name
                     def typeParam2 = origin_table.javaClassName
                     def nameParam2 = origin_table.name
                     c.wrap("public static ${javaClassName} of(${typeParam1} ${nameParam1}, ${typeParam2} ${nameParam2})") {

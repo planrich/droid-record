@@ -23,12 +23,36 @@ public abstract class RecordBuilder<E> {
     protected int offset = -1;
     protected int limit = -1;
 
+    /*!
+     * @query_interface Query interface
+     * -#after relations
+     * -#position 100001
+     *
+     * %p
+     *   The query interface allows you to easily select the data records that match the given
+     *   rules. The following interface provides access to the records:
+     *
+     */
     public RecordBuilder(String tableName, String[] columns, SQLiteDatabase db) {
         this.tableName = tableName;
         this.db = db;
         this.columns = columns;
     }
 
+    /*!
+     * @query_interface|where Where
+     * %span.filename
+     *   where
+     * %pre
+     *   %code{ data: { language: 'java' } }
+     *     :preserve
+     *       public RecordBuilder&lt;E&gt; where(String selection, String ... args);
+     *
+     *       List&lt;Picture&gt; pictures =
+     *           session.queryPictures().where("(title like ? and likes &gt; ?) or likes &lt; ?",
+     *              "%rocky mountains%", "100", "50").all();
+     *
+     */
     public RecordBuilder<E> where(String selection, String ... args) {
         modified = true;
         cachedFirst = null;
@@ -38,6 +62,19 @@ public abstract class RecordBuilder<E> {
         return this;
     }
 
+    /*!
+     * @query_interface|order_by Order by
+     * %span.filename
+     *   orderBy
+     * %pre
+     *   %code{ data: { language: 'java' } }
+     *     :preserve
+     *       public RecordBuilder&lt;E&gt; orderBy(String selection);
+     *
+     *       List&lt;Gallery&gt; galleries =
+     *           session.queryGallery().where("name like '%cars%'").orderBy("name asc").all();
+     *
+     */
     public RecordBuilder<E> orderBy(String order) {
         modified = true;
         cachedFirst = null;
@@ -47,6 +84,17 @@ public abstract class RecordBuilder<E> {
         return this;
     }
 
+    /*!
+     * @query_interface|distinct Distinct
+     * %span.filename
+     *   distinct
+     * %pre
+     *   %code{ data: { language: 'java' } }
+     *     :preserve
+     *       public RecordBuilder&lt;E&gt; distinct();
+     *       public RecordBuilder&lt;E&gt; distinct(boolean value);
+     *
+     */
     public RecordBuilder<E> distinct() {
         return distinct(true);
     }
@@ -56,6 +104,16 @@ public abstract class RecordBuilder<E> {
         return this;
     }
 
+    /*!
+     * @query_interface|limit Limit
+     * %span.filename
+     *   limit
+     * %pre
+     *   %code{ data: { language: 'java' } }
+     *     :preserve
+     *       public RecordBuilder&lt;E&gt; limit(int count);
+     *       public RecordBuilder&lt;E&gt; limit(int offset, int count);
+     */
     public RecordBuilder<E> limit(int count) {
         this.limit = count;
         return this;
@@ -67,6 +125,19 @@ public abstract class RecordBuilder<E> {
         return this;
     }
 
+    /*!
+     * @query_interface|sum Sum
+     * %span.filename
+     *   sum
+     * %pre
+     *   %code{ data: { language: 'java' } }
+     *     :preserve
+     *       public RecordBuilder&lt;E&gt; sum(String column);
+     *       public RecordBuilder&lt;E&gt; sumDouble(String column);
+     *
+     *       long cents = session.queryProduct().sum("cents");
+     *       double dollar = session.queryProduct().sumDouble("cents / 100.0");
+     */
     public long sum(String name) {
         Cursor cursor = db.query(distinct, tableName, new String[] { "sum(" + name + ")" }, selection, bindings, null, null, order, limit());
 
@@ -98,6 +169,22 @@ public abstract class RecordBuilder<E> {
         return lim;
     }
 
+    /*!
+     * @query_interface|cursor Cursor
+     * %span.filename
+     *   cursor
+     * %pre
+     *   %code{ data: { language: 'java' } }
+     *     :preserve
+     *       Cursor queryYourself = session.queryPictures().cursor();
+     *       while (queryYourself.moveToNext()) {
+     *           // This is potentially dangerous and could lead to runtime bugs!
+     *           // But if you _know_ what you are doing this is a nice feature to have!
+     *           Picture picture = Picture.fromCursor(queryYourself);
+     *           String title = queryYourself
+     *               .getString(queryYourself.getColumnIndex("title"));
+     *       }
+     */
     public Cursor cursor() {
         return db.query(distinct, tableName, columns, selection, bindings, null, null, order, limit());
     }
@@ -120,6 +207,19 @@ public abstract class RecordBuilder<E> {
         return first(cursor());
     }
 
+    /*!
+     *
+     * @query_interface|first First, All
+     * -#position 1
+     * %span.filename
+     *   first
+     * %pre
+     *   %code{ data: { language: 'java' } }
+     *     :preserve
+     *       Picture first = session.queryPictures().orderBy("name asc").first();
+     *       List&lt;Picture&gt; all = session.queryPictures().orderBy("name asc").all();
+     *
+     */
     public abstract E first(Cursor c);
 
     public boolean isModified() {

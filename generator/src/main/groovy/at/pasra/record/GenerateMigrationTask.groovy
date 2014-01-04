@@ -12,7 +12,7 @@ class GenerateMigrationTask extends DefaultTask {
     @TaskAction
     void taskExec() {
 
-        AndroidRecordPlugin.sanitizeConfiguration(project)
+        DroidRecordPlugin.sanitizeConfiguration(project)
 
         def name = System.getProperty("name", "migration").replaceAll(" ","_")
 

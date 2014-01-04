@@ -1,12 +1,8 @@
 package at.pasra.record.generation
 
-import at.pasra.record.AndroidRecordPlugin
-import at.pasra.record.Inflector
+import at.pasra.record.DroidRecordPlugin
 import at.pasra.record.database.Field
 import at.pasra.record.database.Table
-import org.apache.tools.ant.Project
-import org.gradle.api.logging.Logging
-
 /**
  * Created by rich on 9/10/13.
  */
@@ -168,7 +164,7 @@ class MigratiorGenerator {
             c.wrap("public void migrate(long currentVersion, long targetVersion)") {
                 c.line("""db.execSQL("insert or replace into ${config_table} (key,value) values ('${
                     generator_version_key
-                }','${AndroidRecordPlugin.VERSION}')");""")
+                }','${DroidRecordPlugin.VERSION}')");""")
                 c.write(codegen.toString(), true, false);
                 c.line("""db.execSQL("insert or replace into ${
                     config_table
@@ -179,7 +175,7 @@ class MigratiorGenerator {
 
         }
 
-        AndroidRecordPlugin.write(path, pkg, "RecordMigrator.java", c.toString(), true);
+        DroidRecordPlugin.write(path, pkg, "RecordMigrator.java", c.toString(), true);
     }
 
 }

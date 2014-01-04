@@ -1,12 +1,9 @@
 package at.pasra.record
 
-import at.pasra.record.database.Table
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import at.pasra.record.generation.MigrationContext
-import org.apache.tools.ant.taskdefs.ExecTask
-import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.InvalidUserCodeException
 import org.gradle.api.InvalidUserDataException
@@ -25,15 +22,15 @@ class MigrateTask extends DefaultTask {
         super();
 
         doLast { Task t ->
-            AndroidRecordPlugin.project = t.project
+            DroidRecordPlugin.project = t.project
             context.generate()
         }
     }
 
     @TaskAction
     void taskExec() {
-        AndroidRecordPluginExtention ex = project.android_record;
-        AndroidRecordPlugin.sanitizeConfiguration(project)
+        DroidRecordPluginExtention ex = project.droid_record;
+        DroidRecordPlugin.sanitizeConfiguration(project)
         context = new MigrationContext(project.file(ex.output_path).path, ex.output_package);
 
         File root = project.file(ex.migration_path);

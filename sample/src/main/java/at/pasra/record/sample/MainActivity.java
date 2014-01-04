@@ -1,8 +1,12 @@
 package at.pasra.record.sample;
 
 import android.app.Activity;
+import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+
+import at.pasra.record.sample.generate.LocalSession;
+import at.pasra.record.sample.generate.RecordMigrator;
 
 /**
  * Created by rich on 9/13/13.
@@ -14,6 +18,7 @@ public class MainActivity extends Activity {
     public SQLiteDatabase getDB() {
         return mDB;
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

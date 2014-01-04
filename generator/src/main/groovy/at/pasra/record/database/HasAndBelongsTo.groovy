@@ -11,33 +11,31 @@ import org.gradle.api.InvalidUserDataException
 class HasAndBelongsTo extends Relation {
 
     def through;
-    def type;
 
     /*!
-     * @relations|has_and_belongs_to Has and belongs to
+     * @relations|has_and_belongs_to_options Has and belongs to options
+     * -#after relations|has_and_belongs_to
      * %p
      *   You can specify the following options in the has_and_belongs_to object:
      *   %ul
      *     %li
-     *       %strong either many|one
+     *       %strong many
      *       \- the target table name it belongs to. In the case of many it is a list of objects,
      *       in the other case it is just a single object
      *     %li
      *       %strong through
      *       \- the intermediate table name
      *     %li
-     *       %string foreign_key_has
+     *       %strong foreign_key_has
      *       (optional). Specifies the name of the has foreign key. Use this if it differs
      *       from the naming convention
      *     %li
-     *       %string foreign_key_belongs_to
+     *       %strong foreign_key_belongs_to
      *       (optional). Specifies the name of the foreign key it belongs to. Use it if its name
      *       differs from the naming convention
      */
-    HasAndBelongsTo(String type, Table origin, Table target, Table through, JsonObject options) {
+    HasAndBelongsTo(Table origin, Table target, Table through, JsonObject options) {
         super(origin, target, options)
-
-        this.type = type
         this.through = through
     }
 
@@ -73,7 +71,7 @@ class HasAndBelongsTo extends Relation {
 
         if (!has_foreign_key) {
             throw new InvalidUserDataException("Table ${through.sqlTableName} does not specify a foreign key '${fk}'. " +
-                    "This means that a ${origin.sqlTableName} record does _NOT_ have and belong to (one|many) ${Inflector.pluralize(origin.name)}!")
+                    "This means that a ${origin.sqlTableName} record does _NOT_ have and belong to many ${Inflector.pluralize(origin.name)}!")
         }
 
         if (!type_match) {
@@ -84,7 +82,7 @@ class HasAndBelongsTo extends Relation {
 
         if (!has_foreign_key) {
             throw new InvalidUserDataException("Table ${through.sqlTableName} does not specify a foreign key '${fk}'. " +
-                    "This means that a ${target.sqlTableName} record does _NOT_ have and belong to (one|many) ${Inflector.pluralize(target.name)}!")
+                    "This means that a ${target.sqlTableName} record does _NOT_ have and belong to many ${Inflector.pluralize(target.name)}!")
         }
 
         if (!type_match) {

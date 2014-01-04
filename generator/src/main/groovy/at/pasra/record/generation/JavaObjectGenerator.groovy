@@ -1,6 +1,6 @@
 package at.pasra.record.generation
 
-import at.pasra.record.AndroidRecordPlugin
+import at.pasra.record.DroidRecordPlugin
 import at.pasra.record.Inflector
 import at.pasra.record.database.BelongsTo
 import at.pasra.record.database.Field
@@ -58,9 +58,9 @@ class JavaObjectGenerator {
         }
 
 
-        AndroidRecordPlugin.write(source, pkg, "Abstract${table.javaClassName}.java", c.toString(), true)
+        DroidRecordPlugin.write(source, pkg, "Abstract${table.javaClassName}.java", c.toString(), true)
 
-        def file = AndroidRecordPlugin.file(source, pkg, "${Inflector.camelize(table.name)}.java", false)
+        def file = DroidRecordPlugin.file(source, pkg, "${Inflector.camelize(table.name)}.java", false)
         if (!file.exists()) {
             c = new CodeGenerator();
             c.copyrightHeader()
@@ -77,7 +77,7 @@ class JavaObjectGenerator {
                 c.line("// add your code here")
             }
 
-            AndroidRecordPlugin.write(source, pkg, "${Inflector.camelize(table.name)}.java", c.toString(), false)
+            DroidRecordPlugin.write(source, pkg, "${Inflector.camelize(table.name)}.java", c.toString(), false)
         }
     }
 

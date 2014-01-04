@@ -1,6 +1,6 @@
 package at.pasra.record.generation
 
-import at.pasra.record.AndroidRecordPlugin
+import at.pasra.record.DroidRecordPlugin
 
 /**
  * Created by rich on 9/10/13.
@@ -62,7 +62,7 @@ class CodeGenerator {
         if (formatType == "java") {
             line("""/* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version ${AndroidRecordPlugin.VERSION} generated this file. For more
+ * Android Record version ${DroidRecordPlugin.VERSION} generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
