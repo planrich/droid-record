@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.5 generated this file. For more
+ * Android Record version 0.0.6 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -24,7 +24,7 @@ import android.content.ContentValues;
 import at.pasra.record.Migrator;
 
 public class RecordMigrator implements Migrator{
-    public static final long MIGRATION_LEVEL = 20131001095638L;
+    public static final long MIGRATION_LEVEL = 20140226161603L;
     
     private final SQLiteDatabase db;
     public RecordMigrator(SQLiteDatabase db){
@@ -54,7 +54,7 @@ public class RecordMigrator implements Migrator{
     }
     @Override
     public void migrate(long currentVersion, long targetVersion){
-        db.execSQL("insert or replace into android_record_configs (key,value) values ('generator_version','0.0.5')");
+        db.execSQL("insert or replace into android_record_configs (key,value) values ('generator_version','0.0.6')");
         if (currentVersion < targetVersion && currentVersion < 20130913154915L){
             db.execSQL("create table galleries (_id integer primary key, name text );");
             currentVersion = 20130913154915L;
@@ -152,6 +152,10 @@ public class RecordMigrator implements Migrator{
         if (currentVersion < targetVersion && currentVersion < 20131001095638L){
             db.execSQL("create table user_pictures (_id integer primary key, user_id integer , picture_id integer );");
             currentVersion = 20131001095638L;
+        }
+        if (currentVersion < targetVersion && currentVersion < 20140226161603L){
+            db.execSQL("create table times (_id integer primary key, millis long , micros integer );");
+            currentVersion = 20140226161603L;
         }
 
         db.execSQL("insert or replace into android_record_configs (key,value) values (?,?)", new Object[] { "version", new Long(currentVersion) });

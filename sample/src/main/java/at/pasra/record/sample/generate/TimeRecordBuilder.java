@@ -21,22 +21,22 @@ package at.pasra.record.sample.generate;
 import at.pasra.record.RecordBuilder;
 import android.database.sqlite.SQLiteDatabase;
 
-public class UserRecordBuilder extends RecordBuilder<User>{
-    public UserRecordBuilder(SQLiteDatabase db){
-        super("users", new String[] { "_id", "first_name", "last_name" }, db);
+public class TimeRecordBuilder extends RecordBuilder<Time>{
+    public TimeRecordBuilder(SQLiteDatabase db){
+        super("times", new String[] { "_id", "millis", "micros" }, db);
     }
     @Override
-    public java.util.List<User> all(android.database.Cursor c){
-        java.util.List<User> list = new java.util.ArrayList<User>();
+    public java.util.List<Time> all(android.database.Cursor c){
+        java.util.List<Time> list = new java.util.ArrayList<Time>();
         while (c.moveToNext()){
-            list.add(User.fromCursor(c));
+            list.add(Time.fromCursor(c));
         }
         return list;
     }
     @Override
-    public User first(android.database.Cursor c){
+    public Time first(android.database.Cursor c){
         if (c.moveToFirst()){
-            User record = User.fromCursor(c);
+            Time record = Time.fromCursor(c);
             c.close();
             return record;
         }

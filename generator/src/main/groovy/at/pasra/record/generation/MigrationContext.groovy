@@ -103,6 +103,7 @@ class MigrationContext {
                      *     %li long - java.lang.Long
                      *     %li date - java.util.Date
                      *     %li boolean - java.lang.Boolean
+                     *     %li double - java.lang.Double
                      *
                      *   %p
                      *     {?ref:title} has a more complex type and it specifies the default value of this column to be "empty".
@@ -280,12 +281,12 @@ class MigrationContext {
                     *   %code{ data: { language: 'java' } }
                     *     :preserve
                     *       public interface DataMigrator {
-                    *           //This custom migrator can be used when the normal migrations cannot handle the conversion.
-                    *           //Do _NOT_ create, drop or alter tables. Droid Record cannot track these changes and this
-                    *           //will lead to undefined behaviour.
+                    *           //This custom migrator can be used when the normal migrations cannot handle
+                     *          //the conversion. Do _NOT_ create, drop or alter tables. Droid Record
+                     *          //cannot track these changes and this will lead to undefined behaviour.
                     *
-                    *           //It is not advisable to use any generated class here. As this class might disappear in
-                    *           //the app development process.
+                    *           //It is not advisable to use any generated class here. As this class
+                    *           //might disappear in the app development process.
                     *           void migrate(SQLiteDatabase db, long currentVersion, long targetVersion);
                     *       }
                     *

@@ -170,6 +170,25 @@ public abstract class RecordBuilder<E> {
     }
 
     /*!
+     * @query_interface|count Counting rows
+     * %p
+     *   You can count the rows of the current builder with the method count.
+     *   You can provide the column name you want to count with the first parameter,
+     *   or just leave it blank resulting in a query like:
+     *   %code select count(*) from table ... ;
+     *
+     */
+    public long count(String column) {
+        Cursor cursor = db.query(distinct, tableName, new String[] { "count("+column+")" }, selection, bindings, null, null, order, limit());
+        long count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+    public long count() {
+        return count("*");
+    }
+
+    /*!
      * @query_interface|cursor Cursor
      * %span.filename
      *   cursor

@@ -10,6 +10,7 @@ import at.pasra.record.sample.generate.Gallery;
 import at.pasra.record.sample.generate.LocalSession;
 import at.pasra.record.sample.generate.Picture;
 import at.pasra.record.sample.generate.RecordMigrator;
+import at.pasra.record.sample.generate.Time;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -128,6 +129,17 @@ public class BasicRecordTest extends AndroidTestCase {
         if (!called[0]) {
             fail("did not call newView of cursor adapter");
         }
+    }
+
+    public void testDouble() {
+        Time t = new Time();
+        t.setMillis(0.001);
+        t.setMicros(1L);
+
+        mSession.saveTime(t);
+
+        t = mSession.findTime(t.getId());
+        assertEquals(0.001, t.getMillis(), 0.001);
     }
 
     public void testRemoteSession() {

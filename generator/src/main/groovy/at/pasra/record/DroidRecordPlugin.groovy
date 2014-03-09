@@ -23,6 +23,13 @@ import org.gradle.api.logging.Logging
  *   devices. Droid Record keeps that in mind and helps you to spend your time
  *   on the important stuff of your app, the business logic.
  *
+ *
+ * %h3 Changelog
+ *
+ * Version 0.0.7: Added double type
+ * %br
+ * Version 0.0.6: First Version
+ *
  * %h3 Definitions
  * %p
  *   In this documentation a
@@ -51,15 +58,18 @@ import org.gradle.api.logging.Logging
  *     :preserve
  *       buildscript {
  *         repositories {
- *            maven { url "http://record.pasra.at/repo" }
+ *            mavenCentral()
+ *            maven { url "http://record.pasra.at/public/repo" }
  *         }
  *         dependencies {
+ *            classpath 'com.google.code.gson:gson:2.2.+'
  *            classpath 'at.pasra.record:generator:0.0.+'
  *         }
  *       }
  *
  *       repositories {
- *         maven { url "http://record.pasra.at/repo" }
+ *         mavenCentral()
+ *         maven { url "http://record.pasra.at/public/repo" }
  *       }
  *
  *       dependencies {
@@ -117,7 +127,7 @@ import org.gradle.api.logging.Logging
  *   table you can do the following:
  *
  * %pre
- *   %code{ 'data-language' => 'javascript' }
+ *   %code{ 'data-language' => 'dsl' }
  *     :preserve
  *       change: [
  *         { cmd: create_table,
@@ -206,15 +216,13 @@ import org.gradle.api.logging.Logging
  */
 class DroidRecordPlugin implements Plugin<Project> {
 
-    public static String VERSION = "0.0.5"
+    public static String VERSION = "0.0.6"
 
     static def outputFiles = []
     static def project;
     static def logger = Logging.getLogger(DroidRecordPlugin.class)
 
     public static void write(String path, String pkg, String file, String content, boolean forcecreate) {
-        //File fh = DroidRecordPlugin.file(path, pkg, file, forcecreate);
-
         File fh = project.file("src/main/java/${pkg.replace('.','/')}")
         fh.mkdirs();
         fh = project.file("src/main/java/${pkg.replace('.','/')}/${file}")

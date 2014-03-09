@@ -22,12 +22,12 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import at.pasra.record.SQLiteConverter;
 
-public class PictureRecord{
-    private final java.util.Map<Long, Picture> primaryKeyCache = new java.util.HashMap<Long, Picture>();
+public class TimeRecord{
+    private final java.util.Map<Long, Time> primaryKeyCache = new java.util.HashMap<Long, Time>();
     public void clearCache(){
         primaryKeyCache.clear();
     }
-    public void save(SQLiteDatabase db, AbstractPicture record){
+    public void save(SQLiteDatabase db, AbstractTime record){
         if (record.getId() == null){
             insert(db, record);
         }
@@ -35,45 +35,39 @@ public class PictureRecord{
             update(db, record);
         }
     }
-    public void insert(SQLiteDatabase db, AbstractPicture record){
-        ContentValues values = new ContentValues(4);
-        values.put("name", record.getName());
-        values.put("image", record.getImage());
-        values.put("date", record.getDate().getTime());
-        values.put("gallery_id", record.getGalleryId());
-        long id = db.insert("pictures", null, values);
+    public void insert(SQLiteDatabase db, AbstractTime record){
+        ContentValues values = new ContentValues(2);
+        values.put("millis", Double.doubleToLongBits(record.getMillis()));
+        values.put("micros", record.getMicros());
+        long id = db.insert("times", null, values);
         record.setId(id);
-        primaryKeyCache.put(id, (Picture)record);
+        primaryKeyCache.put(id, (Time)record);
     }
-    public Picture load(SQLiteDatabase db, long id){
-        Picture cached = primaryKeyCache.get(id);
+    public Time load(SQLiteDatabase db, long id){
+        Time cached = primaryKeyCache.get(id);
         if (cached != null){
             return cached;
         }
-        Cursor c = db.rawQuery("select * from pictures where _id = ?;", new String[] { Long.toString(id) });
+        Cursor c = db.rawQuery("select * from times where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
-            Picture record = new Picture();
+            Time record = new Time();
             record.setId(c.getLong(0));
-            record.setName(c.getString(1));
-            record.setImage(c.getBlob(2));
-            record.setDate(new java.util.Date(c.getLong(3)));
-            record.setGalleryId(c.getLong(4));
+            record.setMillis(Double.longBitsToDouble(c.getLong(1)));
+            record.setMicros(c.getLong(2));
             primaryKeyCache.put(id, record);
             return record;
         }
         return null;
     }
     public void delete(SQLiteDatabase db, long id){
-        db.execSQL("delete from pictures where  _id = ?;", new String[] { Long.toString(id) });
+        db.execSQL("delete from times where  _id = ?;", new String[] { Long.toString(id) });
         primaryKeyCache.remove(id);
     }
-    public void update(SQLiteDatabase db, AbstractPicture record){
-        ContentValues values = new ContentValues(4);
-        values.put("name", record.getName());
-        values.put("image", record.getImage());
-        values.put("date", record.getDate().getTime());
-        values.put("gallery_id", record.getGalleryId());
+    public void update(SQLiteDatabase db, AbstractTime record){
+        ContentValues values = new ContentValues(2);
+        values.put("millis", Double.doubleToLongBits(record.getMillis()));
+        values.put("micros", record.getMicros());
         long id = record.getId();
-        db.update("pictures", values, "_id = ?", new String[] { Long.toString(id) });
+        db.update("times", values, "_id = ?", new String[] { Long.toString(id) });
     }
 }

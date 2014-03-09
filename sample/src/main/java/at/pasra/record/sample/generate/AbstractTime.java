@@ -18,29 +18,31 @@
 // This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 package at.pasra.record.sample.generate;
 
+import at.pasra.record.SQLiteConverter;
 import at.pasra.record.RecordBuilder;
-import android.database.sqlite.SQLiteDatabase;
 
-public class UserRecordBuilder extends RecordBuilder<User>{
-    public UserRecordBuilder(SQLiteDatabase db){
-        super("users", new String[] { "_id", "first_name", "last_name" }, db);
+public class AbstractTime{
+    protected java.lang.Double mMillis;
+    protected java.lang.Long mMicros;
+    protected java.lang.Long mId;
+    
+    public AbstractTime(java.lang.Long id){
+        this.mId = id;
+        this.mMillis = 0.0;
+        this.mMicros = new Long(0L);
     }
-    @Override
-    public java.util.List<User> all(android.database.Cursor c){
-        java.util.List<User> list = new java.util.ArrayList<User>();
-        while (c.moveToNext()){
-            list.add(User.fromCursor(c));
-        }
-        return list;
-    }
-    @Override
-    public User first(android.database.Cursor c){
-        if (c.moveToFirst()){
-            User record = User.fromCursor(c);
-            c.close();
-            return record;
-        }
-        c.close();
-        return null;
+    
+    public java.lang.Double getMillis() { return mMillis; }
+    public void setMillis(java.lang.Double value) { mMillis = value; }
+    public java.lang.Long getMicros() { return mMicros; }
+    public void setMicros(java.lang.Long value) { mMicros = value; }
+    public java.lang.Long getId() { return mId; }
+    public void setId(java.lang.Long value) { mId = value; }
+    public static Time fromCursor(android.database.Cursor cursor){
+        Time record = new Time();
+        record.setId(cursor.getLong(0));
+        record.setMillis(Double.longBitsToDouble(cursor.getLong(1)));
+        record.setMicros(cursor.getLong(2));
+        return record;
     }
 }

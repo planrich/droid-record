@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.5 generated this file. For more
+ * Android Record version 0.0.6 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -27,6 +27,7 @@ public class LocalSession{
     private final PictureRecord picture_record = new PictureRecord();
     private final UserRecord user_record = new UserRecord();
     private final UserPictureRecord user_picture_record = new UserPictureRecord();
+    private final TimeRecord time_record = new TimeRecord();
     public LocalSession(SQLiteDatabase database){
         this.mDB = database;
     }
@@ -114,11 +115,33 @@ public class LocalSession{
     public UserPictureRecordBuilder queryUserpictures(){
         return new UserPictureRecordBuilder(mDB);
     }
+    public void saveTime(Time obj){
+        if (obj == null){
+            throw new IllegalArgumentException("Tried to save an instance of Time which was null. Cannot do that!");
+        }
+        time_record.save(mDB, obj);
+    }
+    public Time findTime(java.lang.Long id){
+        if (id == null){
+            throw new IllegalArgumentException("why would you want to load a time record with a null key?");
+        }
+        return time_record.load(mDB, id);
+    }
+    public void destroyTime(Time obj){
+        if (obj == null){
+            throw new IllegalArgumentException("why would you want to delete a time record with a null obj?");
+        }
+        time_record.delete(mDB, obj.getId());
+    }
+    public TimeRecordBuilder queryTimes(){
+        return new TimeRecordBuilder(mDB);
+    }
     public void clearCache(){
         gallery_record.clearCache();
         picture_record.clearCache();
         user_record.clearCache();
         user_picture_record.clearCache();
+        time_record.clearCache();
     }
     public GalleryRecord getGalleryRecord(){
         return gallery_record;
@@ -131,6 +154,9 @@ public class LocalSession{
     }
     public UserPictureRecord getUserPictureRecord(){
         return user_picture_record;
+    }
+    public TimeRecord getTimeRecord(){
+        return time_record;
     }
     public android.database.Cursor queryRaw(String query, String ... args){
         return mDB.rawQuery(query, args);

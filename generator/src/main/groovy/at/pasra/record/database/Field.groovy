@@ -24,12 +24,13 @@ class Field {
             "long": "java.lang.Long",
             "boolean": "java.lang.Boolean",
             "blob": "byte[]",
-            "date": "java.util.Date" ]
+            "date": "java.util.Date",
+            "double": "java.lang.Double"]
 
     static final to_sqlite_type = ["integer": "integer",
             "long": "integer",
             "boolean": "integer",
-            "float": "real",
+            "double": "long", // yes -> use Double.longToDoubleBits
             "string": "text",
             "blob": "blob",
             "date": "integer", ]
@@ -96,6 +97,9 @@ class Field {
             //suffix = ")";
             //prefix = ""
             suffix = ".getTime()"
+        } else if (type == "java.lang.Double") {
+            prefix = "Double.doubleToLongBits(";
+            suffix = ")"
         }
 
         return "${prefix}${objname}.get${javaFieldName}()${suffix}";
@@ -124,6 +128,8 @@ class Field {
             call = "${c}.getLong(${i})";
         } else if (type == "java.lang.Boolean") {
             call = "(${c}.getInt(${i}) != 0)";
+        } else if (type == "java.lang.Double") {
+            call = "Double.longBitsToDouble(${c}.getLong(${i}))";
         }
 
         return call;
@@ -212,6 +218,8 @@ class Field {
             return "new Long(0L)"
         } else if (type == "java.lang.Boolean") {
             return "new Boolean(false)"
+        } else if (type == "java.lang.Double") {
+            return "0.0"
         }
 
         return "null";

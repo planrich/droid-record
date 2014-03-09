@@ -15,32 +15,12 @@
  *
  * This copyright notice must not be modified or deleted.
  */
-// This file is generated. If you want to save you some time: !!!DO NOT MODIFY!!!
 package at.pasra.record.sample.generate;
 
-import at.pasra.record.RecordBuilder;
-import android.database.sqlite.SQLiteDatabase;
-
-public class UserRecordBuilder extends RecordBuilder<User>{
-    public UserRecordBuilder(SQLiteDatabase db){
-        super("users", new String[] { "_id", "first_name", "last_name" }, db);
+public class Time extends AbstractTime {
+    public Time(){
+        super(null);
     }
-    @Override
-    public java.util.List<User> all(android.database.Cursor c){
-        java.util.List<User> list = new java.util.ArrayList<User>();
-        while (c.moveToNext()){
-            list.add(User.fromCursor(c));
-        }
-        return list;
-    }
-    @Override
-    public User first(android.database.Cursor c){
-        if (c.moveToFirst()){
-            User record = User.fromCursor(c);
-            c.close();
-            return record;
-        }
-        c.close();
-        return null;
-    }
+    
+    // add your code here
 }
