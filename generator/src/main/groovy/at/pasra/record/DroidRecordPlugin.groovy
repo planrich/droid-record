@@ -218,7 +218,7 @@ import org.gradle.api.logging.Logging
  */
 class DroidRecordPlugin implements Plugin<Project> {
 
-    public static String VERSION = "0.0.6"
+    public static String VERSION = "0.0.8"
 
     static def outputFiles = []
     static def project;
