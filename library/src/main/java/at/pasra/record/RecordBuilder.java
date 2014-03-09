@@ -170,7 +170,7 @@ public abstract class RecordBuilder<E> {
     }
 
     /*!
-     * @query_interface|count Counting rows
+     * @query_interface|count Count
      * %p
      *   You can count the rows of the current builder with the method count.
      *   You can provide the column name you want to count with the first parameter,

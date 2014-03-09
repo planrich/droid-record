@@ -112,7 +112,7 @@ public class LocalSession{
         }
         user_picture_record.delete(mDB, obj.getId());
     }
-    public UserPictureRecordBuilder queryUserpictures(){
+    public UserPictureRecordBuilder queryUserPictures(){
         return new UserPictureRecordBuilder(mDB);
     }
     public void saveTime(Time obj){

@@ -40,7 +40,7 @@ class SessionGenerator {
             tables.each { String name, Table table ->
                 def recordName = "${table.name}_record";
                 def javaClassName = table.javaClassName
-                def javaPluralCamel = Inflector.camelize(Inflector.pluralize(javaClassName));
+                def pluralCamel = Inflector.camelize(Inflector.pluralize(table.sqlTableName));
                 c.wrap("public void save${javaClassName}(${javaClassName} obj)") {
                     c.wrap("if (obj == null)") {
                         c.line("throw new IllegalArgumentException(" +
@@ -73,7 +73,7 @@ class SessionGenerator {
                 }
 
                 // generate query builder creators
-                c.wrap("public ${javaClassName}RecordBuilder query${javaPluralCamel}()") {
+                c.wrap("public ${javaClassName}RecordBuilder query${pluralCamel}()") {
                     c.line("return new ${javaClassName}RecordBuilder(mDB);")
                 }
             }

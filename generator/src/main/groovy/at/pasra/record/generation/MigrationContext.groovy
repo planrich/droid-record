@@ -19,7 +19,7 @@ import org.gradle.api.logging.Logging
  */
 
 /*!
- * @migrations Migrations
+ * @migrations Record migrations
  * %p
  *   To handle changes in the database schema {?class:arname;DR} supports several commands in
  *   a migration change array.
@@ -64,7 +64,7 @@ class MigrationContext {
 
 
                     /*!
-                     * @migrations|create_drop_table Creation and deletion of a table
+                     * @migrations|create_drop_table Creation and deletion
                      *
                      * %span.filename
                      *   12345678_table.json
@@ -139,7 +139,7 @@ class MigrationContext {
                     }
 
                     /*!
-                     * @migrations|manage_columns Manage a tables columns
+                     * @migrations|manage_columns Managing columns
                      * -#after migrations|rename_table
                      *
                      * %p
@@ -226,7 +226,7 @@ class MigrationContext {
                     }
 
                     /*!
-                     * @migrations|rename_table Change the name of a table
+                     * @migrations|rename_table Changing the name
                      * -#after migrations|create_drop_table
                      *
                      * %p

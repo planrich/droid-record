@@ -26,6 +26,8 @@ import org.gradle.api.logging.Logging
  *
  * %h3 Changelog
  *
+ * Version 0.0.8: Added count to the query interface
+ * %br
  * Version 0.0.7: Added double type
  * %br
  * Version 0.0.6: First Version
