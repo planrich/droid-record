@@ -9,7 +9,8 @@ import org.gradle.api.InvalidUserDataException
  */
 class HasAndBelongsTo extends Relation {
 
-    def table
+    def many
+    def through
     def through_table
 
     /*!
@@ -47,7 +48,7 @@ class HasAndBelongsTo extends Relation {
     void generateJavaMethods(CodeGenerator c) {
 
         def javaClassName = target.javaClassName
-        def pluralJavaClassName = Inflector.pluralize(javaClassName)
+        def pluralJavaClassName = Inflector.pluralizeCamel(javaClassName)
         c.wrap("public java.util.List<${javaClassName}> load${pluralJavaClassName}(LocalSession session)") {
             c.line("String query = \"select d.* from ${origin.sqlTableName} o, ${through_table.sqlTableName} t, ${target.sqlTableName} d\" +")
             c.line("               \" where\" +")
@@ -66,7 +67,7 @@ class HasAndBelongsTo extends Relation {
 
     @Override
     void checkIntegrity() {
-        def ( fk, has_foreign_key , type_match, type ) = check_foreign_key_exists(origin.name, through_table.fields.values(), "foreign_key_has")
+        def ( fk, has_foreign_key , type_match, type ) = check_foreign_key_exists(origin.name, through_table.fields.values())
 
         if (!has_foreign_key) {
             throw new InvalidUserDataException("Table ${through_table.sqlTableName} does not specify a foreign key '${fk}'. " +
@@ -77,7 +78,7 @@ class HasAndBelongsTo extends Relation {
             throw new InvalidUserDataException("Table ${through_table.sqlTableName}: '${fk}' column type is '${type}' but it should be '${origin.primary.type}'. Please change the type!")
         }
 
-        ( fk, has_foreign_key , type_match, type ) = check_foreign_key_exists(target.name, through_table.fields.values(), "foreign_key_belongs_to")
+        ( fk, has_foreign_key , type_match, type ) = check_foreign_key_exists(target.name, through_table.fields.values())
 
         if (!has_foreign_key) {
             throw new InvalidUserDataException("Table ${through_table.sqlTableName} does not specify a foreign key '${fk}'. " +

@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -53,9 +53,9 @@ public class AbstractUser{
     }
     public static User fromCursor(android.database.Cursor cursor){
         User record = new User();
-        record.setId(cursor.getLong(0));
-        record.setFirstName(cursor.getString(1));
-        record.setLastName(cursor.getString(2));
+        record.setFirstName(cursor.getString(cursor.getColumnIndex("first_name")));
+        record.setLastName(cursor.getString(cursor.getColumnIndex("last_name")));
+        record.setId(cursor.getLong(cursor.getColumnIndex("_id")));
         return record;
     }
 }

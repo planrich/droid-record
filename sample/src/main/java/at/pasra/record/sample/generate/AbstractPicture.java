@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -66,11 +66,11 @@ public class AbstractPicture{
     }
     public static Picture fromCursor(android.database.Cursor cursor){
         Picture record = new Picture();
-        record.setId(cursor.getLong(0));
-        record.setName(cursor.getString(1));
-        record.setImage(cursor.getBlob(2));
-        record.setDate(new java.util.Date(cursor.getLong(3)));
-        record.setGalleryId(cursor.getLong(4));
+        record.setName(cursor.getString(cursor.getColumnIndex("name")));
+        record.setImage(cursor.getBlob(cursor.getColumnIndex("image")));
+        record.setDate(new java.util.Date(cursor.getLong(cursor.getColumnIndex("date"))));
+        record.setGalleryId(cursor.getLong(cursor.getColumnIndex("gallery_id")));
+        record.setId(cursor.getLong(cursor.getColumnIndex("_id")));
         return record;
     }
 }

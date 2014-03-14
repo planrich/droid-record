@@ -38,12 +38,15 @@ class Inflector {
         return name;
     }
 
+    static String pluralizeCamel(String name) {
+        return camelize(pluralize(tabelize(name)))
+    }
     static String pluralize(String name) {
         if (name.startsWith("#")) {
             return name.substring(1)
         }
 
-        def plural = mInstance.irregularSingular[name.toLowerCase()]
+        def plural = mInstance.irregularSingular[name]
         if (plural) {
             return plural;
         }

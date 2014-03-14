@@ -70,7 +70,8 @@ class RecordGenerator {
                     c.line("return cached;")
                 }
 
-                c.line("Cursor c = db.rawQuery(\"select * from ${table.sqlTableName} where ${table.primary.name} = ?;\", new String[] { Long.toString(id) });")
+                def select = table.getOrderedFields(true).collect({ f -> f.sqlName }).join(", ")
+                c.line("Cursor c = db.rawQuery(\"select ${select} from ${table.sqlTableName} where ${table.primary.name} = ?;\", new String[] { Long.toString(id) });")
                 c.wrap("if (c.moveToFirst())") {
 
                     table.javaCallsNewObjectFromCursor(c, "record", "c");

@@ -65,7 +65,7 @@ class Field {
 
     void changeName(String new_name) {
         this.name = Inflector.internalName(new_name)
-        this.sqlName = Inflector.sqlTableName(new_name)
+        this.sqlName = Inflector.tabelize(new_name)
         this.javaFieldName = Inflector.javaClassName(new_name)
     }
 
@@ -107,7 +107,7 @@ class Field {
     String javaCallGetCursor(String c) {
         def call = "";
         def type = javaType()
-        def i = tableOrder;
+        def i = "${c}.getColumnIndex(\"${sqlName}\")";
         if (type == "byte[]") {
             call = "${c}.getBlob(${i})"
         } else if (type == "java.util.Date") {

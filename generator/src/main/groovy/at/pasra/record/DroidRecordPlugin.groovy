@@ -220,9 +220,8 @@ import org.gradle.api.logging.Logging
  */
 class DroidRecordPlugin implements Plugin<Project> {
 
-    public static String VERSION = "x.y.z"
+    public static String VERSION = "0.1.0"
 
-    static def outputFiles = []
     static def project;
     static def logger = Logging.getLogger(DroidRecordPlugin.class)
 
@@ -237,9 +236,6 @@ class DroidRecordPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-
-        VERSION = project.version.toString()
-        logger.info("running version {}", VERSION)
 
         project.extensions.create("droid_record", DroidRecordPluginExtention)
 

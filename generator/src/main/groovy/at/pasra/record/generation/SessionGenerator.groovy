@@ -40,7 +40,7 @@ class SessionGenerator {
             tables.each { String name, Table table ->
                 def recordName = "${table.name}_record";
                 def javaClassName = table.javaClassName
-                def pluralCamel = Inflector.camelize(Inflector.pluralize(table.sqlTableName));
+                def pluralCamel = Inflector.pluralizeCamel(javaClassName);
                 c.wrap("public void save${javaClassName}(${javaClassName} obj)") {
                     c.wrap("if (obj == null)") {
                         c.line("throw new IllegalArgumentException(" +

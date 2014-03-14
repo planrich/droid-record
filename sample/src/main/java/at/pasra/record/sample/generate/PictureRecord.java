@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -50,14 +50,14 @@ public class PictureRecord{
         if (cached != null){
             return cached;
         }
-        Cursor c = db.rawQuery("select * from pictures where _id = ?;", new String[] { Long.toString(id) });
+        Cursor c = db.rawQuery("select name, image, date, gallery_id, _id from pictures where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             Picture record = new Picture();
-            record.setId(c.getLong(0));
-            record.setName(c.getString(1));
-            record.setImage(c.getBlob(2));
-            record.setDate(new java.util.Date(c.getLong(3)));
-            record.setGalleryId(c.getLong(4));
+            record.setName(c.getString(c.getColumnIndex("name")));
+            record.setImage(c.getBlob(c.getColumnIndex("image")));
+            record.setDate(new java.util.Date(c.getLong(c.getColumnIndex("date"))));
+            record.setGalleryId(c.getLong(c.getColumnIndex("gallery_id")));
+            record.setId(c.getLong(c.getColumnIndex("_id")));
             primaryKeyCache.put(id, record);
             return record;
         }

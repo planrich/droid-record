@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -48,12 +48,12 @@ public class UserRecord{
         if (cached != null){
             return cached;
         }
-        Cursor c = db.rawQuery("select * from users where _id = ?;", new String[] { Long.toString(id) });
+        Cursor c = db.rawQuery("select first_name, last_name, _id from users where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             User record = new User();
-            record.setId(c.getLong(0));
-            record.setFirstName(c.getString(1));
-            record.setLastName(c.getString(2));
+            record.setFirstName(c.getString(c.getColumnIndex("first_name")));
+            record.setLastName(c.getString(c.getColumnIndex("last_name")));
+            record.setId(c.getLong(c.getColumnIndex("_id")));
             primaryKeyCache.put(id, record);
             return record;
         }

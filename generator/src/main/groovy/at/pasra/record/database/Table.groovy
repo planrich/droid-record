@@ -52,9 +52,6 @@ class Table {
         primary.type = 'long'
         primary.primary = true
         addField(primary)
-        this.primary = primary
-        primary.tableOrder = 0;
-        table_order--
 
         if (fields.size() == 0) {
             throw new IllegalArgumentException("Every table needs at least one table column. '${name}' has none!")
@@ -63,7 +60,7 @@ class Table {
 
     void changeName(String name) {
         this.name = Inflector.internalName(name)
-        this.javaClassName = Inflector.camelize(name);
+        this.javaClassName = Inflector.javaClassName(name);
         this.sqlTableName = Inflector.sqlTableName(name)
     }
 
@@ -113,7 +110,10 @@ class Table {
                     "to have any other primary keys!")
         }
 
-        if (!field.isPrimary()) {
+        if (field.isPrimary()) {
+            field.tableOrder = 0
+            this.primary = field
+        } else {
             field.tableOrder = table_order++;
         }
 

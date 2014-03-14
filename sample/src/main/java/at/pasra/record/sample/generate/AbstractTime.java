@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -40,9 +40,9 @@ public class AbstractTime{
     public void setId(java.lang.Long value) { mId = value; }
     public static Time fromCursor(android.database.Cursor cursor){
         Time record = new Time();
-        record.setId(cursor.getLong(0));
-        record.setMillis(Double.longBitsToDouble(cursor.getLong(1)));
-        record.setMicros(cursor.getLong(2));
+        record.setMillis(Double.longBitsToDouble(cursor.getLong(cursor.getColumnIndex("millis"))));
+        record.setMicros(cursor.getLong(cursor.getColumnIndex("micros")));
+        record.setId(cursor.getLong(cursor.getColumnIndex("_id")));
         return record;
     }
 }

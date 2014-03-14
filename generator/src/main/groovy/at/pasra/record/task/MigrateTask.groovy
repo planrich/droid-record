@@ -19,6 +19,7 @@ class MigrateTask extends DefaultTask {
     public MigrateTask() {
         super();
 
+
         doLast { Task t ->
             DroidRecordPlugin.project = t.project
             context.generate()
@@ -27,6 +28,7 @@ class MigrateTask extends DefaultTask {
 
     @TaskAction
     void taskExec() {
+
         DroidRecordPluginExtention ex = project.droid_record;
         DroidRecordPlugin.sanitizeConfiguration(project)
         context = new MigrationContext(project.file(ex.output_path).path, ex.output_package);

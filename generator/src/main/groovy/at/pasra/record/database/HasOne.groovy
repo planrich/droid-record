@@ -10,6 +10,8 @@ import org.gradle.api.InvalidUserDataException
  */
 class HasOne extends Relation {
 
+    def table
+
     HasOne(Table origin) {
         super(origin)
     }

@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -48,12 +48,12 @@ public class TimeRecord{
         if (cached != null){
             return cached;
         }
-        Cursor c = db.rawQuery("select * from times where _id = ?;", new String[] { Long.toString(id) });
+        Cursor c = db.rawQuery("select millis, micros, _id from times where _id = ?;", new String[] { Long.toString(id) });
         if (c.moveToFirst()){
             Time record = new Time();
-            record.setId(c.getLong(0));
-            record.setMillis(Double.longBitsToDouble(c.getLong(1)));
-            record.setMicros(c.getLong(2));
+            record.setMillis(Double.longBitsToDouble(c.getLong(c.getColumnIndex("millis"))));
+            record.setMicros(c.getLong(c.getColumnIndex("micros")));
+            record.setId(c.getLong(c.getColumnIndex("_id")));
             primaryKeyCache.put(id, record);
             return record;
         }

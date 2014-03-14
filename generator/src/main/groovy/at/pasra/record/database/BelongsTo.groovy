@@ -8,6 +8,9 @@ import org.gradle.api.InvalidUserDataException
  * Created by rich on 9/17/13.
  */
 class BelongsTo extends Relation{
+
+    def to
+
     protected BelongsTo(Table origin) {
         super(origin)
     }
@@ -29,12 +32,9 @@ class BelongsTo extends Relation{
 
     @Override
     protected String foreign_key() {
-        def foreign_key = "${target.name}_id"
-
-        if (options.has("foreign_key")) {
-            foreign_key = options.get("foreign_key").asString
-        }
-        return foreign_key
+        if (foreign_key != null)
+            return foreign_key
+        return "${target.name}_id"
     }
 
     @Override

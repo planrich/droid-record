@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -23,7 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class PictureRecordBuilder extends RecordBuilder<Picture>{
     public PictureRecordBuilder(SQLiteDatabase db){
-        super("pictures", new String[] { "_id", "name", "image", "date", "gallery_id" }, db);
+        super("pictures", new String[] { "name", "image", "date", "gallery_id", "_id" }, db);
     }
     @Override
     public java.util.List<Picture> all(android.database.Cursor c){

@@ -1,5 +1,3 @@
-// Insert your model relationships here! See the documentation for details.
-
 gallery {
   has_many 'pictures'
   belongs_to 'user'

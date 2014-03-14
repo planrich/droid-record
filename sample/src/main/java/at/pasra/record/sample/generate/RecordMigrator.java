@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -54,60 +54,60 @@ public class RecordMigrator implements Migrator{
     }
     @Override
     public void migrate(long currentVersion, long targetVersion){
-        db.execSQL("insert or replace into android_record_configs (key,value) values ('generator_version','0.0.8')");
+        db.execSQL("insert or replace into android_record_configs (key,value) values ('generator_version','0.1.0')");
         if (currentVersion < targetVersion && currentVersion < 20130913154915L){
-            db.execSQL("create table galleries (_id integer primary key, name text );");
+            db.execSQL("create table galleries (name text , _id integer primary key);");
             currentVersion = 20130913154915L;
         }
         if (currentVersion < targetVersion && currentVersion < 20130913165751L){
-            db.execSQL("create table pictures (_id integer primary key, name text , image blob , date integer , gallery_id integer );");
+            db.execSQL("create table pictures (name text , image blob , date integer , gallery_id integer , _id integer primary key);");
             currentVersion = 20130913165751L;
         }
         if (currentVersion < targetVersion && currentVersion < 20130922092812L){
-            db.execSQL("create table usrs (_id integer primary key, first_name text , last_name text , age integer );");
+            db.execSQL("create table usrs (first_name text , last_name text , age integer , _id integer primary key);");
             db.execSQL("alter table galleries add column usr_id integer ;");
             currentVersion = 20130922092812L;
         }
         if (currentVersion < targetVersion && currentVersion < 20130922093131L){
             db.execSQL("drop table if exists users;");
-            db.execSQL("create table users (_id integer primary key, first_name text , last_name text , age integer );");
+            db.execSQL("create table users (first_name text , last_name text , age integer , _id integer primary key);");
             {
                 Cursor c = db.rawQuery("select * from usrs", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
                     ContentValues vals = new ContentValues();
-                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     vals.put("first_name", c.getString(c.getColumnIndex("first_name")));
                     vals.put("last_name", c.getString(c.getColumnIndex("last_name")));
                     vals.put("age", c.getString(c.getColumnIndex("age")));
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     db.insert("users", null, vals);
                 }
                 db.execSQL("commit");
             }
             db.execSQL("drop table usrs");
             db.execSQL("drop table if exists galleries_mig_temp_table;");
-            db.execSQL("create table galleries_mig_temp_table (_id integer primary key, name text , user_id integer );");
+            db.execSQL("create table galleries_mig_temp_table (name text , _id integer primary key, user_id integer );");
             {
                 Cursor c = db.rawQuery("select * from galleries", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
                     ContentValues vals = new ContentValues();
-                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     vals.put("name", c.getString(c.getColumnIndex("name")));
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     vals.put("user_id", c.getString(c.getColumnIndex("user_id")));
                     db.insert("galleries_mig_temp_table", null, vals);
                 }
                 db.execSQL("commit");
             }
             db.execSQL("drop table galleries");
-            db.execSQL("create table galleries (_id integer primary key, name text , user_id integer );");
+            db.execSQL("create table galleries (name text , _id integer primary key, user_id integer );");
             {
                 Cursor c = db.rawQuery("select * from galleries_mig_temp_table", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
                     ContentValues vals = new ContentValues();
-                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     vals.put("name", c.getString(c.getColumnIndex("name")));
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     vals.put("user_id", c.getString(c.getColumnIndex("user_id")));
                     db.insert("galleries", null, vals);
                 }
@@ -118,29 +118,29 @@ public class RecordMigrator implements Migrator{
         }
         if (currentVersion < targetVersion && currentVersion < 20130922093633L){
             db.execSQL("drop table if exists users_mig_temp_table;");
-            db.execSQL("create table users_mig_temp_table (_id integer primary key, first_name text , last_name text );");
+            db.execSQL("create table users_mig_temp_table (first_name text , last_name text , _id integer primary key);");
             {
                 Cursor c = db.rawQuery("select * from users", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
                     ContentValues vals = new ContentValues();
-                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     vals.put("first_name", c.getString(c.getColumnIndex("first_name")));
                     vals.put("last_name", c.getString(c.getColumnIndex("last_name")));
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     db.insert("users_mig_temp_table", null, vals);
                 }
                 db.execSQL("commit");
             }
             db.execSQL("drop table users");
-            db.execSQL("create table users (_id integer primary key, first_name text , last_name text );");
+            db.execSQL("create table users (first_name text , last_name text , _id integer primary key);");
             {
                 Cursor c = db.rawQuery("select * from users_mig_temp_table", null);
                 db.execSQL("begin");
                 while (c.moveToNext()){
                     ContentValues vals = new ContentValues();
-                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     vals.put("first_name", c.getString(c.getColumnIndex("first_name")));
                     vals.put("last_name", c.getString(c.getColumnIndex("last_name")));
+                    vals.put("_id", c.getString(c.getColumnIndex("_id")));
                     db.insert("users", null, vals);
                 }
                 db.execSQL("commit");
@@ -150,11 +150,11 @@ public class RecordMigrator implements Migrator{
             currentVersion = 20130922093633L;
         }
         if (currentVersion < targetVersion && currentVersion < 20131001095638L){
-            db.execSQL("create table user_pictures (_id integer primary key, user_id integer , picture_id integer );");
+            db.execSQL("create table user_pictures (user_id integer , picture_id integer , _id integer primary key);");
             currentVersion = 20131001095638L;
         }
         if (currentVersion < targetVersion && currentVersion < 20140226161603L){
-            db.execSQL("create table times (_id integer primary key, millis long , micros integer );");
+            db.execSQL("create table times (millis long , micros integer , _id integer primary key);");
             currentVersion = 20140226161603L;
         }
 

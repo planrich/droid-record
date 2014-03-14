@@ -15,7 +15,7 @@ abstract class Relation {
         this.origin = origin
     }
 
-    protected String foreign_key(def name) {
+    protected String foreign_key(def name, def fallback = null) {
         if (foreign_key != null)
             return foreign_key
 
@@ -41,13 +41,13 @@ abstract class Relation {
      * @param fields
      * @return the fk name, if it found the fk, did the type match? and the type
      */
-    def check_foreign_key_exists(def name, def fields, def fallback) {
+    def check_foreign_key_exists(def name, def fields) {
 
         def has_foreign_key = false
         def type_match = false
         def type
 
-        def fk = foreign_key(name, fallback)
+        def fk = foreign_key(name)
         fields.each { Field f ->
             if (f.name == fk) {
                 has_foreign_key = true

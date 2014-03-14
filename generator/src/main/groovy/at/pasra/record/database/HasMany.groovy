@@ -10,6 +10,8 @@ import org.gradle.api.InvalidUserDataException
  */
 class HasMany extends Relation {
 
+    def table
+
     /*!
      * @relations|has_many_options Has many options
      * -#after relations|has_many
@@ -40,7 +42,7 @@ class HasMany extends Relation {
     void generateJavaMethods(CodeGenerator c) {
 
         def javaClassName = target.javaClassName
-        def pluralJavaClassName = Inflector.pluralize(javaClassName)
+        def pluralJavaClassName = Inflector.pluralizeCamel(javaClassName)
         c.wrap("public RecordBuilder<${javaClassName}> load${pluralJavaClassName}(LocalSession session)") {
             c.line("return session.query${pluralJavaClassName}().where(\"${this.foreign_key()} = ?\", Long.toString(${origin.primary.javaPrivateFieldName()}) );")
         }

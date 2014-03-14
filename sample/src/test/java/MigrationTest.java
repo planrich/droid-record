@@ -47,7 +47,7 @@ public class MigrationTest extends AndroidTestCase {
         migrator.migrate(current, target);
         current = target;
 
-        Cursor c = mDB.rawQuery("select * from users;", null);
+        Cursor c = mDB.rawQuery("select _id, first_name, last_name, age from users;", null);
         assertEquals(c.getCount(), 1);
         c.moveToFirst();
         assertEquals(c.getString(c.getColumnIndex("first_name")), "Chuck");
@@ -60,8 +60,8 @@ public class MigrationTest extends AndroidTestCase {
 
         User chuck = session.findUser(id);
         assertNotNull(chuck);
-        assertEquals(chuck.getFirstName(), "Chuck");
-        assertEquals(chuck.getLastName(), "Norris");
+        assertEquals("Chuck", chuck.getFirstName());
+        assertEquals("Norris", chuck.getLastName());
     }
 
     public void testMigrate() {

@@ -69,10 +69,11 @@ class MigrationContext {
      */
     void addMigrationStep(File file, long version) {
 
+        logger.info("reading from ${file.path}")
         migGen.migration = version;
         def delegate = new MigrationInvokeableContext(version, file.path)
 
-        def closure = shell.evaluate("{->${file.text}}")
+        def closure = new GroovyShell().evaluate("{->${file.text}}")
         closure.delegate = delegate
         closure.resolveStrategy = Closure.DELEGATE_ONLY
 
@@ -82,14 +83,12 @@ class MigrationContext {
     }
 
     void relations(File file) {
-
-        def delegate = new RelationsInvokeableContext()
-
-        def closure = shell.evaluate("{->${file.text}}")
-        closure.delegate = delegate
-        closure.resolveStrategy = Closure.DELEGATE_ONLY
-        closure()
-
+        logger.info("loading relations from ${file.path}")
+        def delegate = new RelationsRootContext(this)
+        def cl = new GroovyShell().evaluate("{->${file.text}}")
+        cl.delegate = delegate
+        cl.resolveStrategy = Closure.DELEGATE_ONLY
+        cl()
     }
 
     /**
@@ -264,16 +263,18 @@ class MigrationContext {
                 '__required__': ['column','table','type']
 
             ]
-            def field = LoadUtil.invoke(c, structCtx, new Field())
+            def map = LoadUtil.invoke(c, structCtx)
 
-            def table_name = Inflector.internalName(field.table)
-            def type = field.type
+            def table_name = Inflector.internalName(map.table)
+            def type = map.type
 
             Table table = tables[table_name]
             if (table == null) {
-                throw new IllegalArgumentException("Couldn't find table ${field.table}! If the Inflector messed up the singular step on the table name, use '#table_name_singluar' in the table property!")
+                throw new IllegalArgumentException("Couldn't find table ${map.table}! If the Inflector messed up the singular step on the table name, use '#table_name_singluar' in the table property!")
             }
 
+            def field = new Field(map.column)
+            field.type = map.type
             table.addField(field)
 
             migGen.addField(table, field, version)
@@ -293,7 +294,7 @@ class MigrationContext {
             def new_field_name = map.to
             Table table = getTable(table_name, "Couldn't find table ${table_name}!")
             table.renameField(old_field_name, new_field_name)
-            migGen.renameField(table, old_field_name, new_field_name, file, version)
+            migGen.renameField(table, old_field_name, new_field_name, version)
         }
 
         def remove_column(Closure c) {
@@ -310,7 +311,7 @@ class MigrationContext {
             Table table = getTable(table_name, "Couldn't find table ${table_name}!")
 
             Field field = table.removeField(field_name)
-            migGen.removeField(table, field, file, version)
+            migGen.removeField(table, field, version)
         }
 
         /*!
@@ -355,7 +356,7 @@ class MigrationContext {
             tables.remove(old_table_name)
 
             table.changeName(new_table_name)
-            migGen.renameTable(table, Inflector.sqlTableName(map.table), Inflector.sqlTableName(map.to), file, version)
+            migGen.renameTable(table, Inflector.sqlTableName(map.table), Inflector.sqlTableName(map.to), version)
             tables[new_table_name] = table
         }
 
@@ -396,280 +397,8 @@ class MigrationContext {
             ]
             def map = LoadUtil.invoke(c, structCtx)
             String javaClassName = map.class_name
-            migGen.dataMigrator(javaClassName, file, version);
+            migGen.dataMigrator(javaClassName, version);
         }
     }
 
-    /*!
-     * @relations Relations
-     * -#after migrations
-     *
-     * %p
-     *   Relations are all specified in one file. By default this is
-     *   %span.migration-ref relations.json
-     *   \.
-     *   Relationship between tables is just meta information. At migration time this meta
-     *   information is used to type check the primary and foreign keys on the relation.
-     *
-     * %p
-     *   In the following section the following migration is created before the relations
-     *   are added.
-     *
-     * %span.filename 123456_pre_migration.json
-     * %pre
-     *   %code{ data: { language: 'dsl' } }
-     *     :preserve
-     *       create_table {
-     *         name 'picture'
-     *         fields {
-     *           name 'string'
-     *           data 'blob'
-     *           gallery_id 'long'
-     *         }
-     *       }
-     *       create_table {
-     *         name 'gallery'
-     *         fields {
-     *           name 'string'
-     *           user_id 'long'
-     *         }
-     *       }
-     *       create_table {
-     *         name 'user'
-     *         fields {
-     *           name 'string'
-     *           age 'int'
-     *         }
-     *       }
-     *       create_table {
-     *         name 'user_picture'
-     *         fields {
-     *           user_id 'long'
-     *           picture_id 'long'
-     *         }
-     *       }
-     */
-    class RelationsInvokeableContext {
-
-        def methodMissing(String name, Object args) {
-            Table origin = getTable(Inflector.internalName(name), "Relation expects table '${name}' to exist. But it does not!")
-            if (args.size == 1 && args[0] instanceof Closure) {
-                Closure c = args[0]
-                def delegate = new RelationInvokeableContext(origin)
-                c.delegate = delegate
-                c.resolveStrategy = Closure.DELEGATE_ONLY
-                c()
-            } else {
-                throw new MethodNotFoundException("You must provide a closure to a relation!")
-            }
-        }
-
-    }
-
-    class RelationInvokeableContext {
-
-        Table origin_table
-
-        RelationInvokeableContext(Table o) {
-            this.origin_table = o
-        }
-
-        /*!
-         *@relations|has_one Has One (1..1)
-         *
-         * %p
-         *   Given the following requirement: 'a user has one gallery' add this
-         *   rule to your relationships:
-         *
-         * %span.filename relations.json
-         * %pre
-         *   %code{ data: { language: 'dsl' } }
-         *     :preserve
-         *       ...
-         *       user {
-         *         has_one 'gallery'
-         *       }
-         */
-        def has_one(Object o) {
-            if (o instanceof Closure) {
-                _has_one(o)
-            } else {
-                _has_one { ->
-                    table o.toString()
-                }
-            }
-        }
-
-        def _has_one(Closure c) {
-            def structCtx = [
-                'table': LoadUtil.&string,
-                'primary_key': LoadUtil.&string,
-                'foreign_key': LoadUtil.&string,
-                '__required__': ['table']
-            ]
-            def r = LoadUtil.invoke(c, structCtx, new HasOne(origin_table))
-
-            def target_name = Inflector.internalName(r.table)
-            def target = getTable(target_name, "Has one relation expects table '${target_name}' to exist. But it does not!")
-            r.target = target
-            r.checkIntegrity();
-            origin_table.relations << r
-        }
-
-        /*!
-         * @relations|belongs_to Belongs to
-         *
-         * %p
-         *   Looking at the two sections above it might be useful that given a picture object you can
-         *   retrieve it's gallery, or given a gallery you can lookup it's user. Add the following:
-         *
-         * %span.filename relations.json
-         * %pre
-         *   %code{ data: { language: 'javascript' } }
-         *     :preserve
-         *       ...
-         *       picture {
-         *         belongs_to 'gallery'
-         *       }
-         *       gallery {
-         *         belongs_to 'user'
-         *       }
-         */
-        def belongs_to(Object o) {
-            if (o instanceof Closure) {
-                _belongs_to(o)
-            } else {
-                _belongs_to { ->
-                    to o.toString()
-                }
-            }
-        }
-        def _belongs_to(Closure c) {
-            def structCtx = [
-                    'to': LoadUtil.&string,
-                    'primary_key': LoadUtil.&string,
-                    'foreign_key': LoadUtil.&string,
-                    '__required__': ['to']
-            ]
-            def r = LoadUtil.invoke(c, structCtx, new BelongsTo(origin_table))
-
-            def target_name = Inflector.internalName(r.to)
-            def target = getTable(target_name, "Belongs to relation expects table '${target_name}' to exist. But it does not!")
-            r.target = target
-            r.checkIntegrity();
-            origin_table.relations << r
-        }
-
-        /*!
-         * @relations|has_may Has Many (1..n)
-         *
-         * %p Assuming that any gallery has many pictures (1..n):
-         *
-         * %span.filename relations.json
-         * %pre
-         *   %code{ data: { language: 'dsl' } }
-         *     :preserve
-         *       ...
-         *       gallery {
-         *         has_many 'pictures'
-         *       }
-         *
-         * %p
-         *   Note that the name in
-         *   %span.migration-ref has_many
-         *   array must be plural. This is more readable as you can simply read 'a gallery has many pictures'.
-         *   If {?class:arname;DR} cannot infer the table from the given name in plural you can specifiy the exact
-         *   table name by prepending a hash (#) infront of the name (e.g '#picture' instead of 'pictures').
-         *
-         */
-        def has_many(Object o) {
-            if (o instanceof Closure) {
-                _has_many(o)
-            } else {
-                _has_many { ->
-                    table o.toString()
-                }
-            }
-        }
-        def _has_many(Closure c) {
-
-            def structCtx = [
-                    'table': LoadUtil.&string,
-                    'primary_key': LoadUtil.&string,
-                    'foreign_key': LoadUtil.&string,
-                    '__required__': ['table']
-            ]
-            def r = LoadUtil.invoke(c, structCtx, new BelongsTo(origin_table))
-
-            def target_name = Inflector.internalName(Inflector.singularize(r.table))
-            def target = getTable(target_name, "Has many relation expects table '${target_name}' to exist. But it does not! " +
-                    "If it does and the singularize function messed it up, use a " +
-                    "hash in front of the table name. e.g. 'has_many': '#singular_table_name'")
-            r.target = target
-            r.checkIntegrity();
-            origin_table.relations << r
-        }
-
-        /*!
-         * @relations|has_and_belongs_to Has and belongs to
-         *
-         * %p
-         *   As an example consider the following requirement: "A user has many favourite pictures and a picture can be the favorite of many users".
-         *   In a classic relational database this is called a n:m relation.
-         *
-         * %span.filename relations.json
-         * %pre
-         *   %code{ data: { language: 'dsl' } }
-         *     :preserve
-         *       ...
-         *       user {
-         *         has_and_belongs_to {
-         *           many 'galleries'
-         *           through 'user_picture'
-         *         }
-         *       }
-         *       gallery {
-         *         has_and_belongs_to {
-         *           many: 'users'
-         *           through: 'user_picture'
-         *         }
-         *       }
-         *
-         */
-        def has_and_belongs_to(Closure c) {
-
-            def structCtx = [
-                'many': LoadUtil.&string,
-                'through': LoadUtil.&string,
-                '__required__': ['many','through']
-            ]
-            def map = LoadUtil.invoke(c, structCtx, new HasAndBelongsTo(origin_table))
-
-            def many_table_name = Inflector.internalName(Inflector.singularize(map.many))
-            def through_table_name = Inflector.internalName(Inflector.singularize(map.through))
-
-            def many_table = getTable(many_table_name, "Expected table '${many_table_name}' to exist, but it does not!")
-            def through_table = getTable(through_table_name, "Expected table '${through_table}' to exist, but it does not!")
-
-            r.target = many_table
-            r.through_table = through_table
-            r.checkIntegrity()
-            origin_table.relations << r
-
-            through_table.javaclass_codegen << { CodeGenerator cg ->
-                def javaClassName = Inflector.javaClassName(through_table_name)
-                def typeParam1 = Inflector.javaClassName(many_table_name)
-                def nameParam1 = many_table_name
-                def typeParam2 = origin_table.javaClassName
-                def nameParam2 = origin_table.name
-                cg.wrap("public static ${javaClassName} of(${typeParam1} ${nameParam1}, ${typeParam2} ${nameParam2})") {
-                    cg.line("${javaClassName} obj = new ${javaClassName}();")
-                    cg.line("obj.set${typeParam1}Id(${nameParam1}.getId());")
-                    cg.line("obj.set${typeParam2}Id(${nameParam2}.getId());")
-                    cg.line("return obj;")
-                }
-            }
-        }
-
-    }
 }

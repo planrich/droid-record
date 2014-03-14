@@ -1,6 +1,6 @@
 /* Copyright (c) 2013, Richard Plangger <rich@pasra.at> All rights reserved.
  *
- * Android Record version 0.0.8 generated this file. For more
+ * Android Record version 0.1.0 generated this file. For more
  * information see http://record.pasra.at/
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
@@ -51,9 +51,9 @@ public class AbstractGallery{
     }
     public static Gallery fromCursor(android.database.Cursor cursor){
         Gallery record = new Gallery();
-        record.setId(cursor.getLong(0));
-        record.setName(cursor.getString(1));
-        record.setUserId(cursor.getLong(2));
+        record.setName(cursor.getString(cursor.getColumnIndex("name")));
+        record.setId(cursor.getLong(cursor.getColumnIndex("_id")));
+        record.setUserId(cursor.getLong(cursor.getColumnIndex("user_id")));
         return record;
     }
 }
