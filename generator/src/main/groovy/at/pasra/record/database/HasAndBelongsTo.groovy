@@ -1,8 +1,7 @@
 package at.pasra.record.database
 
-import at.pasra.record.Inflector
+import at.pasra.record.util.Inflector
 import at.pasra.record.generation.CodeGenerator
-import com.google.gson.JsonObject
 import org.gradle.api.InvalidUserDataException
 
 /**
@@ -10,7 +9,8 @@ import org.gradle.api.InvalidUserDataException
  */
 class HasAndBelongsTo extends Relation {
 
-    def through;
+    def table
+    def through_table
 
     /*!
      * @relations|has_and_belongs_to_options Has and belongs to options
@@ -34,9 +34,8 @@ class HasAndBelongsTo extends Relation {
      *       (optional). Specifies the name of the foreign key it belongs to. Use it if its name
      *       differs from the naming convention
      */
-    HasAndBelongsTo(Table origin, Table target, Table through, JsonObject options) {
-        super(origin, target, options)
-        this.through = through
+    HasAndBelongsTo(Table origin) {
+        super(origin)
     }
 
     @Override
@@ -48,9 +47,9 @@ class HasAndBelongsTo extends Relation {
     void generateJavaMethods(CodeGenerator c) {
 
         def javaClassName = target.javaClassName
-        def pluralJavaClassName = Inflector.camelize(Inflector.pluralize(javaClassName))
+        def pluralJavaClassName = Inflector.pluralize(javaClassName)
         c.wrap("public java.util.List<${javaClassName}> load${pluralJavaClassName}(LocalSession session)") {
-            c.line("String query = \"select d.* from ${origin.sqlTableName} o, ${through.sqlTableName} t, ${target.sqlTableName} d\" +")
+            c.line("String query = \"select d.* from ${origin.sqlTableName} o, ${through_table.sqlTableName} t, ${target.sqlTableName} d\" +")
             c.line("               \" where\" +")
             c.line("               \" o.${origin.primary.name} = ? and\" +")
             c.line("               \" o.${origin.primary.name} = t.${foreign_key(origin.name, "foreign_key_has")} and\" +")
@@ -67,21 +66,21 @@ class HasAndBelongsTo extends Relation {
 
     @Override
     void checkIntegrity() {
-        def ( fk, has_foreign_key , type_match, type ) = check_foreign_key_exists(origin.name, through.fields.values(), "foreign_key_has")
+        def ( fk, has_foreign_key , type_match, type ) = check_foreign_key_exists(origin.name, through_table.fields.values(), "foreign_key_has")
 
         if (!has_foreign_key) {
-            throw new InvalidUserDataException("Table ${through.sqlTableName} does not specify a foreign key '${fk}'. " +
+            throw new InvalidUserDataException("Table ${through_table.sqlTableName} does not specify a foreign key '${fk}'. " +
                     "This means that a ${origin.sqlTableName} record does _NOT_ have and belong to many ${Inflector.pluralize(origin.name)}!")
         }
 
         if (!type_match) {
-            throw new InvalidUserDataException("Table ${through.sqlTableName}: '${fk}' column type is '${type}' but it should be '${origin.primary.type}'. Please change the type!")
+            throw new InvalidUserDataException("Table ${through_table.sqlTableName}: '${fk}' column type is '${type}' but it should be '${origin.primary.type}'. Please change the type!")
         }
 
-        ( fk, has_foreign_key , type_match, type ) = check_foreign_key_exists(target.name, through.fields.values(), "foreign_key_belongs_to")
+        ( fk, has_foreign_key , type_match, type ) = check_foreign_key_exists(target.name, through_table.fields.values(), "foreign_key_belongs_to")
 
         if (!has_foreign_key) {
-            throw new InvalidUserDataException("Table ${through.sqlTableName} does not specify a foreign key '${fk}'. " +
+            throw new InvalidUserDataException("Table ${through_table.sqlTableName} does not specify a foreign key '${fk}'. " +
                     "This means that a ${target.sqlTableName} record does _NOT_ have and belong to many ${Inflector.pluralize(target.name)}!")
         }
 

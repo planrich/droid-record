@@ -1,9 +1,7 @@
-change: [
-  { cmd: create_table,
-    name: 'time',
-    fields: {
-      millis: 'double',
-      micros: 'long'
-    }
+create_table {
+  name 'time'
+  fields {
+    millis 'double'
+    micros 'long'
   }
-]
+}

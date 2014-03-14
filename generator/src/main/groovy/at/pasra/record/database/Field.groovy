@@ -1,9 +1,7 @@
 package at.pasra.record.database
 
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import at.pasra.record.generation.CodeGenerator
-import at.pasra.record.Inflector
+import at.pasra.record.util.Inflector
 /**
  * Created by rich on 9/8/13.
  *
@@ -11,73 +9,68 @@ import at.pasra.record.Inflector
  */
 class Field {
 
+    def primary = false
     String javaFieldName; // camelized
     String name; // original
     String sqlName;
-    JsonElement json;
     String type;
     boolean allowNull = false;
     int tableOrder;
 
-    static final to_java_type = ["integer": "java.lang.Integer",
-            "string": "java.lang.String",
-            "long": "java.lang.Long",
-            "boolean": "java.lang.Boolean",
-            "blob": "byte[]",
-            "date": "java.util.Date",
-            "double": "java.lang.Double"]
+    static final ALLOWED_TYPES = ['integer', 'string', 'long', 'boolean', 'blob', 'date', 'double' ]
 
-    static final to_sqlite_type = ["integer": "integer",
-            "long": "integer",
-            "boolean": "integer",
-            "double": "long", // yes -> use Double.longToDoubleBits
-            "string": "text",
-            "blob": "blob",
-            "date": "integer", ]
+    static final TO_JAVA_TYPE_MAP = [
+        "integer": "java.lang.Integer",
+        "string": "java.lang.String",
+        "long": "java.lang.Long",
+        "boolean": "java.lang.Boolean",
+        "blob": "byte[]",
+        "date": "java.util.Date",
+        "double": "java.lang.Double"
+    ]
 
-    Field(String name, JsonElement json) {
-        changeName(name)
-        this.json = json;
+    static final TO_SQLITE_TYPE_MAP = [
+        "integer": "integer",
+        "long": "integer",
+        "boolean": "integer",
+        "double": "long", // yes -> use Double.longToDoubleBits
+        "string": "text",
+        "blob": "blob",
+        "date": "integer",
+    ]
+
+    Field() {
     }
 
-    /**
-     * Check if the json obj given is valid. Throws an exception otherwise
-     */
+    Field(String name) {
+        changeName(name)
+    }
+
     void checkIntegrity() {
 
-        // age: 'integer'
-        if (json.isJsonPrimitive()) {
-            type = json.getAsString()
-            // age: { type: 'integer', default: '0' }
-        } else if (json.isJsonObject()) {
-            JsonObject obj = json.getAsJsonObject();
-            if (!obj.has("type") && !obj.get("type").isJsonPrimitive()) {
-                throw IllegalStateException("Field '${name}' does not have a specified type!");
-            }
-
-            type = obj.get("type").getAsString();
-            if (obj.has("null") && obj.get("null").asBoolean) {
-                allowNull = true;
-            }
-
-            if (obj.has("sql_name") && obj.get("sql_name").isJsonPrimitive()) {
-                this.sqlName = obj.get("sql_name").asString
-            }
+        if (name == null) {
+            throw new IllegalArgumentException("A field needs a name")
         }
 
-        if (to_java_type[type] == null) {
-            throw new IllegalStateException("Type ${type} cannot be used in field ${name}!");
+        changeName(name)
+
+        if (type == null) {
+            throw new IllegalArgumentException("A field needs a type!")
+        }
+
+        if (TO_JAVA_TYPE_MAP[type] == null) {
+            throw new IllegalArgumentException("Type ${type} cannot be used in field ${name}. use one of ${ALLOWED_TYPES}!")
         }
     }
 
     void changeName(String new_name) {
         this.name = Inflector.internalName(new_name)
-        this.sqlName = Inflector.internalName(new_name)
+        this.sqlName = Inflector.sqlTableName(new_name)
         this.javaFieldName = Inflector.javaClassName(new_name)
     }
 
     String javaType() {
-        return to_java_type[type]
+        return TO_JAVA_TYPE_MAP[type]
     }
 
     String javaPrivateFieldName() {
@@ -166,15 +159,11 @@ class Field {
      * @return
      */
     boolean isPrimary() {
-        return json.isJsonObject() && json.getAsJsonObject().has("primary") && json.getAsJsonObject().get("primary").asBoolean();
-    }
-
-    boolean hasConstraint() {
-        return json.isJsonObject() && json.getAsJsonObject().has("constraint")
+        return primary
     }
 
     String sqlType() {
-        def result = to_sqlite_type[type.toLowerCase()];
+        def result = TO_SQLITE_TYPE_MAP[type.toLowerCase()];
         if (result == null) {
             throw new IllegalStateException("unkown datatype: ${type.toLowerCase()} used for column ${name}!");
         }
@@ -189,9 +178,6 @@ class Field {
         def constraints = []
         if (isPrimary()) {
             constraints << "primary key"
-        }
-        if (hasConstraint()) {
-            constraints << json.getAsJsonObject().get("constraint").getAsString()
         }
         return constraints.join(" ")
     }

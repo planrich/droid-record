@@ -1,6 +1,5 @@
 package at.pasra.record.database
 
-import at.pasra.record.Inflector
 import at.pasra.record.generation.CodeGenerator
 import com.google.gson.JsonObject
 import org.gradle.api.InvalidUserDataException
@@ -9,8 +8,8 @@ import org.gradle.api.InvalidUserDataException
  * Created by rich on 9/17/13.
  */
 class BelongsTo extends Relation{
-    protected BelongsTo(Table origin, Table target, JsonObject options) {
-        super(origin, target, options)
+    protected BelongsTo(Table origin) {
+        super(origin)
     }
 
     @Override

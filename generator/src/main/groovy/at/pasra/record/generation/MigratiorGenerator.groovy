@@ -27,15 +27,15 @@ class MigratiorGenerator {
         }
     }
 
-    void addTable(Table table, File file, long version) {
+    void addTable(Table table, long version) {
         codegen.line("db.execSQL(\"${table.creationSQL()}\");")
     }
 
-    void rmTable(String sql_name, File file, long version) {
+    void rmTable(String sql_name, long version) {
         codegen.line("db.execSQL(\"drop table ${sql_name};\");")
     }
 
-    void addField(Table table, Field field, File file, long version) {
+    void addField(Table table, Field field, long version) {
         codegen.line("db.execSQL(\"alter table ${table.sqlTableName} add column ${field.columnSQL()};\");")
     }
 
@@ -64,11 +64,11 @@ class MigratiorGenerator {
         }
     }
 
-    void dataMigrator(String name, File file, long version) {
+    void dataMigrator(String name, long version) {
         codegen.line("new ${name}().migrate(db, currentVersion, targetVersion);");
     }
 
-    void removeField(Table table, Field removed, File file, long version) {
+    void removeField(Table table, Field removed, long version) {
         // move contents to new temporary table
         def suffix = "_mig_temp_table"
         codegen.line("""db.execSQL("drop table if exists ${table.sqlTableName + suffix};");""")
@@ -82,7 +82,7 @@ class MigratiorGenerator {
         codegen.line("db.execSQL(\"drop table ${table.sqlTableName + suffix}\");")
     }
 
-    void renameTable(Table table, String old_name, String new_name, File file, long version) {
+    void renameTable(Table table, String old_name, String new_name, long version) {
         // table already has new name
         codegen.line("""db.execSQL("drop table if exists ${new_name};");""")
         codegen.line("db.execSQL(\"${table.creationSQL()}\");")
@@ -90,7 +90,7 @@ class MigratiorGenerator {
         codegen.line("db.execSQL(\"drop table ${old_name}\");")
     }
 
-    void renameField(Table table, String old_name, String new_name, File file, long version) {
+    void renameField(Table table, String old_name, String new_name, long version) {
         // move contents to new temporary table
         def suffix = "_mig_temp_table"
         codegen.line("""db.execSQL("drop table if exists ${table.sqlTableName + suffix};");""")

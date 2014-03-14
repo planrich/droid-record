@@ -1,5 +1,6 @@
-package at.pasra.record
+package at.pasra.record.task
 
+import at.pasra.record.DroidRecordPlugin
 import at.pasra.record.generation.CodeGenerator
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction

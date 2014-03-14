@@ -1,32 +1,31 @@
 package at.pasra.record.database
 
 import at.pasra.record.generation.CodeGenerator
-import com.google.gson.JsonObject
 
 /**
  * Created by rich on 9/13/13.
  */
 abstract class Relation {
-    protected JsonObject options;
     protected Table origin;
     protected Table target;
+    protected String primary_key;
+    protected String foreign_key;
 
-    protected Relation(Table origin, Table target, JsonObject options) {
+    protected Relation(Table origin) {
         this.origin = origin
-        this.target = target
-        this.options = options;
     }
 
-    protected String foreign_key(def name, def fallback_prop_name = "foreign_key") {
-        def foreign_key = "${name}_id"
+    protected String foreign_key(def name) {
+        if (foreign_key != null)
+            return foreign_key
 
-        if (options.has(fallback_prop_name)) {
-            foreign_key = options.get(fallback_prop_name).asString
-        }
-        return foreign_key
+        return "${name}_id"
     }
 
     protected String foreign_key() {
+        if (foreign_key != null)
+            return foreign_key
+
         foreign_key(origin.name)
     }
 

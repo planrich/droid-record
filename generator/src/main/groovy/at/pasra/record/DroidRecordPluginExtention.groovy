@@ -8,4 +8,5 @@ class DroidRecordPluginExtention {
     def output_path = 'src/main/java'
     def relationship = 'relationship.json'
     def output_package = null
+    def schema = 'schema'
 }

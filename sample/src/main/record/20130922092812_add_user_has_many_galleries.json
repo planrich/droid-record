@@ -1,12 +1,14 @@
-change: [
-  { cmd: create_table,
-    name: 'usr',
-    fields: {
-      first_name: "string",
-      last_name: "string",
-      age: "integer"
-    }
-  },
+create_table {
+  name 'usr'
+  fields {
+    first_name "string"
+    last_name "string"
+    age "integer"
+  }
+}
 
-  { cmd: add_column, table: "gallery", column: "usr_id", type: "long" }
-]
+add_column {
+  table "gallery"
+  column "usr_id"
+  type "long"
+}

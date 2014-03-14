@@ -1,4 +1,4 @@
-package at.pasra.record
+package at.pasra.record.util
 
 import java.util.regex.Pattern
 

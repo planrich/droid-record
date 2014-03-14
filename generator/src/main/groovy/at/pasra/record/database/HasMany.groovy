@@ -1,6 +1,6 @@
 package at.pasra.record.database
 
-import at.pasra.record.Inflector
+import at.pasra.record.util.Inflector
 import at.pasra.record.generation.CodeGenerator
 import com.google.gson.JsonObject
 import org.gradle.api.InvalidUserDataException
@@ -26,8 +26,8 @@ class HasMany extends Relation {
      *       \- the pluralized table name or a hashed singular table name (e.g 'stock_items' or '#STOCK_ITEM').
      *       The hash should only be used when dealing with legacy databases.
      */
-    HasMany(Table origin, Table target, JsonObject options) {
-        super(origin, target, options)
+    HasMany(Table origin) {
+        super(origin)
     }
 
 
@@ -40,7 +40,7 @@ class HasMany extends Relation {
     void generateJavaMethods(CodeGenerator c) {
 
         def javaClassName = target.javaClassName
-        def pluralJavaClassName = Inflector.camelize(Inflector.pluralize(javaClassName))
+        def pluralJavaClassName = Inflector.pluralize(javaClassName)
         c.wrap("public RecordBuilder<${javaClassName}> load${pluralJavaClassName}(LocalSession session)") {
             c.line("return session.query${pluralJavaClassName}().where(\"${this.foreign_key()} = ?\", Long.toString(${origin.primary.javaPrivateFieldName()}) );")
         }

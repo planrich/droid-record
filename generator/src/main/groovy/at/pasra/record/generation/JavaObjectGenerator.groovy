@@ -1,7 +1,7 @@
 package at.pasra.record.generation
 
 import at.pasra.record.DroidRecordPlugin
-import at.pasra.record.Inflector
+import at.pasra.record.util.Inflector
 import at.pasra.record.database.BelongsTo
 import at.pasra.record.database.Field
 import at.pasra.record.database.Relation
@@ -24,21 +24,21 @@ class JavaObjectGenerator {
         c.copyrightHeader()
         c.doNotModify()
 
-        def javaClassName = Inflector.camelize(table.name)
+        def javaClassName = table.javaClassName
 
         c.line("package ${pkg};")
         c.line()
         c.line("import at.pasra.record.SQLiteConverter;");
         c.line("import at.pasra.record.RecordBuilder;");
         c.line();
-        c.wrap("public class Abstract${Inflector.camelize(table.name)}") {
+        c.wrap("public class Abstract${javaClassName}") {
             table.fields.each { _, Field field ->
                 field.generateDaoJavaField(c);
             }
 
             c.line()
 
-            c.wrap("public Abstract${Inflector.camelize(table.name)}(${table.primary.javaType()} id)") {
+            c.wrap("public Abstract${javaClassName}(${table.primary.javaType()} id)") {
                 c.line("this.mId = id;");
                 table.getOrderedFields(false).each { Field f ->
                     if (!f.allowsNull()) {
@@ -56,7 +56,6 @@ class JavaObjectGenerator {
                 c.line("return record;")
             }
         }
-
 
         DroidRecordPlugin.write(source, pkg, "Abstract${table.javaClassName}.java", c.toString(), true)
 

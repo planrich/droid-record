@@ -1,21 +1,21 @@
 package at.pasra.record.database
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
 import at.pasra.record.generation.CodeGenerator
-import at.pasra.record.Inflector
+import at.pasra.record.util.Inflector
 /**
  * Created by rich on 9/8/13.
  */
 class Table {
 
-    String name;
-    String sqlTableName;
-    String javaClassName;
-    JsonObject json;
+    def static name_regex = /#?[a-zA-Z_][a-zA-Z0-9]*/
+
+    def name
+    def fields = [:]
+
+    def sqlTableName;
+    def javaClassName;
 
     Field primary = null;
-    def fields = [:];
 
     def relations = [];
 
@@ -23,61 +23,47 @@ class Table {
 
     def table_order = 1;
 
-    Table(JsonObject json) {
-        this.json = json
+    Table() {
     }
 
-    /**
-     *
-     * @return true if the object has the properties fields (as non empty json map) and name as primitive
-     */
     void checkIntegrity() {
-        if (json.has("name")
-           && json.get("name").isJsonPrimitive()
-           && json.has("fields")
-           && json.get("fields").isJsonObject()) {
-            changeName(json.get("name").getAsString())
-            def jsonFields = json.get("fields").getAsJsonObject()
+        if (name == null) {
+            throw new IllegalArgumentException("A table needs a name!")
+        }
 
-            jsonFields.entrySet().each { entry ->
-                def fieldName = entry.getKey()
-                def fieldElement = entry.getValue()
+        def matches = name =~ name_regex
+        if (!matches) {
+            throw new IllegalArgumentException("A table name must match the regex: '#?[a-zA-Z_][a-zA-Z0-9]*'")
+        }
 
-                if (fieldName == "id" || fieldName == "_id") {
-                    throw new IllegalArgumentException("Please do not use the reserved column name 'id' or '_id'. " +
-                            "By default android record will add an _id column to uniquely identify " +
-                            "every table row.");
-                }
+        changeName(name)
 
-                addField(new Field(fieldName, fieldElement));
-            }
+        fields.each { _, field ->
+            field.checkIntegrity()
+        }
 
-            JsonObject id = new JsonObject();
-            id.add("type", new JsonPrimitive("long"))
-            id.add("primary", new JsonPrimitive(true))
-            addField(new Field("_id", id))
-            primary.tableOrder = 0;
+        if (fields["_id"] != null) {
+            throw new IllegalArgumentException("Please do not use the reserved column name '_id'. " +
+                    "By default droid record will add an _id column to uniquely identify " +
+                    "every table row.");
+        }
 
-            if (fields.size() == 0) {
-                throw new IllegalArgumentException("Every table needs at least one table column. '${name}' has none!")
-            }
-        } else {
-            throw new IllegalArgumentException("A table from the given json cannot be constructed. Please correct typos and check the docs for create_table!");
+        def primary = new Field("_id")
+        primary.type = 'long'
+        primary.primary = true
+        addField(primary)
+        this.primary = primary
+        primary.tableOrder = 0;
+        table_order--
+
+        if (fields.size() == 0) {
+            throw new IllegalArgumentException("Every table needs at least one table column. '${name}' has none!")
         }
     }
 
     void changeName(String name) {
-        def hash_in_front = name.startsWith("#")
-        if (hash_in_front) {
-            this.name = name.substring(1)
-            this.javaClassName = Inflector.camelize(this.name.toLowerCase());
-        } else {
-            this.name = Inflector.tabelize(name)
-            this.javaClassName = Inflector.camelize(this.name);
-        }
-
         this.name = Inflector.internalName(name)
-        this.javaClassName = Inflector.javaClassName(name)
+        this.javaClassName = Inflector.camelize(name);
         this.sqlTableName = Inflector.sqlTableName(name)
     }
 
@@ -123,13 +109,11 @@ class Table {
         fields[field.name] = field
         if (field.isPrimary() && primary != null) {
             throw new IllegalStateException("It is not possible to have two primary keys! " +
-                    "Android record defines '_id' by default and yet it is not possible " +
+                    "Droid record defines '_id' by default and yet it is not possible " +
                     "to have any other primary keys!")
         }
 
-        if (field.isPrimary()) {
-            primary = field;
-        } else {
+        if (!field.isPrimary()) {
             field.tableOrder = table_order++;
         }
 
@@ -157,17 +141,6 @@ class Table {
     String creationSQL(name_suffix = "") {
         def columns = getOrderedFields(true).collect { Field field -> field.columnSQL() }.join ", "
         return "create table ${sqlTableName + name_suffix} (${columns});";
-    }
-
-    /**
-     * A relation can be either:
-     * has_many
-     * has_one
-     * belongs_to
-     *
-     * @param relation
-     */
-    void new_relation(JsonObject relation) {
     }
 
     boolean hasFieldOfType(String type) {

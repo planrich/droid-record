@@ -1,4 +1,10 @@
-change: [
-  { cmd: rename_table, table: 'usr', to: 'user' },
-  { cmd: rename_column, table: 'gallery', column: 'usr_id', to: 'user_id' }
-]
+rename_table {
+  table 'usr'
+  to 'user'
+}
+
+rename_column {
+  table 'gallery'
+  column 'usr_id'
+  to 'user_id'
+}

@@ -1,11 +1,9 @@
-package at.pasra.record
+package at.pasra.record.task
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import com.google.gson.stream.JsonReader
-import at.pasra.record.generation.MigrationContext
+import at.pasra.record.DroidRecordPlugin
+import at.pasra.record.DroidRecordPluginExtention
+import at.pasra.record.loading.MigrationContext
 import org.gradle.api.DefaultTask
-import org.gradle.api.InvalidUserCodeException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskAction
@@ -34,38 +32,25 @@ class MigrateTask extends DefaultTask {
         context = new MigrationContext(project.file(ex.output_path).path, ex.output_package);
 
         File root = project.file(ex.migration_path);
-        JsonParser parser = new JsonParser();
 
         String[] files = root.list().sort()
-        files.each { String file ->
-            if (isMigration(file)) {
-                JsonReader reader = new JsonReader(new StringReader("{"+(new File(root, file).text)+ "}"));
-                reader.setLenient(true);
-                try {
-                    JsonObject obj = parser.parse(reader).getAsJsonObject();
-
-                    long version = extractVersion(file)
-                    context.addMigrationStep(obj, new File(root, file), version);
-                } catch (Exception e) {
-                    throw new InvalidUserCodeException("In file ${file}: " + e.message);
+        files.each { String filename ->
+            File file = new File(root, filename)
+            if (file.isFile()) {
+                if (isMigration(filename)) {
+                    long version = extractVersion(filename)
+                    context.addMigrationStep(file, version);
+                } else {
+                    if ( ! (filename.equals(ex.schema) || filename.equals(ex.relationship)) ) {
+                        logger.warn("Did not parse file '${filename}' in migration path!")
+                    }
                 }
-            } else {
-                logger.info("Did not parse json file '${file}' in migration path!")
             }
         }
 
         File relationShip = new File(root, ex.relationship);
         if (relationShip.exists()) {
-            JsonReader reader = new JsonReader(new StringReader("{"+relationShip.text+"}"));
-            reader.setLenient(true);
-            JsonObject obj = null;
-            try {
-                obj =  parser.parse(reader).getAsJsonObject();
-            } catch (Exception e) {
-                throw new InvalidUserCodeException("In file ${ex.relationship}: " + e.message)
-            }
-
-            context.relations(obj);
+            context.relations(relationShip);
         } else {
             logger.info("could not find relation ship file '${ex.relationship}' in migration path")
         }

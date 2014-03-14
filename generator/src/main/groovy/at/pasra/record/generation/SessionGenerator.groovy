@@ -1,7 +1,7 @@
 package at.pasra.record.generation
 
 import at.pasra.record.DroidRecordPlugin
-import at.pasra.record.Inflector
+import at.pasra.record.util.Inflector
 import at.pasra.record.database.Table
 /**
  * Created by rich on 9/14/13.

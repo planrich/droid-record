@@ -1,9 +1,7 @@
-change: [
-  { cmd: create_table,
-    name: 'user_picture',
-    fields: {
-      user_id: 'long',
-      picture_id: 'long'
-    }
+create_table {
+  name 'user_picture'
+  fields {
+    user_id 'long'
+    picture_id 'long'
   }
-]
+}

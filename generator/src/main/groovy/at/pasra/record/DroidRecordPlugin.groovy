@@ -1,6 +1,8 @@
 package at.pasra.record
 
 import at.pasra.record.generation.CodeGenerator
+import at.pasra.record.task.GenerateMigrationTask
+import at.pasra.record.task.MigrateTask
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -218,7 +220,7 @@ import org.gradle.api.logging.Logging
  */
 class DroidRecordPlugin implements Plugin<Project> {
 
-    public static String VERSION = "0.0.8"
+    public static String VERSION = "x.y.z"
 
     static def outputFiles = []
     static def project;
@@ -236,9 +238,12 @@ class DroidRecordPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
 
+        VERSION = project.version.toString()
+        logger.info("running version {}", VERSION)
+
         project.extensions.create("droid_record", DroidRecordPluginExtention)
 
-        def migrate = project.task('migrate', type: MigrateTask, )
+        def migrate = project.task('migrate', type: MigrateTask )
         migrate.group = "Build"
         migrate.description = "Generates java source code for the database structure"
 
@@ -262,7 +267,7 @@ class DroidRecordPlugin implements Plugin<Project> {
         File relationShip = new File(migPath, ext.relationship)
         if (!relationShip.exists()) {
             CodeGenerator c = new CodeGenerator(2, "json");
-            c.line("comment: 'Insert your model relationships here! See http://recrod.pasra.at/droid_record#relations.'")
+            c.line("comment 'Insert your model relationships here! See http://record.pasra.at/droid_record#relations.'")
             OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(relationShip));
             w.write(c.toString())
             w.close()
