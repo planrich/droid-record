@@ -6,7 +6,7 @@ package at.pasra.record
 class DroidRecordPluginExtention {
     def migration_path = 'src/main/record'
     def output_path = 'src/main/java'
-    def relationship = 'relationship.json'
+    def relationship = 'relationship.dr'
     def output_package = null
-    def schema = 'schema'
+    def schema = 'schema.dr'
 }

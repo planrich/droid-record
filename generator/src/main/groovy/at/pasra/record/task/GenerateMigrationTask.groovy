@@ -19,12 +19,15 @@ class GenerateMigrationTask extends DefaultTask {
 
         File root = project.file(project.droid_record.migration_path)
 
-        File migration = new File(root, "${timestamp(new Date())}_${name}.json")
+        File migration = new File(root, "${timestamp(new Date())}_${name}.dr")
         OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(migration));
         CodeGenerator c = new CodeGenerator();
-        c.line("change: [")
-        c.line("")
-        c.line("]")
+        c.line("// create_table {")
+        c.line("//   name 'lion'")
+        c.line("//   fields {")
+        c.line("//     cage 'long'")
+        c.line("//   }")
+        c.line("// }")
 
         w.write(c.toString());
         w.close()

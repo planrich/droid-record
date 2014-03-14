@@ -13,7 +13,7 @@ import org.gradle.api.tasks.TaskAction
  */
 class MigrateTask extends DefaultTask {
 
-    def migrationRegex = /^(\d+)_([^.]*).json$/
+    def migrationRegex = /^(\d+)_([^.]*).dr$/
     def context;
 
     public MigrateTask() {

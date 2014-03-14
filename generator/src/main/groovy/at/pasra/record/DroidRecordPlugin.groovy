@@ -43,7 +43,7 @@ import org.gradle.api.logging.Logging
  * %h3 Naming convention
  *
  * %p
- *   When providing a name in a json file, you should always provide a singular name.
+ *   When providing a name in a plain droid record file, you should always provide a singular name.
  *   If you want to create a object called 'User' you should specify 'user' in the name field, not
  *   'users'.
  * %p
@@ -99,7 +99,7 @@ import org.gradle.api.logging.Logging
  *   %dt migration_path
  *   %dd A path relative to the build.gradle file. In this folder the migration files and the relationship file will be searched. default: 'src/main/record'
  *   %dt relationship
- *   %dd The filename of the relationship file, default: 'relationship.json'
+ *   %dd The filename of the relationship file, default: 'relationship.dr'
  *   %dt output_path
  *   %dd A path relative to the build.gradle file. The code will be generated to the package in this folder. Default: 'src/main/java'
  *
@@ -108,7 +108,7 @@ import org.gradle.api.logging.Logging
  *
  * %code $ gradle migration -Dname=something_your_remember
  * %p
- *   Generates a file in the migration_path of the following format: {timestamp}_{name_property}.json.
+ *   Generates a file in the migration_path of the following format: {timestamp}_{name_property}.dr.
  *   You can also add this file by hand and use any number instead of the timestamp.
  *   .alert.alert-warning
  *     If you add the files by hand you should ensure that the files have increasing timestamps.
@@ -127,20 +127,18 @@ import org.gradle.api.logging.Logging
  * @getting_started|generated_files The first table
  * -#after getting_started|commands
  * %p
- *   {?class:arname;AD} uses json files to describe you database objects. To create your first
+ *   {?class:arname;DR} uses groovy files (ending dr) to describe you database objects. To create your first
  *   table you can do the following:
  *
  * %pre
  *   %code{ 'data-language' => 'dsl' }
  *     :preserve
- *       change: [
- *         { cmd: create_table,
- *           name: 'picture',
- *           fields: {
- *             image: 'blob'
- *           }
- *         }
- *       ]
+ *        create_table {
+ *          name 'picture'
+ *          fields {
+ *            image 'blob'
+ *          }
+ *        }
  *
  * %p Droid Record generates the following files:
  * %pre
@@ -262,8 +260,8 @@ class DroidRecordPlugin implements Plugin<Project> {
 
         File relationShip = new File(migPath, ext.relationship)
         if (!relationShip.exists()) {
-            CodeGenerator c = new CodeGenerator(2, "json");
-            c.line("comment 'Insert your model relationships here! See http://record.pasra.at/droid_record#relations.'")
+            CodeGenerator c = new CodeGenerator(2, "dr");
+            c.line("// Insert your model relationships here! See http://record.pasra.at/droid_record#relations")
             OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(relationShip));
             w.write(c.toString())
             w.close()
