@@ -212,7 +212,7 @@ class MigrationContext {
 
             def name = Inflector.internalName(map.name)
             getTable(name, "Table ${map.name} is missing but should be present.")
-            tables[name] = null;
+            tables.remove(name)
 
             migGen.rmTable(Inflector.sqlTableName(map.name), version);
         }

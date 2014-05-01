@@ -28,6 +28,10 @@ import org.gradle.api.logging.Logging
  *
  * %h3 Changelog
  *
+ * Version 0.1.1: Bugfix: Sorting, Table removal left null as reference
+ * %br
+ * Version 0.1.0: Syntax has changed to a more gradle like syntax
+ * %br
  * Version 0.0.8: Added count to the query interface
  * %br
  * Version 0.0.7: Added double type
@@ -66,8 +70,7 @@ import org.gradle.api.logging.Logging
  *            maven { url "http://record.pasra.at/public/repo" }
  *         }
  *         dependencies {
- *            classpath 'com.google.code.gson:gson:2.2.+'
- *            classpath 'at.pasra.record:generator:0.0.+'
+ *            classpath 'at.pasra.record:generator:0.1.+'
  *         }
  *       }
  *
