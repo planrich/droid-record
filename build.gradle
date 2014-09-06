@@ -1,15 +1,19 @@
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.12.2'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
     }
 }
 
 allprojects {
     repositories {
-        mavenCentral()
+        jcenter()
     }
+
+    project.version = '0.1.1'
 }
+

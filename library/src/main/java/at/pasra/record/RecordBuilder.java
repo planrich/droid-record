@@ -3,7 +3,6 @@ package at.pasra.record;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,7 +52,7 @@ public abstract class RecordBuilder<E> {
      *              "%rocky mountains%", "100", "50").all();
      *
      */
-    public RecordBuilder<E> where(String selection, String ... args) {
+    public RecordBuilder<E> where(String selection, String... args) {
         modified = true;
         cachedFirst = null;
 

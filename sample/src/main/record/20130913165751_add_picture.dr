@@ -1,9 +1,0 @@
-create_table {
-  name 'picture'
-  fields {
-    name 'string'
-    image 'blob'
-    date 'date'
-    gallery_id 'long'
-  }
-}

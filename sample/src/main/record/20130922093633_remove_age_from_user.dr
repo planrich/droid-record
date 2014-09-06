@@ -1,8 +1,0 @@
-remove_column {
-  table 'user'
-  column 'age'
-}
-
-migrate_data {
-  class_name 'at.pasra.record.sample.NullMigrator'
-}

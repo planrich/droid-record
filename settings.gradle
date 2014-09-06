@@ -1,1 +1,2 @@
-include 'generator', 'library', 'sample'
+include ':library'
+include 'generator' //, 'library'
