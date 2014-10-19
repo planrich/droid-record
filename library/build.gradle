@@ -13,12 +13,14 @@ configurations {
     published
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+// Add the sourceJars to non-extractor modules
+artifacts {
+    published sourceJar
 }
 
 apply plugin: 'com.jfrog.bintray'
@@ -27,7 +29,7 @@ bintray {
     user = file('../../auth_bintray.txt').readLines()[0]
     key = file('../../auth_bintray.txt').readLines()[1]
 
-    publications = ['mavenJava'] //When uploading Maven-based publication files
+    configurations = ['published', 'archives']
     publish = false //If version should be auto published after an upload
     pkg {
         repo = 'droid-record'

@@ -13,7 +13,5 @@ allprojects {
     repositories {
         jcenter()
     }
-
-    project.version = '0.1.1'
 }
 

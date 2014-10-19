@@ -16,21 +16,14 @@ repositories {
     jcenter()
 }
 
-task binaryJar(type: Jar) {
-    from files(sourceSets.main.output.classesDir)
-    classifier = 'binaryJar'
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
 }
 
+// Add the sourceJars to non-extractor modules
 artifacts {
-    published binaryJar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
+    published sourceJar
 }
 
 apply plugin: 'com.jfrog.bintray'
@@ -39,14 +32,14 @@ bintray {
     user = file('../../auth_bintray.txt').readLines()[0]
     key = file('../../auth_bintray.txt').readLines()[1]
 
-    publications = ['mavenJava'] //When uploading Maven-based publication files
+    configurations = ['published', 'archives']
     publish = false //If version should be auto published after an upload
     pkg {
         repo = 'droid-record'
         userOrg = '' //An optional organization name when the repo belongs to one of the user's orgs
         name = 'droid-record-gradle-plugin'
         desc = 'Droid Record gradle plugin (ORM generator)'
-        licenses = ['GPLv3']
+        licenses = ['MIT']
         labels = ['db', 'database', 'orm', 'sqlite', 'mapper']
         version {
             name = project.version
