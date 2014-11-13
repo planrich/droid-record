@@ -36,12 +36,12 @@ class MigrateTask extends DefaultTask {
         File root = project.file(ex.migration_path);
 
         String[] files = root.list().sort{ a,b ->
-                    matcher = a =~ migrationRegex
+                    def matcher = a =~ migrationRegex
                     if (!matcher.matches()) { return 1; }
-                    ai = matcher.group(1).toInteger()
+                    def ai = matcher.group(1).toInteger()
                     matcher = b =~ migrationRegex
                     if (!matcher.matches()) { return -1; }
-                    bi = matcher.group(1).toInteger()
+                    def bi = matcher.group(1).toInteger()
 
                     return ai <=> bi
                 }

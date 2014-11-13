@@ -2,6 +2,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 
 group = "at.pasra.record"
+version = "0.1.2"
 
 dependencies {
     compile gradleApi()
@@ -39,7 +40,7 @@ bintray {
         userOrg = '' //An optional organization name when the repo belongs to one of the user's orgs
         name = 'droid-record-gradle-plugin'
         desc = 'Droid Record gradle plugin (ORM generator)'
-        licenses = ['MIT']
+        licenses = ['GPLv3']
         labels = ['db', 'database', 'orm', 'sqlite', 'mapper']
         version {
             name = project.version
