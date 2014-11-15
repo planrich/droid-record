@@ -28,7 +28,7 @@ class RecordGenerator {
         c.line("import android.database.sqlite.SQLiteDatabase;")
         c.line("import android.content.ContentValues;")
         c.line("import android.database.Cursor;")
-        c.line("import at.pasra.record.SQLiteConverter;")
+        //c.line("import at.pasra.record.SQLiteConverter;")
 
         c.line();
 

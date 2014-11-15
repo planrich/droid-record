@@ -218,6 +218,14 @@ public abstract class RecordBuilder<E> {
     public abstract List<E> all(Cursor c);
 
     /**
+     * Delete all from the table. Cannot be undone!
+     * @return the amount of rows that have been dropped
+     */
+    public int deleteAll() {
+        return db.delete(tableName, null, null);
+    }
+
+    /**
      *
      * @return the first entry if it exists. null otherwise
      */

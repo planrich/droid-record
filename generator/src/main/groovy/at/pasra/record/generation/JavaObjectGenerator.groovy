@@ -28,7 +28,7 @@ class JavaObjectGenerator {
 
         c.line("package ${pkg};")
         c.line()
-        c.line("import at.pasra.record.SQLiteConverter;");
+        //c.line("import at.pasra.record.SQLiteConverter;");
         c.line("import at.pasra.record.RecordBuilder;");
         c.line();
         c.wrap("public class Abstract${javaClassName}") {
