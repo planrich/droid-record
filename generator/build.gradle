@@ -50,8 +50,5 @@ bintray {
         websiteUrl = 'https://github.com/planrich/droid-record'
         issueTrackerUrl = 'https://github.com/planrich/droid-record/issues'
         vcsUrl = 'https://github.com/planrich/droid-record.git'
-        //publicDownloadNumbers = true
-        //attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
-        //Optional version descriptor
     }
 }
