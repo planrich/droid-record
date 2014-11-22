@@ -15,7 +15,6 @@ public abstract class RemoteState implements RemoteCallback {
 
     public RemoteState(ApplicationContext ctx, boolean useAuth) {
         this.context = ctx;
-        //this.app = context.getApplication();
         this.useAuth = useAuth;
     }
 
@@ -25,7 +24,7 @@ public abstract class RemoteState implements RemoteCallback {
         this.userCallback = callback;
     }
 
-    public RemoteCallback getUserCallback() {
+    public RemoteCallback getCallback() {
         return userCallback;
     }
 }

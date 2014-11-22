@@ -1,7 +1,6 @@
 package at.pasra.record.remote;
 
 import android.os.AsyncTask;
-import android.util.Base64;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -22,7 +21,7 @@ public class RemoteRequest extends AsyncTask<Void, Void, RemoteResponse> {
 
     public RemoteRequest(HttpMethod method, String route, RemoteState state) {
         this.method = method;
-        this.route = route;
+        this.route = RouteUtil.resolveDSL(route, this);
         this.context = state.context;
         this.state = state;
     }
@@ -30,7 +29,7 @@ public class RemoteRequest extends AsyncTask<Void, Void, RemoteResponse> {
     @Override
     protected RemoteResponse doInBackground(Void... params) {
 
-        HttpRequestBase httpRequest = method.freshRequest(route);
+        HttpRequestBase httpRequest = method.newRequest(route);
 
         if (state.useAuth) {
             //httpRequest.setHeader("Authorization", "Basic " + basicAuthBase64(context.getApplication().getBasicAuth()));
@@ -48,12 +47,8 @@ public class RemoteRequest extends AsyncTask<Void, Void, RemoteResponse> {
         return null;
     }
 
-    private String basicAuthBase64(String basicAuth) {
-        return Base64.encodeToString(basicAuth.getBytes(), Base64.DEFAULT);
-    }
-
     private void respond(RemoteResponse response) {
-        RemoteCallback userCallback = state.getUserCallback();
+        RemoteCallback userCallback = state.getCallback();
         if (response.getStatusCode() == 200) {
             state.onRequestOk(response);
             if (userCallback != null) {

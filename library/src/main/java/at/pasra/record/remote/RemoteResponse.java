@@ -9,11 +9,9 @@ import com.google.gson.JsonParser;
 import org.apache.http.HttpResponse;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * Created by rich on 10.11.14.
@@ -50,17 +48,21 @@ public class RemoteResponse {
         }
     }
 
-    public JsonElement getJson() {
+    public String getStringBody() {
+        return new String(bytes);
+    }
+
+    public JsonElement getJsonBody() {
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(new String(bytes));
         return element;
     }
 
-    public JsonObject getJsonObject() {
-        return getJson().getAsJsonObject();
+    public JsonObject getJsonObjectBody() {
+        return getJsonBody().getAsJsonObject();
     }
 
-    public JsonArray getJsonArray() {
-        return getJson().getAsJsonArray();
+    public JsonArray getJsonArrayBody() {
+        return getJsonBody().getAsJsonArray();
     }
 }

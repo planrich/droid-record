@@ -1,9 +1,7 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
 .DS_Store
 build/
-repo/
-/.idea/
-/andrec.iml
+.idea/
 auth_bintray.txt
+*.iml
