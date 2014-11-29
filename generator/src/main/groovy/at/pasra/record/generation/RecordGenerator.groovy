@@ -14,7 +14,7 @@ class RecordGenerator {
         this.table = table
     }
 
-    void generateSQLite(String source, String pkg) {
+    void generateSQLite(String source, String pkg, String domainPkg) {
 
         CodeGenerator c = new CodeGenerator();
         c.copyrightHeader()
@@ -28,6 +28,7 @@ class RecordGenerator {
         c.line("import android.database.sqlite.SQLiteDatabase;")
         c.line("import android.content.ContentValues;")
         c.line("import android.database.Cursor;")
+        c.line("import ${domainPkg}.${javaClassName};")
         //c.line("import at.pasra.record.SQLiteConverter;")
 
         c.line();
@@ -93,7 +94,7 @@ class RecordGenerator {
                     c.line("values.put(\"${f.name}\", ${f.javaCallToSerialize("record")});")
                 }
 
-                c.line("long id = record.get${table.primary.javaFieldName}();")
+                c.line("long id = record.get${table.primary.fieldName}();")
                 c.line("db.update(\"${table.sqlTableName}\", values, \"${table.primary.name} = ?\", new String[] { Long.toString(id) });")
             }
 
@@ -102,6 +103,6 @@ class RecordGenerator {
             }
         }
 
-        DroidRecordPlugin.write(source, pkg, "${javaClassName}Record.java", c.toString(), true);
+        DroidRecordPlugin.writeJavaSource(source, pkg, "${javaClassName}Record.java", c.toString(), true);
     }
 }

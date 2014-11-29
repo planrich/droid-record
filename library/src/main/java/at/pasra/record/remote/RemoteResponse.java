@@ -14,11 +14,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by rich on 10.11.14.
+ * @author rich
+ * 10.11.14
  */
 public class RemoteResponse {
     private final HttpResponse response;
-    private byte[] bytes;
+    private byte[] byteBody;
+    private String stringBody;
+    private JsonElement jsonElementBody;
 
     public RemoteResponse(HttpResponse httpResponse) {
         this.response = httpResponse;
@@ -33,13 +36,18 @@ public class RemoteResponse {
                     output.write(tmp, 0, read);
                 }
 
-                bytes = output.toByteArray();
+                byteBody = output.toByteArray();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        } else {
+            byteBody = new byte[0];
         }
     }
 
+    /**
+     * @return the status code from the webserver. -1 if the request did not reach the server at all
+     */
     public int getStatusCode() {
         if (response == null || response.getStatusLine() == null) {
             return -1;
@@ -48,21 +56,55 @@ public class RemoteResponse {
         }
     }
 
+    /**
+     * @return The body as utf-8 encoded string.
+     */
     public String getStringBody() {
-        return new String(bytes);
+        if (stringBody == null) {
+            stringBody = new String(byteBody);
+        }
+        return stringBody;
     }
 
+    /**
+     * @return a json element. most likely an object/array.
+     * @throws com.google.gson.JsonParseException
+     */
     public JsonElement getJsonBody() {
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(new String(bytes));
-        return element;
+        if (jsonElementBody == null) {
+            JsonParser parser = new JsonParser();
+            jsonElementBody = parser.parse(new String(byteBody));
+        }
+        return jsonElementBody;
     }
 
+    /**
+     * @return a json object. if this request is not a json response
+     *         a <code>JsonParseException</code> will be thrown.
+     *         never returns null. in case it is not an object, an empty
+     *         object is returned
+     * @throws com.google.gson.JsonParseException
+     */
     public JsonObject getJsonObjectBody() {
-        return getJsonBody().getAsJsonObject();
+        JsonElement element = getJsonBody();
+        if (element.isJsonObject()) {
+            return element.getAsJsonObject();
+        }
+        return new JsonObject();
     }
 
+    /**
+     * @return a json array. if this request is not a json response
+     *         a <code>JsonParseException</code> will be thrown.
+     *         never returns null. in case it is not an array, an empty
+     *         array is returned
+     * @throws com.google.gson.JsonParseException
+     */
     public JsonArray getJsonArrayBody() {
-        return getJsonBody().getAsJsonArray();
+        JsonElement element = getJsonBody();
+        if (element.isJsonArray()) {
+            return element.getAsJsonArray();
+        }
+        return new JsonArray();
     }
 }

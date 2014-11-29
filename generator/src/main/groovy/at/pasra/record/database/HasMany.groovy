@@ -2,7 +2,6 @@ package at.pasra.record.database
 
 import at.pasra.record.util.Inflector
 import at.pasra.record.generation.CodeGenerator
-import com.google.gson.JsonObject
 import org.gradle.api.InvalidUserDataException
 
 /**
@@ -44,7 +43,7 @@ class HasMany extends Relation {
         def javaClassName = target.javaClassName
         def pluralJavaClassName = Inflector.pluralizeCamel(javaClassName)
         c.wrap("public RecordBuilder<${javaClassName}> load${pluralJavaClassName}(LocalSession session)") {
-            c.line("return session.query${pluralJavaClassName}().where(\"${this.foreign_key()} = ?\", Long.toString(${origin.primary.javaPrivateFieldName()}) );")
+            c.line("return session.query${pluralJavaClassName}().where(\"${this.foreign_key()} = ?\", Long.toString(${origin.primary.javaFieldName()}) );")
         }
     }
 

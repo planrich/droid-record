@@ -10,10 +10,11 @@ import at.pasra.record.util.Inflector
 class Field {
 
     def primary = false
-    String javaFieldName; // camelized
+    String fieldName; // camelized
     String name; // original
     String sqlName;
     String type;
+    def init
     boolean allowNull = false;
     int tableOrder;
 
@@ -66,19 +67,19 @@ class Field {
     void changeName(String new_name) {
         this.name = Inflector.internalName(new_name)
         this.sqlName = Inflector.tabelize(new_name)
-        this.javaFieldName = Inflector.javaClassName(new_name)
+        this.fieldName = Inflector.javaClassName(new_name)
     }
 
     String javaType() {
         return TO_JAVA_TYPE_MAP[type]
     }
 
-    String javaPrivateFieldName() {
-        return "m${javaFieldName}"
+    String javaFieldName() {
+        return "m${fieldName}"
     }
 
     String javaGetCall() {
-        return "get${javaFieldName}()"
+        return "get${fieldName}()"
     }
 
     String javaCallToSerialize(String objname) {
@@ -95,13 +96,13 @@ class Field {
             suffix = ")"
         }
 
-        return "${prefix}${objname}.get${javaFieldName}()${suffix}";
+        return "${prefix}${objname}.get${fieldName}()${suffix}";
     }
 
     String javaCallToDeserialize(String objname, String cursorobj) {
         def call = javaCallGetCursor(cursorobj)
 
-        return "${objname}.set${javaFieldName}(${call})"
+        return "${objname}.set${fieldName}(${call})"
     }
 
     String javaCallGetCursor(String c) {
@@ -134,7 +135,7 @@ class Field {
      * @param c
      */
     void generateDaoJavaField(CodeGenerator c) {
-        c.line("protected ${javaType()} m${javaFieldName};")
+        c.line("protected ${javaType()} ${javaFieldName()};")
     }
 
     /**
@@ -150,8 +151,8 @@ class Field {
      * @param c
      */
     void generateDaoJavaFieldGetterSetter(CodeGenerator c) {
-        c.line("public ${javaType()} get${javaFieldName}() { return m${javaFieldName}; }")
-        c.line("public void set${javaFieldName}(${javaType()} value) { m${javaFieldName} = value; }")
+        c.line("public ${javaType()} get${fieldName}() { return ${javaFieldName()}; }")
+        c.line("public void set${fieldName}(${javaType()} value) { ${javaFieldName()} = value; }")
     }
 
     /**
@@ -186,25 +187,42 @@ class Field {
         return allowNull;
     }
 
-    String privateFieldName() {
-        return "m${javaFieldName}"
-    }
-
     String defaultValue() {
         String type = javaType();
         if (type == "byte[]") {
+            if (init != null) {
+                throw new RuntimeException("you cannot set default value for bytes. yet...");
+            }
             return "new byte[0]"
         } else if (type == "java.util.Date") {
+            if (init != null) {
+                throw new RuntimeException("you cannot set default value for bytes. yet...");
+            }
             return "new java.util.Date(0)"
         } else if (type == "java.lang.String") {
+            if (init != null) {
+                return "\"${init}\"";
+            }
             return "\"\""
         } else if (type == "java.lang.Integer") {
+            if (init != null) {
+                return "new Integer(${init})"
+            }
             return "new Integer(0)"
         } else if (type == "java.lang.Long") {
+            if (init != null) {
+                return "new Long((long)${init})"
+            }
             return "new Long(0L)"
         } else if (type == "java.lang.Boolean") {
+            if (init != null) {
+                return "new Boolean(${init})"
+            }
             return "new Boolean(false)"
         } else if (type == "java.lang.Double") {
+            if (init != null) {
+                return init;
+            }
             return "0.0"
         }
 

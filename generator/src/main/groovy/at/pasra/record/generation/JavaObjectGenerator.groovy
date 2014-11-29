@@ -18,7 +18,7 @@ class JavaObjectGenerator {
         this.table = table
     }
 
-    void generate(String source, String pkg) {
+    void generate(String source, String pkg, String domainPkg) {
 
         CodeGenerator c = new CodeGenerator();
         c.copyrightHeader()
@@ -29,6 +29,10 @@ class JavaObjectGenerator {
         c.line("package ${pkg};")
         c.line()
         //c.line("import at.pasra.record.SQLiteConverter;");
+        c.line("import ${domainPkg}.${javaClassName};");
+        table.relations.each { Relation r ->
+            c.line("import ${domainPkg}.${r.target.javaClassName};");
+        }
         c.line("import at.pasra.record.RecordBuilder;");
         c.line();
         c.wrap("public class Abstract${javaClassName}") {
@@ -42,7 +46,7 @@ class JavaObjectGenerator {
                 c.line("this.mId = id;");
                 table.getOrderedFields(false).each { Field f ->
                     if (!f.allowsNull()) {
-                        c.line("this.${f.privateFieldName()} = ${f.defaultValue()};")
+                        c.line("this.${f.javaFieldName()} = ${f.defaultValue()};")
                     }
                 }
             }
@@ -57,16 +61,19 @@ class JavaObjectGenerator {
             }
         }
 
-        DroidRecordPlugin.write(source, pkg, "Abstract${table.javaClassName}.java", c.toString(), true)
+        DroidRecordPlugin.writeJavaSource(source, pkg, "Abstract${table.javaClassName}.java", c.toString(), true)
 
-        def file = DroidRecordPlugin.file(source, pkg, "${Inflector.camelize(table.name)}.java", false)
+        def file = DroidRecordPlugin.file(source, domainPkg, "${Inflector.camelize(table.name)}.java", false)
         if (!file.exists()) {
             c = new CodeGenerator();
             c.copyrightHeader()
 
-            c.line("package ${pkg};")
+            def abstractBaseClass = "Abstract${Inflector.camelize(table.name)}"
+            c.line("package ${domainPkg};")
             c.line();
-            c.wrap("public class ${Inflector.camelize(table.name)} extends Abstract${Inflector.camelize(table.name)} ") {
+            c.line("import ${pkg}.${abstractBaseClass};")
+            c.line();
+            c.wrap("public class ${Inflector.camelize(table.name)} extends ${abstractBaseClass} ") {
 
                 c.wrap("public ${Inflector.camelize(table.name)}()") {
                     c.line("super(null);");
@@ -76,7 +83,7 @@ class JavaObjectGenerator {
                 c.line("// add your code here")
             }
 
-            DroidRecordPlugin.write(source, pkg, "${Inflector.camelize(table.name)}.java", c.toString(), false)
+            DroidRecordPlugin.writeJavaSource(source, domainPkg, "${Inflector.camelize(table.name)}.java", c.toString(), false)
         }
     }
 

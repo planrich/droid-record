@@ -24,6 +24,7 @@ class LoadContext {
 
     def methodMissing(String name, Object arg) {
 
+        logger.info("method missing in load context. search for method ${name} with arg ${arg}")
         def structValue = structCtx[name]
         if (anyProp) {
             structValue = structCtx['*']
@@ -67,7 +68,7 @@ class LoadContext {
                 // if __fields__ is defined it must be a closure to create the context obj for the next invoke
                 def prop = "__${anyProp ? '*' : name}__"
                 if (structCtx[prop] != null) {
-                    obj = ctx[name] = structCtx[prop]()
+                    obj = ctx[name] = structCtx[prop](name)
                 }
                 LoadUtil.invoke(fileValue, structValue, obj)
             } else {

@@ -2,7 +2,6 @@ package at.pasra.record.database
 
 import at.pasra.record.util.Inflector
 import at.pasra.record.generation.CodeGenerator
-import com.google.gson.JsonObject
 import org.gradle.api.InvalidUserDataException
 
 /**
@@ -22,7 +21,7 @@ class HasOne extends Relation {
     @Override
     void generateJavaMethods(CodeGenerator c) {
         c.wrap("public ${target.javaClassName} load${target.javaClassName}(LocalSession session)") {
-            c.line("return session.query${Inflector.camelize(Inflector.pluralize(target.javaClassName))}().where(\"${origin.name}_id = ?\", Long.toString(${origin.primary.javaPrivateFieldName()})).limit(1).first();")
+            c.line("return session.query${Inflector.camelize(Inflector.pluralize(target.javaClassName))}().where(\"${origin.name}_id = ?\", Long.toString(${origin.primary.javaFieldName()})).limit(1).first();")
         }
     }
 

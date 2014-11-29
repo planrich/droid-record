@@ -175,7 +175,7 @@ class MigratiorGenerator {
 
         }
 
-        DroidRecordPlugin.write(path, pkg, "RecordMigrator.java", c.toString(), true);
+        DroidRecordPlugin.writeJavaSource(path, pkg, "RecordMigrator.java", c.toString(), true);
     }
 
 }

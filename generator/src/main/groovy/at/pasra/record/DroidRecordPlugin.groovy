@@ -28,6 +28,16 @@ import org.gradle.api.logging.Logging
  *
  * %h3 Changelog
  *
+ * Version 0.1.4:
+ *   <ul>
+ *       <li>Default values implemented for boolean,integer,long,double and string</li>
+ *       <li>Migration (gradle command) now uses a number (starting from 1) instead of timestamp as prefix for migrations</li>
+ *   </ul>
+ * %br
+ * Version 0.1.3: Toolchain adaption
+ * %br
+ * Version 0.1.2: Split projects
+ * %br
  * Version 0.1.1: Bugfix: Sorting, Table removal left null as reference
  * %br
  * Version 0.1.0: Syntax has changed to a more gradle like syntax
@@ -67,25 +77,26 @@ import org.gradle.api.logging.Logging
  *       buildscript {
  *         repositories {
  *            mavenCentral()
- *            maven { url "http://record.pasra.at/public/repo" }
+ *            jcenter()
  *         }
  *         dependencies {
- *            classpath 'at.pasra.record:generator:0.1.+'
+ *            classpath 'at.pasra.record:generator:0.1.4'
  *         }
  *       }
  *
  *       repositories {
  *         mavenCentral()
- *         maven { url "http://record.pasra.at/public/repo" }
+ *         jcenter()
  *       }
  *
  *       dependencies {
- *         compile 'at.pasra.record:library:0.0.+@aar'
+ *         compile 'at.pasra.record:library:0.1.4@aar'
  *       }
  *
  *       apply plugin: 'droid_record'
  *
  *       droid_record {
+ *         domain_package='com.example.sample.domain'
  *         output_package='com.example.sample.generate'
  *       }
  * %p
@@ -99,6 +110,8 @@ import org.gradle.api.logging.Logging
  * %dl
  *   %dt output_package
  *   %dd Required. The package of the generated classes. Example: 'com.example.generate'
+ *   %dt domain_package
+ *   %dd Required. The package for the generated classes. You might want to edit these classes! Example: 'com.example.domain'
  *   %dt migration_path
  *   %dd A path relative to the build.gradle file. In this folder the migration files and the relationship file will be searched. default: 'src/main/record'
  *   %dt relationship
@@ -221,26 +234,41 @@ import org.gradle.api.logging.Logging
  */
 class DroidRecordPlugin implements Plugin<Project> {
 
-    public static String VERSION = "0.1.0"
+    public static String VERSION = "0.1.4"
 
     static def project;
     static def logger = Logging.getLogger(DroidRecordPlugin.class)
 
-    public static void write(String path, String pkg, String file, String content, boolean forcecreate) {
+    public static void write(String path, String file, String content, boolean  forceCreate) {
+        File fh = project.file("${path}")
+        fh.mkdirs();
+        fh = new File(fh, file)
+        logger.info("generating ${fh.path}")
+
+        if (forceCreate || !fh.exists()) {
+            fh.write(content)
+        }
+    }
+
+    public static void writeJavaSource(String path, String pkg, String file, String content, boolean forcecreate) {
         File fh = project.file("src/main/java/${pkg.replace('.','/')}")
         fh.mkdirs();
         fh = project.file("src/main/java/${pkg.replace('.','/')}/${file}")
         logger.info("generating ${fh.path}")
 
-        fh.write(content)
+        if (forcecreate || !fh.exists()) {
+            fh.write(content)
+        }
     }
 
     @Override
     void apply(Project project) {
 
+        DroidRecordPlugin.project = project;
+
         project.extensions.create("droid_record", DroidRecordPluginExtention)
 
-        def migrate = project.task('migrate', type: MigrateTask )
+        def migrate = project.task('migrate', type: MigrateTask)
         migrate.group = "Build"
         migrate.description = "Generates java source code for the database structure"
 
@@ -279,6 +307,9 @@ class DroidRecordPlugin implements Plugin<Project> {
             throw new InvalidUserDataException("Output package not specified. Please add output_package=your.package to the droid record plugin!")
         }
 
+        if (ext.domain_package == null) {
+            ext.domain_package = ext.output_package
+        }
     }
 
     static File dir(path, pkg) {

@@ -1,7 +1,6 @@
 package at.pasra.record.database
 
 import at.pasra.record.generation.CodeGenerator
-import com.google.gson.JsonObject
 import org.gradle.api.InvalidUserDataException
 
 /**

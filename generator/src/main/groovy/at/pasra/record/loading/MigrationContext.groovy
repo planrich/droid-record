@@ -1,21 +1,18 @@
 package at.pasra.record.loading
 
-import at.pasra.record.database.HasAndBelongsTo
-import at.pasra.record.database.HasOne
+import at.pasra.record.DroidRecordPlugin
 import at.pasra.record.generation.CodeGenerator
 import at.pasra.record.generation.JavaObjectGenerator
+import at.pasra.record.generation.MarshallGenerator
 import at.pasra.record.generation.MigratiorGenerator
 import at.pasra.record.generation.RecordBuilderGenerator
 import at.pasra.record.generation.RecordGenerator
 import at.pasra.record.generation.SessionGenerator
 import at.pasra.record.util.Inflector
-import at.pasra.record.database.BelongsTo
 import at.pasra.record.database.Field
 import at.pasra.record.database.Table
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.logging.Logging
-
-import javax.el.MethodNotFoundException
 
 /**
  * Created by rich on 9/8/13.
@@ -39,13 +36,15 @@ class MigrationContext {
     GroovyShell shell = new GroovyShell()
     def path;
     def pkg;
+    def domainPkg;
     MigratiorGenerator migGen;
 
     def tables = [:];
 
-    MigrationContext(String path, String pkg) {
+    MigrationContext(String path, String pkg, String domainPkg) {
         this.path = path
         this.pkg = pkg
+        this.domainPkg = domainPkg
         this.migGen = new MigratiorGenerator(path, pkg);
     }
 
@@ -101,19 +100,42 @@ class MigrationContext {
         migGen.writeToFile();
 
         SessionGenerator session = new SessionGenerator(tables);
-        session.generate(path, pkg)
+        session.generate(path, pkg, domainPkg)
 
         tables.each { String name, Table table ->
             def objGen = new JavaObjectGenerator(table)
-            objGen.generate(path, pkg)
+            objGen.generate(path, pkg, domainPkg)
+
+            def marshallGen = new MarshallGenerator(table)
+            marshallGen.generate(path, pkg, domainPkg)
 
             def recordGen = new RecordGenerator(table)
-            recordGen.generateSQLite(path, pkg)
+            recordGen.generateSQLite(path, pkg, domainPkg)
 
             def recordBuilder = new RecordBuilderGenerator(table)
-            recordBuilder.generate(path, pkg)
+            recordBuilder.generate(path, pkg, domainPkg)
         }
 
+    }
+
+    void generateCurrentSchema(String path, String fileName) {
+        def sortedTables = tables.values().sort{ Table a, Table b ->
+            return a.name <=> b.name
+        }
+        def c = new CodeGenerator(2, "dr")
+        c.line("/* AUTO GENERATED. DO NOT MODIFY")
+        c.line(" * This file has the sole purpose of displaying the current database layout.")
+        c.line(" */")
+
+        sortedTables.each { Table table ->
+            c.wrap("create_table ${table.name}") {
+                table.fields.each { String name, Field field ->
+                    c.line("${field.name} { type '${field.type}', default '${field.defaultValue()}'}")
+                }
+            }
+        }
+
+        DroidRecordPlugin.write(path, fileName, c.toString(), true);
     }
 
     class MigrationInvokeableContext {
@@ -139,7 +161,7 @@ class MigrationContext {
          *         {?ref:fields} {
          *           {?ref:title} {
          *             type 'string'
-         *             default 'empty'
+         *             init 'empty'
          *           }
          *           likes 'integer'
          *           data 'blob'
@@ -169,7 +191,7 @@ class MigrationContext {
          *     %li double - java.lang.Double
          *
          *   %p
-         *     {?ref:title} has a more complex type and it specifies the default value of this column to be "empty".
+         *     {?ref:title} has a more complex type and it specifies the initial (init) value of this column to be "empty".
          *     Note that this value is then set in the constructor of a record object.
          *   %p
          *     The generated Picture.java file will have getters and setters of each column.
@@ -181,12 +203,11 @@ class MigrationContext {
                 'name': LoadUtil.&string,
                 'fields': [
                     '*': [
-                        LoadUtil.&type,
-                        [ 'type': LoadUtil.&type,
-                          'default': LoadUtil.&string
-                        ]
+                      'type': LoadUtil.&type,
+                      'init': LoadUtil.&primitive,
+                      '__required__': ['type']
                     ],
-                    '__*__': { -> return new Field() },
+                    '__*__': { name -> def f = new Field(); f.name = name; f },
                     '__*__key_property__': 'name',
                     '__*__default_value_property__': 'type',
                 ],

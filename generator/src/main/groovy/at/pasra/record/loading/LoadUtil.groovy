@@ -13,6 +13,9 @@ class LoadUtil {
         }
     }
 
+    def static void primitive(def s) {
+    }
+
     def static type(String s) {
         if (!Field.ALLOWED_TYPES.contains(s)) {
             throw new IllegalArgumentException("expected one of ${Field.ALLOWED_TYPES} but got ${s}")

@@ -14,7 +14,7 @@ class SessionGenerator {
         this.tables = tables
     }
 
-    void generate(String path, String pkg) {
+    void generate(String path, String pkg, String domainPkg) {
 
         CodeGenerator c = new CodeGenerator();
         c.copyrightHeader()
@@ -24,6 +24,9 @@ class SessionGenerator {
         c.line()
         c.line("import android.database.sqlite.SQLiteDatabase;")
         c.line("import at.pasra.record.RecordBuilder;")
+        tables.each { String name, Table table ->
+            c.line("import ${domainPkg}.${table.javaClassName};")
+        }
         c.line();
         c.wrap("public class LocalSession") {
 
@@ -98,6 +101,6 @@ class SessionGenerator {
             }
         }
 
-        DroidRecordPlugin.write(path, pkg, "LocalSession.java", c.toString(), true);
+        DroidRecordPlugin.writeJavaSource(path, pkg, "LocalSession.java", c.toString(), true);
     }
 }

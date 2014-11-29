@@ -6,8 +6,8 @@ import at.pasra.record.generation.CodeGenerator
  * Created by rich on 9/13/13.
  */
 abstract class Relation {
-    protected Table origin;
-    protected Table target;
+    def Table origin;
+    def Table target;
     protected String primary_key;
     protected String foreign_key;
 

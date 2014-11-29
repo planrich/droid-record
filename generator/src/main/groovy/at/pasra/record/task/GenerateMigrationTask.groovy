@@ -1,6 +1,7 @@
 package at.pasra.record.task
 
 import at.pasra.record.DroidRecordPlugin
+import at.pasra.record.DroidRecordPluginExtention
 import at.pasra.record.generation.CodeGenerator
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
@@ -10,6 +11,8 @@ import org.gradle.api.tasks.TaskAction
  */
 class GenerateMigrationTask extends DefaultTask {
 
+    def MIGRATION_REGEX = /^(\d+)_([^.]*).dr$/
+
     @TaskAction
     void taskExec() {
 
@@ -17,9 +20,21 @@ class GenerateMigrationTask extends DefaultTask {
 
         def name = System.getProperty("name", "migration").replaceAll(" ","_")
 
-        File root = project.file(project.droid_record.migration_path)
+        DroidRecordPluginExtention ex = project.droid_record;
+        File root = project.file(ex.migration_path)
 
-        File migration = new File(root, "${timestamp(new Date())}_${name}.dr")
+        def max = 1.toLong();
+        root.list().each{ a ->
+            def matcher = a =~ MIGRATION_REGEX
+            if (matcher.matches()) {
+                def version = matcher.group(1).toLong()
+                if (version > max) {
+                    max = version;
+                }
+            }
+        }
+
+        File migration = new File(root, "${max}_${name}.dr")
         OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(migration));
         CodeGenerator c = new CodeGenerator();
         c.line("// create_table {")

@@ -55,7 +55,7 @@ class HasAndBelongsTo extends Relation {
             c.line("               \" o.${origin.primary.name} = ? and\" +")
             c.line("               \" o.${origin.primary.name} = t.${foreign_key(origin.name, "foreign_key_has")} and\" +")
             c.line("               \" d.${target.primary.name} = t.${foreign_key(target.name, "foreign_key_belongs_to")}\";")
-            c.line("android.database.Cursor c = session.queryRaw(query, Long.toString(m${origin.primary.javaFieldName}));")
+            c.line("android.database.Cursor c = session.queryRaw(query, Long.toString(m${origin.primary.fieldName}));")
             c.line("RecordBuilder<${javaClassName}> rb = session.query${pluralJavaClassName}();")
             c.line("return rb.all(c);");
         }

@@ -8,5 +8,6 @@ class DroidRecordPluginExtention {
     def output_path = 'src/main/java'
     def relationship = 'relationship.dr'
     def output_package = null
+    def domain_package = null
     def schema = 'schema.dr'
 }

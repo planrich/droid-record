@@ -1,11 +1,8 @@
 package at.pasra.record;
 
-import junit.framework.Assert;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestResult;
 
-import at.pasra.record.remote.RouteUtil;
+import at.pasra.record.remote.RouteDSL;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -25,17 +22,17 @@ public class RouteDSLTest extends TestCase {
     public void testRouteDSL_Success() {
         Target target = new Target();
         target.t = target;
-        assertEquals("/abc", RouteUtil.resolveDSL("/abc", null));
-        assertEquals("/user/william", RouteUtil.resolveDSL("/user/{name}", target));
-        assertEquals("/user/william", RouteUtil.resolveDSL("/user/{name#toString}", target));
-        assertEquals("/user/william/details", RouteUtil.resolveDSL("/user/{name}/details", target));
-        assertEquals("/i/0", RouteUtil.resolveDSL("/i/{prop0}", target));
-        assertEquals("/long/123456", RouteUtil.resolveDSL("/long/{t#getId}", target));
+        assertEquals("/abc", RouteDSL.resolveDSL("/abc", null));
+        assertEquals("/user/william", RouteDSL.resolveDSL("/user/{name}", target));
+        assertEquals("/user/william", RouteDSL.resolveDSL("/user/{name#toString}", target));
+        assertEquals("/user/william/details", RouteDSL.resolveDSL("/user/{name}/details", target));
+        assertEquals("/i/0", RouteDSL.resolveDSL("/i/{prop0}", target));
+        assertEquals("/long/123456", RouteDSL.resolveDSL("/long/{t#getId}", target));
     }
 
     public void testRouteDSL_Failure() {
         try {
-            assertNotSame("/{t}", RouteUtil.resolveDSL("/{t}", null));
+            assertNotSame("/{t}", RouteDSL.resolveDSL("/{t}", null));
             fail();
         } catch (NullPointerException e) {
 

@@ -13,13 +13,11 @@ import org.gradle.api.tasks.TaskAction
  */
 class MigrateTask extends DefaultTask {
 
-    def migrationRegex = /^(\d+)_([^.]*).dr$/
+    def MIGRATION_REGEX = /^(\d+)_([^.]*).dr$/
     def context;
 
     public MigrateTask() {
         super();
-
-
         doLast { Task t ->
             DroidRecordPlugin.project = t.project
             context.generate()
@@ -31,17 +29,20 @@ class MigrateTask extends DefaultTask {
 
         DroidRecordPluginExtention ex = project.droid_record;
         DroidRecordPlugin.sanitizeConfiguration(project)
-        context = new MigrationContext(project.file(ex.output_path).path, ex.output_package);
+        def output_path = project.file(ex.output_path).path
+        def output_pkg = ex.output_package
+        def domain_pkg = ex.domain_package
+        context = new MigrationContext(output_path, output_pkg, domain_pkg);
 
         File root = project.file(ex.migration_path);
 
         String[] files = root.list().sort{ a,b ->
-                    def matcher = a =~ migrationRegex
+                    def matcher = a =~ MIGRATION_REGEX
                     if (!matcher.matches()) { return 1; }
-                    def ai = matcher.group(1).toInteger()
-                    matcher = b =~ migrationRegex
+                    def ai = matcher.group(1).toLong()
+                    matcher = b =~ MIGRATION_REGEX
                     if (!matcher.matches()) { return -1; }
-                    def bi = matcher.group(1).toInteger()
+                    def bi = matcher.group(1).toLong()
 
                     return ai <=> bi
                 }
@@ -65,6 +66,8 @@ class MigrateTask extends DefaultTask {
         } else {
             logger.info("could not find relation ship file '${ex.relationship}' in migration path")
         }
+
+        context.generateCurrentSchema(project.file(ex.migration_path).path, ex.schema);
     }
 
     /**
@@ -74,9 +77,9 @@ class MigrateTask extends DefaultTask {
      * @throws InvalidUserDataException If the filename is malformed
      */
     long extractVersion(String filename) {
-        def matcher = filename =~ migrationRegex
+        def matcher = filename =~ MIGRATION_REGEX
         if (!matcher.matches()) {
-            throw InvalidUserDataException("The migration ${filename} does not match the regex '${migrationRegex}'!");
+            throw InvalidUserDataException("The migration ${filename} does not match the regex '${MIGRATION_REGEX}'!");
         }
         return Long.parseLong(matcher.group(1))
     }
@@ -86,7 +89,7 @@ class MigrateTask extends DefaultTask {
      * @param file
      */
     boolean isMigration(String file) {
-        if (file ==~ migrationRegex) {
+        if (file ==~ MIGRATION_REGEX) {
             return true;
         }
 

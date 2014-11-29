@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * Created by rich on 22.11.14.
  */
-public class RouteUtil {
+public class RouteDSL {
 
     public static String resolveDSL(String route, Object ref) {
         int pos = 0;

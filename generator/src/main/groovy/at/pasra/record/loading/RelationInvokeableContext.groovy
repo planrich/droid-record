@@ -203,18 +203,23 @@ class RelationInvokeableContext {
         r.checkIntegrity()
         origin_table.relations << r
 
+        def belongOrigin = new BelongsTo(through_table)
+        belongOrigin.target = origin_table
+        belongOrigin.checkIntegrity()
+        through_table.relations << belongOrigin
+
         through_table.javaclass_codegen << { CodeGenerator cg ->
             def javaClassName = Inflector.javaClassName(through_table_name)
             def typeParam1 = Inflector.javaClassName(many_table_name)
             def nameParam1 = many_table_name
             def typeParam2 = origin_table.javaClassName
             def nameParam2 = origin_table.name
-            cg.wrap("public static ${javaClassName} of(${typeParam1} ${nameParam1}, ${typeParam2} ${nameParam2})") {
+            /*cg.wrap("public static ${javaClassName} of(${typeParam1} ${nameParam1}, ${typeParam2} ${nameParam2})") {
                 cg.line("${javaClassName} obj = new ${javaClassName}();")
                 cg.line("obj.set${typeParam1}Id(${nameParam1}.getId());")
                 cg.line("obj.set${typeParam2}Id(${nameParam2}.getId());")
                 cg.line("return obj;")
-            }
+            }*/
         }
     }
 

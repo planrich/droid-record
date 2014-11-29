@@ -1,30 +1,38 @@
 package at.pasra.record.remote;
 
+
+import org.apache.http.auth.Credentials;
+
 /**
- * Created by rich on 10.11.14.
+ * @author rich
+ * 10.11.14
  */
 public abstract class RemoteState implements RemoteCallback {
 
-    protected RemoteCallback userCallback;
+    protected RemoteCallback callback;
     protected ApplicationContext context;
-    protected boolean useAuth;
 
     public RemoteState(ApplicationContext ctx) {
-        this(ctx, false);
-    }
-
-    public RemoteState(ApplicationContext ctx, boolean useAuth) {
         this.context = ctx;
-        this.useAuth = useAuth;
     }
 
-    public abstract RemoteRequest invoke();
+    public abstract RemoteRequest prepare();
+
+    /**
+     * Provide your web app credentials here. Per default the credentials
+     * from the app context are returned.
+     *
+     * @return null, if no auth. should be added, credentials instead
+     */
+    public Credentials getCredentials() {
+        return context.getCredentials();
+    }
 
     public void setCallback(RemoteCallback callback) {
-        this.userCallback = callback;
+        this.callback = callback;
     }
 
     public RemoteCallback getCallback() {
-        return userCallback;
+        return callback;
     }
 }

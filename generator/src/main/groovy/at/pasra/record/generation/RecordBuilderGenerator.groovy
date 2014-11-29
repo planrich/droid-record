@@ -11,7 +11,7 @@ class RecordBuilderGenerator {
         this.table = table
     }
 
-    void generate(String path, String pkg) {
+    void generate(String path, String pkg, String domainPkg) {
 
         CodeGenerator c = new CodeGenerator();
         c.copyrightHeader();
@@ -23,6 +23,7 @@ class RecordBuilderGenerator {
         c.line()
         c.line("import at.pasra.record.RecordBuilder;")
         c.line("import android.database.sqlite.SQLiteDatabase;")
+        c.line("import ${domainPkg}.${javaClassName};")
         c.line()
         c.wrap("public class ${javaClassName}RecordBuilder extends RecordBuilder<${javaClassName}>") {
             c.wrap("public ${javaClassName}RecordBuilder(SQLiteDatabase db)") {
@@ -55,6 +56,6 @@ class RecordBuilderGenerator {
             }
         }
 
-        DroidRecordPlugin.write(path, pkg, "${javaClassName}RecordBuilder.java", c.toString(), true);
+        DroidRecordPlugin.writeJavaSource(path, pkg, "${javaClassName}RecordBuilder.java", c.toString(), true);
     }
 }

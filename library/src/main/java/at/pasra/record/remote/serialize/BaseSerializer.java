@@ -1,29 +1,36 @@
 package at.pasra.record.remote.serialize;
 
 import com.google.gson.JsonElement;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by rich on 13.11.14.
+ * @author rich
+ * 13.11.14
  */
-public abstract class BaseSerializer<T> {
+public abstract class BaseSerializer<O> {
 
-    private T target;
+    private O target;
     private Map<String,String> remoteResolutionMap;
+    private DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
     public BaseSerializer() {
-        remoteResolutionMap = getRemoteResolutionMap();
+        remoteResolutionMap = new HashMap<>();
+        getRemoteResolutionMap(new HashMap<String,String>());
     }
 
-    protected abstract Map<String, String> getRemoteResolutionMap();
-    protected abstract T newObject();
+    protected abstract void getRemoteResolutionMap(Map<String,String> map);
+    protected abstract O newObject();
 
-    public T deserialize(JsonObject object) {
+    public O deserialize(JsonObject object) {
         setTarget(newObject());
         for (Map.Entry<String,String> entry : remoteResolutionMap.entrySet()) {
             Object typed = getTyped(entry.getValue(), entry.getKey(), object);
@@ -34,7 +41,7 @@ public abstract class BaseSerializer<T> {
         return target;
     }
 
-    public JsonObject serialize(T target) {
+    public JsonObject serialize(O target) {
         setTarget(target);
         JsonObject object = new JsonObject();
         for (Map.Entry<String, String> entry : remoteResolutionMap.entrySet()) {
@@ -44,7 +51,7 @@ public abstract class BaseSerializer<T> {
     }
 
     /**
-     * Resolves
+     * Resolves a json object an tries
      * @param key
      * @param object
      * @return
@@ -57,7 +64,11 @@ public abstract class BaseSerializer<T> {
         Field field = getField(target.getClass(), objKey);
         Class<?> clazz = field.getType();
         if (clazz == Date.class) {
-            throw new SerializeException("unkown type");
+            try {
+                return dateFormat.parse(object.getAsJsonPrimitive(key).getAsString());
+            } catch (ParseException e) {
+                throw new SerializeException(e);
+            }
         } else if (clazz == Integer.class) {
             return object.getAsJsonPrimitive(key).getAsInt();
         } else if (clazz == Long.class) {
@@ -75,7 +86,7 @@ public abstract class BaseSerializer<T> {
         }
     }
 
-    public void setObjectProperty(String property, Object value) {
+    private void setObjectProperty(String property, Object value) {
         try {
             Field field = getField(target.getClass(), property);
             boolean accessible = field.isAccessible();
@@ -87,7 +98,7 @@ public abstract class BaseSerializer<T> {
         }
     }
 
-    public JsonElement getObjectProperty(String property) {
+    private JsonElement getObjectProperty(String property) {
         try {
             Field field = target.getClass().getField(property);
             boolean accessible = field.isAccessible();
@@ -108,7 +119,7 @@ public abstract class BaseSerializer<T> {
         }
     }
 
-    public Field getField(Class<?> clazz, String name) {
+    private Field getField(Class<?> clazz, String name) {
         try {
             return clazz.getDeclaredField(name);
         } catch (NoSuchFieldException e) {
@@ -119,7 +130,15 @@ public abstract class BaseSerializer<T> {
         }
     }
 
-    public void setTarget(T target) {
+    public void setDateFormat(DateFormat dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public DateFormat getDateFormat() {
+        return dateFormat;
+    }
+
+    protected void setTarget(O target) {
         this.target = target;
     }
 }
