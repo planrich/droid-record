@@ -29,11 +29,9 @@ import org.gradle.api.logging.Logging
  * %h3 Changelog
  *
  * Version 0.1.4:
- *   <ul>
- *       <li>Default values implemented for boolean,integer,long,double and string</li>
- *       <li>Migration (gradle command) now uses a number (starting from 1) instead of timestamp as prefix for migrations</li>
- *   </ul>
- * %br
+ * %ul
+ *   %li Default values implemented for boolean,integer,long,double and string
+ *   %li Migration (gradle command) now uses a number (starting from 1) instead of timestamp as prefix for migrations
  * Version 0.1.3: Toolchain adaption
  * %br
  * Version 0.1.2: Split projects
