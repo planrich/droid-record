@@ -1,0 +1,16 @@
+Getting Started
+===============
+
+If you used active record already you might find yourself
+very comfortable with this toolkit. Note that this is not an
+approach to clone active record as it would not make sense.
+After all ruby is a dynamic language moving a lot of it's functionality
+into the runtime. Java in this respect makes those things not that easy.
+Android is a mobile operating system and runs most likely on battery powered
+devices. Droid Record keeps that in mind and helps you to spend your time
+on the important stuff of your app, the business logic.
+
+
+`Setup`_
+
+.. _Setup: setup.html

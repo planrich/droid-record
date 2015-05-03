@@ -13,28 +13,6 @@ class HasAndBelongsTo extends Relation {
     def through
     def through_table
 
-    /*!
-     * @relations|has_and_belongs_to_options Has and belongs to options
-     * -#after relations|has_and_belongs_to
-     * %p
-     *   You can specify the following options in the has_and_belongs_to object:
-     *   %ul
-     *     %li
-     *       %strong many
-     *       \- the target table name it belongs to. In the case of many it is a list of objects,
-     *       in the other case it is just a single object
-     *     %li
-     *       %strong through
-     *       \- the intermediate table name
-     *     %li
-     *       %strong foreign_key_has
-     *       (optional). Specifies the name of the has foreign key. Use this if it differs
-     *       from the naming convention
-     *     %li
-     *       %strong foreign_key_belongs_to
-     *       (optional). Specifies the name of the foreign key it belongs to. Use it if its name
-     *       differs from the naming convention
-     */
     HasAndBelongsTo(Table origin) {
         super(origin)
     }

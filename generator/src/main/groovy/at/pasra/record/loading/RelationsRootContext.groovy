@@ -8,56 +8,6 @@ import javax.el.MethodNotFoundException;
 /**
  * Created by rich on 3/14/14.
  */
-
-/*!
- * @relations Relations
- * -#after migrations
- *
- * %p
- *   Relations are all specified in one file. By default this is
- *   %span.migration-ref relations.json
- *   \.
- *   Relationship between tables is just meta information. At migration time this meta
- *   information is used to type check the primary and foreign keys on the relation.
- *
- * %p
- *   In the following section the following migration is created before the relations
- *   are added.
- *
- * %span.filename 123456_pre_migration.json
- * %pre
- *   %code{ data: { language: 'dsl' } }
- *     :preserve
- *       create_table {
- *         name 'picture'
- *         fields {
- *           name 'string'
- *           data 'blob'
- *           gallery_id 'long'
- *         }
- *       }
- *       create_table {
- *         name 'gallery'
- *         fields {
- *           name 'string'
- *           user_id 'long'
- *         }
- *       }
- *       create_table {
- *         name 'user'
- *         fields {
- *           name 'string'
- *           age 'int'
- *         }
- *       }
- *       create_table {
- *         name 'user_picture'
- *         fields {
- *           user_id 'long'
- *           picture_id 'long'
- *         }
- *       }
- */
 class RelationsRootContext {
 
     MigrationContext context;

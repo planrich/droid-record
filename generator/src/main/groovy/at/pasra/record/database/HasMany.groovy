@@ -11,22 +11,6 @@ class HasMany extends Relation {
 
     def table
 
-    /*!
-     * @relations|has_many_options Has many options
-     * -#after relations|has_many
-     * %p
-     *   You can specify the following options:
-     *   %ul
-     *     %li
-     *       %strong foreign_key
-     *       \- the column name used to specify the foreign key. If this field is not specified
-     *       the target table name (singular) is used and '_id' is appended.
-     *       (e.g. target table name = 'stock_items', then the foreign key is 'stock_item_id')
-     *     %li
-     *       %strong many
-     *       \- the pluralized table name or a hashed singular table name (e.g 'stock_items' or '#STOCK_ITEM').
-     *       The hash should only be used when dealing with legacy databases.
-     */
     HasMany(Table origin) {
         super(origin)
     }

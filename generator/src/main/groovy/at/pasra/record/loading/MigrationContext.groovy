@@ -17,19 +17,6 @@ import org.gradle.api.logging.Logging
 /**
  * Created by rich on 9/8/13.
  */
-
-/*!
- * @migrations Record migrations
- * %p
- *   To handle changes in the database schema {?class:arname;DR} supports several commands in
- *   a migration change array.
- *   The items are evaluated one after another. That means
- *   that modifications take place in the order you define it.
- * %p
- *   {?class:arname;DR} provides migrations to create, drop, rename tables and add, remove
- *   and rename columns and a custom migration which gives you full control over the database.
- *
- */
 class MigrationContext {
 
     def logger = Logging.getLogger("droid_record")
@@ -148,56 +135,6 @@ class MigrationContext {
             this.path = p
         }
 
-        /*!
-         * @migrations|create_drop_table Creation and deletion
-         *
-         * %span.filename
-         *   12345678_table.json
-         * %pre
-         *   %code{ data: { language: 'dsl' } }
-         *     :preserve
-         *       create_table {
-         *         {?ref:name} 'picture'
-         *         {?ref:fields} {
-         *           {?ref:title} {
-         *             type 'string'
-         *             init 'empty'
-         *           }
-         *           likes 'integer'
-         *           data 'blob'
-         *           datetime 'date'
-         *         }
-         *       }
-         *       drop_table {
-         *         table 'picture'
-         *       }
-         *
-         * %p
-         *   In the example above a 'pictures' sql table will be created when the migration is run on Android.
-         *   The singular {?ref:name} will be used to address this relation.
-         *
-         * %p
-         *   Each key value pair of {?ref:fields}
-         *   is a column of the table with a specified type. In simple cases you can just specify
-         *   one of the following types.
-         *
-         *   %ul
-         *     %li string - java.lang.String
-         *     %li blob - byte[]
-         *     %li integer - java.lang.Integer
-         *     %li long - java.lang.Long
-         *     %li date - java.util.Date
-         *     %li boolean - java.lang.Boolean
-         *     %li double - java.lang.Double
-         *
-         *   %p
-         *     {?ref:title} has a more complex type and it specifies the initial (init) value of this column to be "empty".
-         *     Note that this value is then set in the constructor of a record object.
-         *   %p
-         *     The generated Picture.java file will have getters and setters of each column.
-         *
-         * After the drop command has been run all data will be lost. Forever!
-         */
         def create_table(Closure c) {
             def structCtx = [
                 'name': LoadUtil.&string,
@@ -238,44 +175,6 @@ class MigrationContext {
             migGen.rmTable(Inflector.sqlTableName(map.name), version);
         }
 
-        /*!
-         * @migrations|manage_columns Managing columns
-         * -#after migrations|rename_table
-         *
-         * %p
-         *   No record is limited to the fields you specify while creating the table. Adding,
-         *   removing and renaming of fields is just that easy:
-         *
-         * %span.filename
-         *   12345678_manage_columns.json
-         * %pre
-         *   %code{ data: { language: 'dsl' } }
-         *     :preserve
-         *       add_column {
-         *         table 'picture'
-         *         column 'description'{?ref:1}
-         *         type 'string'
-         *       }
-         *       remove_column {
-         *         table 'picture'
-         *         column 'datetime'{?ref:2}
-         *       }
-         *       rename_column {
-         *         table 'picture'
-         *         column 'title'{?ref:3}
-         *         to 'name'
-         *       }
-         *
-         * %p
-         *   Column {?ref:1} will be added as a new column to the table.
-         *   You can specify the same properties here which you can specify when creating a table.
-         *
-         * %p
-         *   {?ref:2} will be removed. Note that after this migration has been run the data is lost forever!
-         *
-         * %p
-         *   {?ref:3} gets a new name. Note that data conversion cannot be made here!
-         */
         def add_column(Closure c) {
             def structCtx = [
                 'column': LoadUtil.&string,
@@ -335,30 +234,6 @@ class MigrationContext {
             migGen.removeField(table, field, version)
         }
 
-        /*!
-         * @migrations|rename_table Changing the name
-         * -#after migrations|create_drop_table
-         *
-         * %p
-         *   Sometimes it can happen that a record receives the wrong name.
-         *   This mistake is easy to correct:
-         *
-         * %span.filename
-         *   12345678_rename_table.json
-         * %pre
-         *   %code{ data: { language: 'dsl' } }
-         *     :preserve
-         *       rename_table {
-         *         table 'picture'
-         *         to 'jpg_picture'
-         *       }
-         *
-         * %p
-         *   Before running
-         *   %code $ gradle migrate
-         *   you should consider renaming the Picture class to JpgPicture in your IDE.
-         *   By doing so you won't have to correct the code afterwards manually.
-         */
         def rename_table(Closure c) {
             def structCtx = [
                 'table': LoadUtil.&string,
@@ -381,36 +256,6 @@ class MigrationContext {
             tables[new_table_name] = table
         }
 
-        /*!
-        * @migrations|custom Custom migrations
-        * -#after migrations|manage_columns
-        *
-        * %p
-        *   When all the above would fail when migrating the database one can implement
-        *   the following interface:
-        * %span.filename DataMigrator.java
-        * %pre
-        *   %code{ data: { language: 'java' } }
-        *     :preserve
-        *       public interface DataMigrator {
-        *           //This custom migrator can be used when the normal migrations cannot handle
-         *          //the conversion. Do _NOT_ create, drop or alter tables. Droid Record
-         *          //cannot track these changes and this will lead to undefined behaviour.
-        *
-        *           //It is not advisable to use any generated class here. As this class
-        *           //might disappear in the app development process.
-        *           void migrate(SQLiteDatabase db, long currentVersion, long targetVersion);
-        *       }
-        *
-        * %p
-        *   Then add a migration and specifiy your DataMigrator subclass:
-        *
-        * %span.filename 123456_custom_migration.json
-        * %pre
-        *   %code{ data: { language: 'dsl' } }
-        *     :preserve
-        *         migrate_data { class_name 'org.your.company.DataMigratorImpl' }
-        */
         def migrate_data(Closure c) {
             def structCtx = [
                 'class_name': LoadUtil.&string,
@@ -421,5 +266,4 @@ class MigrationContext {
             migGen.dataMigrator(javaClassName, version);
         }
     }
-
 }
